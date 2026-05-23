@@ -24,19 +24,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ---------------------------
+      # WORKSPACE PREP
+      # ---------------------------
       - name: Prepare workspace
         shell: bash
         run: |
           set -euo pipefail
           rm -rf "$WORKSPACE"
           mkdir -p "$WORKSPACE"
+
           rsync -a \
             --delete \
             --exclude ".git" \
             --exclude ".godot" \
             ./ "$WORKSPACE/"
+
           rm -rf "$WORKSPACE/.godot"
 
+      # ---------------------------
+      # GODOT IMPORT
+      # ---------------------------
       - name: Import project
         shell: bash
         env:
@@ -45,6 +53,9 @@ jobs:
           set -euo pipefail
           "$GODOT" --headless --path "$WORKSPACE" --import --quit
 
+      # ---------------------------
+      # EXPORT WEB
+      # ---------------------------
       - name: Export web build
         shell: bash
         env:
@@ -66,19 +77,18 @@ jobs:
             --export-release Web \
             "$BUILD_DIR/index.html"
 
-      - name: Normalize Godot output (critical fix)
+      # ---------------------------
+      # REMOVE GODOT PWA LAYER
+      # ---------------------------
+      - name: Normalize Godot output
         shell: bash
         run: |
           set -euo pipefail
-
-          # remove Godot manifest (we own PWA now)
           rm -f "$BUILD_DIR/index.manifest.json"
 
-          # ensure clean naming stability
-          for f in "$BUILD_DIR"/icon_* "$BUILD_DIR"/index.*; do
-            [ -e "$f" ] || true
-          done
-
+      # ---------------------------
+      # CI-OWNED STATIC ASSETS
+      # ---------------------------
       - name: Copy CI-owned PWA assets
         shell: bash
         run: |
@@ -89,18 +99,19 @@ jobs:
           cp "$WORKSPACE/icon_512x512.png" "$BUILD_DIR/icon_512x512.png"
 
           mkdir -p "$BUILD_DIR/screenshots"
+
           cp "$WORKSPACE/desktop.png" "$BUILD_DIR/screenshots/desktop.png"
           cp "$WORKSPACE/mobile.png" "$BUILD_DIR/screenshots/mobile.png"
 
       # ---------------------------
-      # PWA MANIFEST (CI OWNED)
+      # MANIFEST (CI OWNED, VALID JSON)
       # ---------------------------
       - name: Generate manifest
         shell: bash
         run: |
           set -euo pipefail
 
-          cat > "$BUILD_DIR/manifest.webmanifest" <<'EOF'
+          cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
 {
   "id": "/index.html",
   "name": "doodleblob",
@@ -108,14 +119,26 @@ jobs:
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone"],
+  "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "any",
   "background_color": "#00b700",
   "theme_color": "#00b700",
   "icons": [
-    { "src": "/icon_144x144.png", "sizes": "144x144", "type": "image/png" },
-    { "src": "/icon_180x180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "/icon_512x512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/icon_144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon_180x180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ],
   "screenshots": [
     {
@@ -133,11 +156,15 @@ jobs:
 }
 EOF
 
+      # ---------------------------
+      # ROBOTS
+      # ---------------------------
       - name: Generate robots.txt
         shell: bash
         run: |
           set -euo pipefail
-          cat > "$BUILD_DIR/robots.txt" <<'EOF'
+
+          cat > "$BUILD_DIR/robots.txt" <<EOF
 User-agent: *
 Allow: /
 EOF
@@ -159,10 +186,10 @@ html = p.read_text(encoding="utf-8")
 
 bootstrap = """
 <script>
-/* ---- Lighthouse Bootstrap Layer ---- */
+/* Lighthouse Bootstrap Layer */
 
-/* Canvas fix */
-document.addEventListener("DOMContentLoaded", () => {
+/* Fix canvas sizing (prevents CLS + layout shift penalties) */
+window.addEventListener("load", () => {
   const c = document.getElementById("canvas");
   if (c) {
     c.style.width = "100vw";
@@ -170,8 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/* Audio unlock (no autoplay penalty loop spam) */
-(function () {
+/* Audio unlock (single interaction, no spam listeners) */
+(() => {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return;
 
@@ -179,21 +206,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const unlock = async () => {
     try { await ctx.resume(); } catch (e) {}
+    window.removeEventListener("click", unlock);
+    window.removeEventListener("touchstart", unlock);
+    window.removeEventListener("keydown", unlock);
   };
 
-  ["click","touchstart","keydown"].forEach(evt =>
-    window.addEventListener(evt, unlock, { once: true, passive: true })
-  );
+  window.addEventListener("click", unlock, { passive: true });
+  window.addEventListener("touchstart", unlock, { passive: true });
+  window.addEventListener("keydown", unlock, { passive: true });
 })();
 </script>
 """
 
-if "<meta name=\"viewport\"" in html:
-    html = html.replace(
-        '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">',
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
-    )
+# viewport fix (Lighthouse accessibility + mobile usability)
+html = html.replace(
+    'user-scalable=no,',
+    ''
+)
 
+# inject bootstrap
 html = html.replace("</head>", bootstrap + "\n</head>")
 
 p.write_text(html, encoding="utf-8")
@@ -206,24 +237,35 @@ PY
         shell: bash
         run: |
           set -euo pipefail
+
           test -f "$BUILD_DIR/index.html"
           test -f "$BUILD_DIR/index.js"
           test -f "$BUILD_DIR/index.wasm"
           test -f "$BUILD_DIR/index.pck"
           test -f "$BUILD_DIR/manifest.webmanifest"
 
+      # ---------------------------
+      # DEPLOY
+      # ---------------------------
       - name: Deploy
         shell: bash
         run: |
           set -euo pipefail
           ln -sfn "$BUILD_DIR" "$CURRENT"
 
+      # ---------------------------
+      # CLEANUP
+      # ---------------------------
       - name: Cleanup old releases
         shell: bash
         run: |
           set -euo pipefail
+
           KEEP=10
-          mapfile -t releases < <(find "$RELEASES" -mindepth 1 -maxdepth 1 -type d | sort -r)
+
+          mapfile -t releases < <(
+            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d | sort -r
+          )
 
           count=0
           for r in "${releases[@]}"; do
@@ -233,8 +275,11 @@ PY
             fi
           done
 
+      # ---------------------------
+      # STATUS
+      # ---------------------------
       - name: Show deployment
         shell: bash
         run: |
-          echo "Build: $BUILD_ID"
+          echo "Build ID: $BUILD_ID"
           echo "Current: $(readlink -f "$CURRENT")"
