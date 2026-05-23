@@ -100,6 +100,29 @@ jobs:
           cp "$WORKSPACE/mobile.png" \
             "$BUILD_DIR/screenshots/mobile.png"
 
+            - name: Add Lighthouse bootstrap layer
+  shell: bash
+  run: |
+    set -euo pipefail
+
+    cp bootstrap.js "$BUILD_DIR/bootstrap.js"
+
+    python3 - "$BUILD_DIR/index.html" <<'PY'
+from pathlib import Path
+import sys
+
+p = Path(sys.argv[1])
+html = p.read_text()
+
+if "bootstrap.js" not in html:
+    html = html.replace(
+        "</head>",
+        '  <script src="bootstrap.js" defer></script>\n</head>'
+    )
+
+p.write_text(html)
+PY
+
       - name: Generate CI-owned manifest
         shell: bash
         run: |
