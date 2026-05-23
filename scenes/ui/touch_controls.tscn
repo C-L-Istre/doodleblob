@@ -1,0 +1,172 @@
+[gd_scene format=3 uid="uid://beo0q1itvj6hp"]
+
+[ext_resource type="Texture2D" uid="uid://b1xxg8i8ascce" path="res://icon.svg" id="1_6wx45"]
+[ext_resource type="Texture2D" uid="uid://cik47pmkbif4j" path="res://assets/sprites/characters/Doodleblob-walk-left.png" id="1_notdv"]
+[ext_resource type="Texture2D" uid="uid://c4eqc31y00e1r" path="res://assets/sprites/characters/Doodleblob-walk-right.png" id="2_c1tq5"]
+[ext_resource type="Texture2D" uid="uid://iajx3hi7jtpk" path="res://assets/sprites/characters/Doodleblob-jump-icon.png" id="4_pefoi"]
+[ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="5_sayjt"]
+
+[node name="TouchControls" type="CanvasLayer" unique_id=1997154890]
+
+[node name="crouch" type="TouchScreenButton" parent="." unique_id=1581638040]
+visible = false
+position = Vector2(1696, 559)
+scale = Vector2(0.5, 0.269)
+texture_normal = ExtResource("1_6wx45")
+texture_pressed = ExtResource("1_6wx45")
+action = "crouch"
+
+[node name="action" type="TouchScreenButton" parent="." unique_id=447656533]
+visible = false
+position = Vector2(1758, 76)
+scale = Vector2(0.5, 0.269)
+texture_normal = ExtResource("1_6wx45")
+texture_pressed = ExtResource("1_6wx45")
+action = "ui_select"
+
+[node name="cancel" type="TouchScreenButton" parent="." unique_id=1734731170]
+visible = false
+position = Vector2(1758, 76)
+scale = Vector2(0.5, 0.269)
+texture_normal = ExtResource("1_6wx45")
+texture_pressed = ExtResource("1_6wx45")
+action = "ui_cancel"
+
+[node name="esc" type="TouchScreenButton" parent="." unique_id=1213357428]
+visible = false
+position = Vector2(44.000004, 42)
+scale = Vector2(0.76562494, 0.5859375)
+texture_normal = ExtResource("1_6wx45")
+texture_pressed = ExtResource("1_6wx45")
+action = "ui_end"
+
+[node name="MenuButtonContainer" type="HBoxContainer" parent="." unique_id=1080875536]
+offset_right = 134.0
+offset_bottom = 134.0
+
+[node name="MenuButton" type="TouchScreenButton" parent="MenuButtonContainer" unique_id=1290261326]
+texture_normal = ExtResource("1_6wx45")
+texture_pressed = ExtResource("1_6wx45")
+action = "pause"
+
+[node name="Label" type="Label" parent="MenuButtonContainer/MenuButton" unique_id=1559993191]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -22.5
+offset_top = -23.0
+offset_right = 22.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Menu"
+
+[node name="PauseMenu" parent="MenuButtonContainer/MenuButton" unique_id=1174273434 instance=ExtResource("5_sayjt")]
+
+[node name="DirectionButtonContainer" type="HBoxContainer" parent="." unique_id=1896679321]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -160.0
+offset_right = 327.0
+offset_bottom = -21.0
+grow_vertical = 0
+
+[node name="LeftButton" type="TouchScreenButton" parent="DirectionButtonContainer" unique_id=955666584]
+scale = Vector2(3, 3)
+texture_normal = ExtResource("1_notdv")
+texture_pressed = ExtResource("1_notdv")
+action = "move_left"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="DirectionButtonContainer/LeftButton" unique_id=2053723891]
+anchors_preset = -1
+anchor_top = 1.789
+anchor_bottom = 1.789
+offset_left = 0.33333337
+offset_top = -31.248003
+offset_right = 40.333332
+offset_bottom = -8.248001
+grow_vertical = 0
+text = "Left"
+
+[node name="Panel" type="Panel" parent="DirectionButtonContainer/LeftButton" unique_id=808627394]
+z_index = -1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -36.0
+offset_right = 36.0
+grow_vertical = 0
+
+[node name="RightButton" type="TouchScreenButton" parent="DirectionButtonContainer" unique_id=346669371]
+position = Vector2(192, 0)
+scale = Vector2(3, 3)
+texture_normal = ExtResource("2_c1tq5")
+texture_pressed = ExtResource("2_c1tq5")
+action = "move_right"
+visibility_mode = 1
+
+[node name="Panel2" type="Panel" parent="DirectionButtonContainer/RightButton" unique_id=294640801]
+z_index = -1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -18.0
+offset_top = -36.0
+offset_right = 18.0
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="DirectionButtonContainer/RightButton" unique_id=1773745155]
+offset_left = -3.0
+offset_top = 26.666666
+offset_right = 38.0
+offset_bottom = 49.666664
+text = "Right"
+metadata/_edit_use_anchors_ = true
+
+[node name="ActionButtonContainer" type="HBoxContainer" parent="." unique_id=651561239]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -173.0
+offset_top = -163.0
+offset_right = -44.0
+offset_bottom = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="JumpButton" type="TouchScreenButton" parent="ActionButtonContainer" unique_id=1931118649]
+rotation = -0.27052605
+scale = Vector2(2.9999998, 2.9999998)
+texture_normal = ExtResource("4_pefoi")
+texture_pressed = ExtResource("4_pefoi")
+action = "jump"
+visibility_mode = 1
+
+[node name="Panel3" type="Panel" parent="ActionButtonContainer/JumpButton" unique_id=67231611]
+z_index = -1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -36.0
+offset_top = -36.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="ActionButtonContainer/JumpButton" unique_id=1849400470]
+offset_left = -5.94946
+offset_top = 23.94771
+offset_right = 35.05054
+offset_bottom = 46.947712
+text = "Jump"

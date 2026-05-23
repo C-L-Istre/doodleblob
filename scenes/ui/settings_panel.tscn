@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://bvgn5wc0it5mu"]
+
+[ext_resource type="Script" uid="uid://cxfqdtjw3vg4v" path="res://scripts/settings_panel.gd" id="1_ea4bf"]
+
+[node name="SettingsPanel" type="Panel" unique_id=312149562]
+anchors_preset = -1
+offset_right = 216.0
+offset_bottom = 423.0
+script = ExtResource("1_ea4bf")
+
+[node name="Volume" type="VBoxContainer" parent="." unique_id=697691731]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -74.25
+offset_top = 15.0
+offset_right = 74.25
+offset_bottom = 163.0
+grow_horizontal = 2
+
+[node name="MainVolumeLabel" type="Label" parent="Volume" unique_id=345036925]
+layout_mode = 2
+text = "Main Volume"
+
+[node name="MainVolumeSlider" type="HSlider" parent="Volume" unique_id=1648554294]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MusicVolumeLabel" type="Label" parent="Volume" unique_id=1732342825]
+layout_mode = 2
+text = "Music Volume"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="Volume" unique_id=1920447091]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="SFXVolumeLabel" type="Label" parent="Volume" unique_id=775992233]
+layout_mode = 2
+text = "SFX Volume"
+
+[node name="SFXVolumeSlider" type="HSlider" parent="Volume" unique_id=1711530936]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Graphics" type="BoxContainer" parent="." unique_id=1042464327]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.5
+offset_top = -43.5
+offset_right = 60.5
+offset_bottom = 92.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Graphics" unique_id=343389192]
+layout_mode = 2
+
+[node name="FullscreenCheckBox" type="CheckBox" parent="Graphics/VBoxContainer" unique_id=331499760]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="VsyncCheckButton" type="CheckButton" parent="Graphics/VBoxContainer" unique_id=2064975304]
+layout_mode = 2
+disabled = true
+text = "Vsync"
+
+[node name="Label" type="Label" parent="Graphics/VBoxContainer" unique_id=949126827]
+layout_mode = 2
+text = "Resolution"
+
+[node name="ResolutionOptionButton" type="OptionButton" parent="Graphics/VBoxContainer" unique_id=916546468]
+layout_mode = 2
+item_count = 2
+popup/item_0/text = "option 1"
+popup/item_0/id = 0
+popup/item_1/text = "option 2"
+popup/item_1/id = 1
+
+[node name="Close" type="PanelContainer" parent="." unique_id=1917856799]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -97.0
+offset_top = -95.0
+offset_right = 94.0
+offset_bottom = -42.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="CloseSettingsButton" type="Button" parent="Close" unique_id=76915350]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Close"

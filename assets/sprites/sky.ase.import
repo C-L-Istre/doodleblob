@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://cqhqcemhwl3ie"
+path="res://.godot/imported/sky.ase-97135544af56b3e78d63f06c7175b53d.res"
+
+[deps]
+
+source_file="res://assets/sprites/sky.ase"
+dest_files=["res://.godot/imported/sky.ase-97135544af56b3e78d63f06c7175b53d.res"]
+
+[params]
+

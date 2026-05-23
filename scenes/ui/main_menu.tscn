@@ -1,0 +1,140 @@
+[gd_scene format=3 uid="uid://dka21svgen1vb"]
+
+[ext_resource type="Script" uid="uid://pouuwnhtfhe4" path="res://scripts/main_menu.gd" id="1_m1kxf"]
+[ext_resource type="Texture2D" uid="uid://b1xxg8i8ascce" path="res://icon.svg" id="2_x2yvf"]
+[ext_resource type="Texture2D" uid="uid://bd10j131t2wey" path="res://assets/sprites/npcs/KingOct.png" id="3_uhagc"]
+[ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="4_btxxm"]
+
+[node name="MainMenu" type="Control" unique_id=740505111]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_m1kxf")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=963263958]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 37.0
+offset_right = 327.0
+offset_bottom = 873.0
+scale = Vector2(0.75, 0.75)
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=608265347]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="PlayGameButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=470539406]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Play Game"
+icon = ExtResource("2_x2yvf")
+
+[node name="SelectLevelButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=447735588]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select Level"
+icon = ExtResource("2_x2yvf")
+
+[node name="SelectLevelPanel" type="ItemList" parent="CenterContainer/VBoxContainer/SelectLevelButton" unique_id=418572927]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.033
+anchor_top = 0.055000003
+anchor_right = 1.033
+anchor_bottom = 0.055000003
+offset_left = -4.075012
+offset_top = -148.48
+offset_right = 319.925
+offset_bottom = 685.52
+item_count = 4
+item_0/text = "Level 1"
+item_0/icon = ExtResource("2_x2yvf")
+item_1/text = "Level 2"
+item_1/icon = ExtResource("2_x2yvf")
+item_2/text = "Level 3"
+item_2/icon = ExtResource("2_x2yvf")
+item_3/text = "Bonus"
+item_3/icon = ExtResource("3_uhagc")
+
+[node name="HighscoreButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=2133948144]
+unique_name_in_owner = true
+layout_mode = 2
+text = "High Score"
+icon = ExtResource("2_x2yvf")
+
+[node name="HighscorePanel" type="Label" parent="CenterContainer/VBoxContainer/HighscoreButton" unique_id=2145263567]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0680001
+anchor_top = 0.13800001
+anchor_right = 1.0680001
+anchor_bottom = 0.13800001
+offset_left = -14.700012
+offset_top = -14.768002
+offset_right = 274.3
+offset_bottom = 112.231995
+text = "Itsada high score! "
+
+[node name="HelpButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=832029591]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Help"
+icon = ExtResource("2_x2yvf")
+
+[node name="HelpPanel" type="RichTextLabel" parent="CenterContainer/VBoxContainer/HelpButton" unique_id=1586638106]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.9330001
+anchor_right = 1.9330001
+offset_left = -213.25504
+offset_top = 2.0
+offset_right = 281.74496
+offset_bottom = 128.0
+tooltip_text = "Ughhh....
+
+If you REALLY need to know:
+
+Use WASD or Arrow keys to move (D-Pad or either Joystick when using a controller)
+
+Jump with the JUMP button (W, Space, Up arrow, D-pad up, A Button)
+
+Mobile controls are on the screen (Left, Right, Jump).
+
+And if you actually found and read all of this then you probably could have figured it out on your own
+
+C-L-I"
+text = "Figure it out! You ain't never played a game before?"
+
+[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1892021837]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Settings"
+icon = ExtResource("2_x2yvf")
+
+[node name="SettingsPanel" parent="CenterContainer/VBoxContainer/SettingsButton" unique_id=312149562 instance=ExtResource("4_btxxm")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchors_preset = 0
+offset_left = 254.0
+offset_top = -289.0
+offset_right = 470.0
+offset_bottom = 134.0
+
+[node name="ExitGameButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=129122344]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Exit"
+icon = ExtResource("2_x2yvf")

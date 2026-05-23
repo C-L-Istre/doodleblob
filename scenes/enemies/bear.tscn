@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://c84of0lh6sffq"]
+
+[ext_resource type="Texture2D" uid="uid://bd7bltnjslrxl" path="res://assets/sprites/enemies/SquareBear.png" id="1_aquv5"]
+[ext_resource type="Script" uid="uid://btxet1vmejij5" path="res://scripts/enemy.gd" id="1_v0uag"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mdfxs"]
+size = Vector2(26, 26)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_a5djg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_aquv5")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Bear" type="Area2D" unique_id=1518300592]
+collision_mask = 2
+script = ExtResource("1_v0uag")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=104046962]
+shape = SubResource("RectangleShape2D_mdfxs")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1131798373]
+sprite_frames = SubResource("SpriteFrames_a5djg")
+frame_progress = 0.053356078
+
+[node name="RayCastRight" type="RayCast2D" parent="." unique_id=1623374849]
+target_position = Vector2(20, 0)
+
+[node name="RayCastLeft" type="RayCast2D" parent="." unique_id=877884964]
+target_position = Vector2(-20, 0)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

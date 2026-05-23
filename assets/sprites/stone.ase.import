@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://dy6mlmq6q1ejf"
+path="res://.godot/imported/stone.ase-e50ffc6a4d0415a42730c66b9065192d.res"
+
+[deps]
+
+source_file="res://assets/sprites/stone.ase"
+dest_files=["res://.godot/imported/stone.ase-e50ffc6a4d0415a42730c66b9065192d.res"]
+
+[params]
+

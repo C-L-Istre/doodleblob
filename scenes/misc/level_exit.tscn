@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cgolhqm2ftq5r"]
+
+[ext_resource type="Script" uid="uid://cm06kfeqpjrap" path="res://scripts/level_exit.gd" id="1_olism"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_muv60"]
+size = Vector2(114, 20)
+
+[node name="LevelEnd" type="Area2D" unique_id=11591199 groups=["player"]]
+collision_mask = 2
+script = ExtResource("1_olism")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1032891990]
+position = Vector2(-2.0544353e-06, -47)
+rotation = -1.5707964
+shape = SubResource("RectangleShape2D_muv60")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

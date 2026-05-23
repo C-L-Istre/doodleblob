@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://wlmbjhsd1x0u"]
+
+[ext_resource type="Script" uid="uid://otq5i4wgqibl" path="res://scripts/pause_menu.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="2_0lmf7"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=1174273434]
+process_mode = 3
+layer = 10
+script = ExtResource("1")
+
+[node name="Overlay" type="ColorRect" parent="." unique_id=505097231]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=368805183]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -200.0
+offset_right = 150.0
+offset_bottom = 200.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=400973095]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer" unique_id=378132844]
+layout_mode = 2
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/VBoxContainer" unique_id=663497672]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="ButtonContainer" type="VBoxContainer" parent="Panel/VBoxContainer/MarginContainer" unique_id=639930907]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResumeButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer" unique_id=1499615217]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "Resume"
+
+[node name="SettingsButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer" unique_id=2072559907]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "Settings"
+
+[node name="SettingsPanel" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer/SettingsButton" unique_id=312149562 instance=ExtResource("2_0lmf7")]
+unique_name_in_owner = true
+layout_mode = 0
+anchors_preset = 0
+offset_left = 293.0
+offset_top = -107.0
+offset_right = 509.0
+offset_bottom = 316.0
+
+[node name="MainMenuButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer" unique_id=656031257]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "Main Menu"
+
+[node name="ExitButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer" unique_id=412490237]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "Exit Game"

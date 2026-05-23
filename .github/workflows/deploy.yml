@@ -1,0 +1,397 @@
+name: Deploy Godot Web
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: godot-web-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: [self-hosted, godot, proxmox]
+
+    env:
+      GODOT: /usr/local/bin/godot
+      WORKSPACE: /var/lib/godot/workspace
+      RELEASES: /var/www/godot/releases
+      CURRENT: /var/www/godot/current
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf "$WORKSPACE"
+          mkdir -p "$WORKSPACE"
+
+          rsync -a \
+            --delete \
+            --exclude ".git" \
+            --exclude ".godot" \
+            ./ "$WORKSPACE/"
+
+          rm -rf "$WORKSPACE/.godot"
+
+      - name: Import project
+        shell: bash
+        env:
+          HOME: /home/godot
+          GODOT_SILENCE_ROOT_WARNING: "1"
+        run: |
+          set -euo pipefail
+
+          "$GODOT" --headless \
+            --path "$WORKSPACE" \
+            --import --quit
+
+      - name: Export web build
+        shell: bash
+        env:
+          HOME: /home/godot
+          GODOT_SILENCE_ROOT_WARNING: "1"
+        run: |
+          set -euo pipefail
+
+          BUILD_ID="$(date +%s)-${GITHUB_SHA::7}"
+          BUILD_DIR="$RELEASES/$BUILD_ID"
+
+          rm -rf "$BUILD_DIR"
+          mkdir -p "$BUILD_DIR"
+
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+          echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
+
+          "$GODOT" --headless \
+            --path "$WORKSPACE" \
+            --export-release Web \
+            "$BUILD_DIR/index.html"
+
+      - name: Remove Godot-generated manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -f "$BUILD_DIR/index.manifest.json"
+
+      - name: Copy CI-owned PWA assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Copying icons..."
+          cp "$WORKSPACE/icon_144x144.png" "$BUILD_DIR/icon_144x144.png"
+          cp "$WORKSPACE/icon_180x180.png" "$BUILD_DIR/icon_180x180.png"
+          cp "$WORKSPACE/icon_512x512.png" "$BUILD_DIR/icon_512x512.png"
+
+          echo "Copying screenshots..."
+          mkdir -p "$BUILD_DIR/screenshots"
+
+          cp "$WORKSPACE/desktop.png" \
+            "$BUILD_DIR/screenshots/desktop.png"
+
+          cp "$WORKSPACE/mobile.png" \
+            "$BUILD_DIR/screenshots/mobile.png"
+
+      - name: Generate CI-owned manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat > "$BUILD_DIR/manifest.webmanifest" <<'EOF'
+          {
+            "id": "/index.html",
+            "name": "doodleblob",
+            "short_name": "doodleblob",
+            "description": "doodleblob",
+            "start_url": "/index.html",
+            "scope": "/",
+            "display": "standalone",
+            "display_override": [
+              "window-controls-overlay",
+              "standalone"
+            ],
+            "orientation": "any",
+            "background_color": "#00b700",
+            "theme_color": "#00b700",
+
+            "icons": [
+              {
+                "src": "/icon_144x144.png",
+                "sizes": "144x144",
+                "type": "image/png"
+              },
+              {
+                "src": "/icon_180x180.png",
+                "sizes": "180x180",
+                "type": "image/png"
+              },
+              {
+                "src": "/icon_512x512.png",
+                "sizes": "512x512",
+                "type": "image/png"
+              }
+            ],
+
+            "screenshots": [
+              {
+                "src": "/screenshots/desktop.png",
+                "sizes": "1280x720",
+                "type": "image/png",
+                "form_factor": "wide"
+              },
+              {
+                "src": "/screenshots/mobile.png",
+                "sizes": "1080x1920",
+                "type": "image/png"
+              }
+            ]
+          }
+          EOF
+
+      - name: Generate robots.txt
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat > "$BUILD_DIR/robots.txt" <<'EOF'
+          User-agent: *
+          Allow: /
+
+          #Sitemap: https://game.fretu.stream/sitemap.xml
+          EOF
+
+      - name: Patch index.html
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - "$BUILD_DIR/index.html" <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          path = Path(sys.argv[1])
+          html = path.read_text(encoding="utf-8")
+
+          # --------------------------------------------------
+          # Better viewport for Lighthouse accessibility
+          # --------------------------------------------------
+
+          html = html.replace(
+              '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">',
+              '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+          )
+
+          # --------------------------------------------------
+          # Remove Godot-generated manifest reference
+          # --------------------------------------------------
+
+          html = re.sub(
+              r'<link rel="manifest" href="index\.manifest\.json">\s*',
+              '',
+              html
+          )
+
+          # --------------------------------------------------
+          # Add CI-owned manifest + theme color
+          # --------------------------------------------------
+
+          inject_head = '''
+          <link rel="manifest" href="/manifest.webmanifest">
+
+          <link rel="canonical"
+                href="https://game.fretu.stream/">
+          
+          <meta name="theme-color" content="#00b700">
+          
+          <meta name="description"
+                content="doodleblob is a browser-based multiplayer sandbox game built with Godot.">
+          
+          <meta name="keywords"
+                content="godot, web game, multiplayer, sandbox, browser game">
+          
+          <meta name="author"
+                content="fretu.stream">
+          
+          <meta property="og:type"
+                content="website">
+          
+          <meta property="og:title"
+                content="doodleblob">
+          
+          <meta property="og:description"
+                content="Play doodleblob directly in your browser.">
+          
+          <meta property="og:url"
+                content="https://game.fretu.stream/">
+          
+          <meta property="og:image"
+                content="https://game.fretu.stream/icon_512x512.png">
+          
+          <meta name="twitter:card"
+                content="summary_large_image">
+          
+          <meta name="twitter:title"
+                content="doodleblob">
+          
+          <meta name="twitter:description"
+                content="Play doodleblob directly in your browser.">
+          
+          <meta name="twitter:image"
+                content="https://game.fretu.stream/icon_512x512.png">
+          '''
+
+          html = html.replace(
+              '</head>',
+              inject_head + '\n</head>'
+          )
+
+          # --------------------------------------------------
+          # Improve body/canvas sizing
+          # --------------------------------------------------
+
+          html = html.replace(
+              'overflow: hidden;',
+              'overflow: hidden;\n        width: 100vw;\n        height: 100vh;'
+          )
+
+          html = html.replace(
+              '#canvas {\n        display: block;\n}',
+              '#canvas {\n        display: block;\n        width: 100vw;\n        height: 100vh;\n}'
+          )
+
+          # --------------------------------------------------
+          # Inject audio unlock helper
+          # --------------------------------------------------
+
+          audio_unlock = r'''
+          <script>
+          function unlockAudio() {
+            const AudioContext =
+              window.AudioContext || window.webkitAudioContext;
+
+            if (!AudioContext) return;
+
+            const ctx = new AudioContext();
+
+            const resume = async () => {
+              if (ctx.state === "suspended") {
+                try {
+                  await ctx.resume();
+                } catch (_) {}
+              }
+
+              document.removeEventListener("click", resume);
+              document.removeEventListener("touchstart", resume);
+              document.removeEventListener("keydown", resume);
+            };
+
+            document.addEventListener("click", resume, { passive: true });
+            document.addEventListener("touchstart", resume, { passive: true });
+            document.addEventListener("keydown", resume, { passive: true });
+          }
+
+          unlockAudio();
+          </script>
+          '''
+
+          html = html.replace(
+              '<noscript>',
+              audio_unlock + '\n<noscript>'
+          )
+
+          # --------------------------------------------------
+          # Disable COI/service worker injection logic
+          # avoids unstable Lighthouse/service-worker edge cases
+          # --------------------------------------------------
+
+          html = html.replace(
+              '"ensureCrossOriginIsolationHeaders":true',
+              '"ensureCrossOriginIsolationHeaders":false'
+          )
+
+          path.write_text(html, encoding="utf-8")
+          PY
+
+      - name: Validate output
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REQUIRED_FILES=(
+            index.html
+            index.js
+            index.wasm
+            index.pck
+            manifest.webmanifest
+            icon_144x144.png
+            icon_180x180.png
+            icon_512x512.png
+            screenshots/desktop.png
+            screenshots/mobile.png
+          )
+
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [[ ! -f "$BUILD_DIR/$file" ]]; then
+              echo "Missing required file: $file"
+              exit 1
+            fi
+          done
+
+          echo
+          echo "Final build contents:"
+          find "$BUILD_DIR" -maxdepth 2 -type f | sort
+
+      - name: Deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ln -sfn "$BUILD_DIR" "$CURRENT"
+
+          echo
+          echo "Deployment complete"
+          echo "Current release:"
+          readlink -f "$CURRENT"
+
+      - name: Cleanup old releases
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          KEEP=10
+
+          mapfile -t releases < <(
+            find "$RELEASES" \
+              -mindepth 1 \
+              -maxdepth 1 \
+              -type d \
+              | sort -r
+          )
+
+          count=0
+
+          for release in "${releases[@]}"; do
+            count=$((count + 1))
+
+            if [[ "$count" -gt "$KEEP" ]]; then
+              echo "Removing old release: $release"
+              rm -rf "$release"
+            fi
+          done
+
+      - name: Show deployment info
+        shell: bash
+        run: |
+          echo "Build ID: $BUILD_ID"
+          echo "Build Dir: $BUILD_DIR"
+          echo "Current Symlink:"
+          ls -la "$CURRENT"

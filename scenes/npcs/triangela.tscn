@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://7cd1csawdkwd"]
+
+[ext_resource type="Texture2D" uid="uid://d3iamh3holr21" path="res://assets/sprites/npcs/PrincessTriangela.png" id="1_l8kju"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qplbt"]
+atlas = ExtResource("1_l8kju")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qnifl"]
+atlas = ExtResource("1_l8kju")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_s5r76"]
+animations = [{
+"frames": [{
+"duration": 3.0,
+"texture": SubResource("AtlasTexture_qplbt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qnifl")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_27vpw"]
+size = Vector2(10, 26)
+
+[node name="Triangela" type="CharacterBody2D" unique_id=1107866423]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=379029911]
+sprite_frames = SubResource("SpriteFrames_s5r76")
+animation = &"idle"
+autoplay = "idle"
+frame_progress = 0.1764631
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=307942677]
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_27vpw")
