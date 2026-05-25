@@ -112,5 +112,3 @@ EOF
 - Required browser headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`) are set by Caddy and are verified on each deploy — these are mandatory for Godot's multithreaded web export
 <<<<<<< Updated upstream
 - WE'RE BACK!!!!!
-=======
->>>>>>> Stashed changes
