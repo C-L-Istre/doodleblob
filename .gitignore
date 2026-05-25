@@ -1,2 +1,4 @@
 addons/
+exports/
 .godot/
+*.bak
