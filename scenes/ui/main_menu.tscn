@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dka21svgen1vb"]
 
 [ext_resource type="Script" uid="uid://pouuwnhtfhe4" path="res://scripts/main_menu.gd" id="1_m1kxf"]
-[ext_resource type="Texture2D" uid="uid://cvr4oegeylpsy" path="res://96x96_placeholder_texture_2d.tres" id="2_uhagc"]
+[ext_resource type="Texture2D" uid="uid://cvr4oegeylpsy" path="res://assets/sprites/placeholder/96x96_placeholder_texture_2d.tres" id="2_uhagc"]
 [ext_resource type="Texture2D" uid="uid://b1xxg8i8ascce" path="res://icon.svg" id="2_x2yvf"]
 [ext_resource type="Texture2D" uid="uid://bd10j131t2wey" path="res://assets/sprites/npcs/KingOct.png" id="3_uhagc"]
 [ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="4_btxxm"]

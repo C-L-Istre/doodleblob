@@ -15,7 +15,6 @@ func _ready() -> void:
 	main_menu_button.pressed.connect(_on_main_menu_pressed)
 	exit_button.pressed.connect(_on_exit_pressed)
 
-	# Hide exit button on platforms where quitting isn't supported
 	exit_button.visible = PlatformDetection.can_quit()
 
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -34,8 +33,6 @@ func _pause() -> void:
 func _resume() -> void:
 	get_tree().paused = false
 	hide()
-	# Ensure settings panel is also closed when resuming so it doesn't
-	# remain open with the tree unpaused on next pause cycle
 	settings_panel.hide()
 
 func _on_resume_pressed() -> void:

@@ -31,7 +31,6 @@ const RESOLUTIONS := [
 var config := ConfigFile.new()
 
 func _ready() -> void:
-	# Hide display controls that have no effect outside desktop
 	var is_desktop := PlatformDetection.can_quit()
 	fullscreen_checkbox.visible      = is_desktop
 	vsync_check_button.visible       = is_desktop
@@ -146,8 +145,6 @@ func _on_sfx_mute_button_toggled(toggled_on: bool) -> void:
 	AudioServer.set_bus_mute(BUS_SFX, toggled_on)
 	config.set_value("audio", "sfx_muted", toggled_on)
 	save_settings()
-
-# ── Display signal handlers (desktop only) ─────────────────────────────────────
 
 func _on_resolution_option_button_item_selected(index: int) -> void:
 	if not PlatformDetection.can_quit():
