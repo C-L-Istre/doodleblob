@@ -18,7 +18,8 @@ jobs:
       GODOT: /usr/local/bin/godot
       WORKSPACE: /var/lib/godot/workspace
       RELEASES: /var/www/godot/releases
-      CURRENT: /var/www/godot/current
+
+      PRODUCTION: /var/www/godot/production
       STAGING: /var/www/godot/staging
 
     steps:
@@ -79,7 +80,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           rm -f "$BUILD_DIR/index.manifest.json"
 
       - name: Copy CI-owned PWA assets
@@ -87,12 +87,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "Copying icons..."
           cp "$WORKSPACE/icon_144x144.png" "$BUILD_DIR/icon_144x144.png"
           cp "$WORKSPACE/icon_180x180.png" "$BUILD_DIR/icon_180x180.png"
           cp "$WORKSPACE/icon_512x512.png" "$BUILD_DIR/icon_512x512.png"
 
-          echo "Copying screenshots..."
           mkdir -p "$BUILD_DIR/screenshots"
 
           cp "$WORKSPACE/desktop.png" "$BUILD_DIR/screenshots/desktop.png"
@@ -256,10 +254,7 @@ jobs:
                 content="https://game.fretu.stream/icon_512x512.png">
           '''
 
-          html = html.replace(
-              '</head>',
-              inject_head + '\n</head>'
-          )
+          html = html.replace("</head>", inject_head + "\n</head>")
 
           html = html.replace(
               'overflow: hidden;',
@@ -302,10 +297,7 @@ jobs:
           </script>
           '''
 
-          html = html.replace(
-              '<noscript>',
-              audio_unlock + '\n<noscript>'
-          )
+          html = html.replace("<noscript>", audio_unlock + "\n<noscript>")
 
           html = html.replace(
               '"ensureCrossOriginIsolationHeaders":true',
@@ -341,10 +333,6 @@ jobs:
             fi
           done
 
-          echo
-          echo "Final build contents:"
-          find "$BUILD_DIR" -maxdepth 2 -type f | sort
-
       - name: Deploy
         shell: bash
         run: |
@@ -352,14 +340,10 @@ jobs:
 
           case "$GITHUB_REF_NAME" in
             main)
-              ln -sfn "$BUILD_DIR" "$CURRENT"
-              echo "Production deploy to: $CURRENT"
-              readlink -f "$CURRENT"
+              TARGET="$PRODUCTION"
               ;;
             staging)
-              ln -sfn "$BUILD_DIR" "$STAGING"
-              echo "Staging deploy to: $STAGING"
-              readlink -f "$STAGING"
+              TARGET="$STAGING"
               ;;
             *)
               echo "Unsupported branch: $GITHUB_REF_NAME"
@@ -367,8 +351,10 @@ jobs:
               ;;
           esac
 
-          echo
-          echo "Deployment complete"
+          ln -sfn "$BUILD_DIR" "$TARGET"
+
+          echo "Deployed to: $TARGET"
+          readlink -f "$TARGET"
 
       - name: Cleanup old releases
         shell: bash
@@ -391,17 +377,6 @@ jobs:
             count=$((count + 1))
 
             if [[ "$count" -gt "$KEEP" ]]; then
-              echo "Removing old release: $release"
               rm -rf "$release"
             fi
           done
-
-      - name: Show deployment info
-        shell: bash
-        run: |
-          echo "Build ID: $BUILD_ID"
-          echo "Build Dir: $BUILD_DIR"
-          echo "Current Symlink:"
-          ls -la "$CURRENT"
-          echo "Staging Symlink:"
-          ls -la "$STAGING"
