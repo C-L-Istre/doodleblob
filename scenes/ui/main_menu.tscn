@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dka21svgen1vb"]
 
 [ext_resource type="Script" uid="uid://pouuwnhtfhe4" path="res://scripts/main_menu.gd" id="1_m1kxf"]
+[ext_resource type="Texture2D" uid="uid://cvr4oegeylpsy" path="res://96x96_placeholder_texture_2d.tres" id="2_uhagc"]
 [ext_resource type="Texture2D" uid="uid://b1xxg8i8ascce" path="res://icon.svg" id="2_x2yvf"]
 [ext_resource type="Texture2D" uid="uid://bd10j131t2wey" path="res://assets/sprites/npcs/KingOct.png" id="3_uhagc"]
 [ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="4_btxxm"]
@@ -15,33 +16,35 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_m1kxf")
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=963263958]
-layout_mode = 0
-offset_left = 52.0
-offset_top = 37.0
-offset_right = 327.0
-offset_bottom = 873.0
-scale = Vector2(0.75, 0.75)
-mouse_filter = 2
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1832448155]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_right = -20.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=608265347]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1778714318]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
-mouse_filter = 2
-alignment = 1
+size_flags_horizontal = 0
+size_flags_vertical = 4
 
-[node name="PlayGameButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=470539406]
+[node name="PlayGameButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=470539406]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Play Game"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
-[node name="SelectLevelButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=447735588]
+[node name="SelectLevelButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=447735588]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Select Level"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
-[node name="SelectLevelPanel" type="ItemList" parent="CenterContainer/VBoxContainer/SelectLevelButton" unique_id=418572927]
+[node name="SelectLevelPanel" type="ItemList" parent="MarginContainer/VBoxContainer/SelectLevelButton" unique_id=418572927]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -64,13 +67,13 @@ item_2/icon = ExtResource("2_x2yvf")
 item_3/text = "Bonus"
 item_3/icon = ExtResource("3_uhagc")
 
-[node name="HighscoreButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=2133948144]
+[node name="HighscoreButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2133948144]
 unique_name_in_owner = true
 layout_mode = 2
 text = "High Score"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
-[node name="HighscorePanel" type="Label" parent="CenterContainer/VBoxContainer/HighscoreButton" unique_id=2145263567]
+[node name="HighscorePanel" type="Label" parent="MarginContainer/VBoxContainer/HighscoreButton" unique_id=2145263567]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -85,13 +88,13 @@ offset_right = 274.3
 offset_bottom = 112.231995
 text = "Itsada high score! "
 
-[node name="HelpButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=832029591]
+[node name="HelpButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=832029591]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Help"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
-[node name="HelpPanel" type="RichTextLabel" parent="CenterContainer/VBoxContainer/HelpButton" unique_id=1586638106]
+[node name="HelpPanel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HelpButton" unique_id=1586638106]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -117,24 +120,24 @@ And if you actually found and read all of this then you probably could have figu
 C-L-I"
 text = "Figure it out! You ain't never played a game before?"
 
-[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1892021837]
+[node name="SettingsButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1892021837]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Settings"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
-[node name="SettingsPanel" parent="CenterContainer/VBoxContainer/SettingsButton" unique_id=312149562 instance=ExtResource("4_btxxm")]
+[node name="SettingsPanel" parent="MarginContainer/VBoxContainer/SettingsButton" unique_id=312149562 instance=ExtResource("4_btxxm")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
 anchors_preset = 0
-offset_left = 254.0
-offset_top = -289.0
-offset_right = 470.0
-offset_bottom = 134.0
+offset_left = 236.0
+offset_top = -324.0
+offset_right = 476.0
+offset_bottom = 104.0
 
-[node name="ExitGameButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=129122344]
+[node name="ExitGameButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=129122344]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Exit"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
