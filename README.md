@@ -110,5 +110,3 @@ EOF
 - Builds are triggered automatically on every push to `main` or `master`
 - The 10 most recent builds are retained on disk; older ones are deleted automatically
 - Required browser headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`) are set by Caddy and are verified on each deploy — these are mandatory for Godot's multithreaded web export
-<<<<<<< Updated upstream
-- WE'RE BACK!!!!!
