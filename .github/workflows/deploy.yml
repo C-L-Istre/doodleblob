@@ -91,24 +91,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          cp "$WORKSPACE/PWA/icon_144x144.png" "$BUILD_DIR/icon_144x144.png"
-          cp "$WORKSPACE/PWA/icon_180x180.png" "$BUILD_DIR/icon_180x180.png"
-          cp "$WORKSPACE/PWA/icon_512x512.png" "$BUILD_DIR/icon_512x512.png"
+          cp "$WORKSPACE/.github/PWA/icon_144x144.png" "$BUILD_DIR/icon_144x144.png"
+          cp "$WORKSPACE/.github/PWA/icon_180x180.png" "$BUILD_DIR/icon_180x180.png"
+          cp "$WORKSPACE/.github/PWA/icon_512x512.png" "$BUILD_DIR/icon_512x512.png"
 
           mkdir -p "$BUILD_DIR/screenshots"
 
-          cp "$WORKSPACE/PWA/desktop.png" "$BUILD_DIR/screenshots/desktop.png"
-          cp "$WORKSPACE/PWA/mobile.png" "$BUILD_DIR/screenshots/mobile.png"
+          cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/desktop.png"
+          cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/mobile.png"
 
       - name: Add Lighthouse bootstrap layer
         shell: bash
         run: |
           set -euo pipefail
 
-          if [[ -f "$WORKSPACE/PWA/bootstrap.js" ]]; then
+          if [[ -f "$WORKSPACE/.github/PWA/bootstrap.js" ]]; then
           echo "bootstrap.js found"
 
-          cp "$WORKSPACE/PWA/bootstrap.js" "$BUILD_DIR/bootstrap.js"
+          cp "$WORKSPACE/.github/PWA/bootstrap.js" "$BUILD_DIR/bootstrap.js"
 
           python3 - "$BUILD_DIR/index.html" <<'PY'
           from pathlib import Path
