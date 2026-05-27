@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dka21svgen1vb"]
 
 [ext_resource type="Script" uid="uid://pouuwnhtfhe4" path="res://scripts/main_menu.gd" id="1_m1kxf"]
+[ext_resource type="Texture2D" uid="uid://cvr4oegeylpsy" path="res://assets/placeholder/96x96_placeholder_texture_2d.tres" id="2_uhagc"]
 [ext_resource type="Texture2D" uid="uid://b1xxg8i8ascce" path="res://icon.svg" id="2_x2yvf"]
 [ext_resource type="Texture2D" uid="uid://bd10j131t2wey" path="res://assets/sprites/npcs/KingOct.png" id="3_uhagc"]
 [ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="4_btxxm"]
@@ -33,13 +34,13 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 text = "Play Game"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
 [node name="SelectLevelButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=447735588]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Select Level"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
 [node name="SelectLevelPanel" type="ItemList" parent="CenterContainer/VBoxContainer/SelectLevelButton" unique_id=418572927]
 unique_name_in_owner = true
@@ -68,7 +69,7 @@ item_3/icon = ExtResource("3_uhagc")
 unique_name_in_owner = true
 layout_mode = 2
 text = "High Score"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
 [node name="HighscorePanel" type="Label" parent="CenterContainer/VBoxContainer/HighscoreButton" unique_id=2145263567]
 unique_name_in_owner = true
@@ -89,7 +90,7 @@ text = "Itsada high score! "
 unique_name_in_owner = true
 layout_mode = 2
 text = "Help"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
 [node name="HelpPanel" type="RichTextLabel" parent="CenterContainer/VBoxContainer/HelpButton" unique_id=1586638106]
 unique_name_in_owner = true
@@ -121,7 +122,7 @@ text = "Figure it out! You ain't never played a game before?"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Settings"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
 
 [node name="SettingsPanel" parent="CenterContainer/VBoxContainer/SettingsButton" unique_id=312149562 instance=ExtResource("4_btxxm")]
 unique_name_in_owner = true
@@ -137,4 +138,4 @@ offset_bottom = 134.0
 unique_name_in_owner = true
 layout_mode = 2
 text = "Exit"
-icon = ExtResource("2_x2yvf")
+icon = ExtResource("2_uhagc")
