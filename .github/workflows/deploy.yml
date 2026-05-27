@@ -102,25 +102,25 @@ jobs:
           set -euo pipefail
 
           if [[ -f "$WORKSPACE/bootstrap.js" ]]; then
-            echo "bootstrap.js found"
+          echo "bootstrap.js found"
 
-            cp "$WORKSPACE/bootstrap.js" "$BUILD_DIR/bootstrap.js"
+          cp "$WORKSPACE/bootstrap.js" "$BUILD_DIR/bootstrap.js"
 
-            python3 - "$BUILD_DIR/index.html" <<'PY'
-            from pathlib import Path
-            import sys
+          python3 - "$BUILD_DIR/index.html" <<'PY'
+          from pathlib import Path
+          import sys
 
-            p = Path(sys.argv[1])
-            html = p.read_text()
+          p = Path(sys.argv[1])
+          html = p.read_text()
 
-            if "bootstrap.js" not in html:
+          if "bootstrap.js" not in html:
                 html = html.replace(
                     "</head>",
                     '  <script src="bootstrap.js" defer></script>\n</head>'
                 )
 
-            p.write_text(html)
-            PY
+          p.write_text(html)
+          PY
 
           else
             echo "bootstrap.js not present, skipping"
@@ -330,7 +330,6 @@ jobs:
             icon_512x512.png
             screenshots/desktop.png
             screenshots/mobile.png
-            bootstrap.js
           )
 
           for file in "${REQUIRED_FILES[@]}"; do
