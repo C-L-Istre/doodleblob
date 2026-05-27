@@ -101,23 +101,30 @@ jobs:
         run: |
           set -euo pipefail
 
-          cp "$WORKSPACE/bootstrap.js" "$BUILD_DIR/bootstrap.js"
+          if [[ -f "$WORKSPACE/bootstrap.js" ]]; then
+            echo "bootstrap.js found"
 
-          python3 - "$BUILD_DIR/index.html" <<'PY'
-          from pathlib import Path
-          import sys
+            cp "$WORKSPACE/bootstrap.js" "$BUILD_DIR/bootstrap.js"
 
-          p = Path(sys.argv[1])
-          html = p.read_text()
+            python3 - "$BUILD_DIR/index.html" <<'PY'
+            from pathlib import Path
+            import sys
 
-          if "bootstrap.js" not in html:
-              html = html.replace(
-                  "</head>",
-                  '  <script src="bootstrap.js" defer></script>\n</head>'
-              )
+            p = Path(sys.argv[1])
+            html = p.read_text()
 
-          p.write_text(html)
-          PY
+            if "bootstrap.js" not in html:
+                html = html.replace(
+                    "</head>",
+                    '  <script src="bootstrap.js" defer></script>\n</head>'
+                )
+
+            p.write_text(html)
+            PY
+
+          else
+            echo "bootstrap.js not present, skipping"
+          fi
 
       - name: Generate CI-owned manifest
         shell: bash
