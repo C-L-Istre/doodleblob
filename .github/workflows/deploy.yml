@@ -28,7 +28,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Load config
-        run: source .github/config.env
+        run: |
+          set -euo pipefail
+          source .github/config.env
+          echo "DOMAIN=$DOMAIN" >> $GITHUB_ENV
+          echo "THEME_COLOR=$THEME_COLOR" >> $GITHUB_ENV
 
       - name: Set deployment metadata
         shell: bash
