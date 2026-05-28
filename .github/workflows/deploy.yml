@@ -33,6 +33,7 @@ jobs:
           source .github/config.env
           echo "DOMAIN=$DOMAIN" >> $GITHUB_ENV
           echo "THEME_COLOR=$THEME_COLOR" >> $GITHUB_ENV
+          echo "GAME_NAME=${GAME_NAME:-${{ github.event.repository.name }}}" >> "$GITHUB_ENV"
 
       - name: Set deployment metadata
         shell: bash
