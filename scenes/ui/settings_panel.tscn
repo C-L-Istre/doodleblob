@@ -6,106 +6,185 @@
 anchors_preset = -1
 offset_right = 216.0
 offset_bottom = 423.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_ea4bf")
 
-[node name="Volume" type="VBoxContainer" parent="." unique_id=697691731]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1009959844]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -74.25
-offset_top = 15.0
-offset_right = 74.25
-offset_bottom = 163.0
-grow_horizontal = 2
-
-[node name="MainVolumeLabel" type="Label" parent="Volume" unique_id=345036925]
-layout_mode = 2
-text = "Main Volume"
-
-[node name="MainVolumeSlider" type="HSlider" parent="Volume" unique_id=1648554294]
-unique_name_in_owner = true
-layout_mode = 2
-max_value = 1.0
-step = 0.01
-value = 1.0
-
-[node name="MusicVolumeLabel" type="Label" parent="Volume" unique_id=1732342825]
-layout_mode = 2
-text = "Music Volume"
-
-[node name="MusicVolumeSlider" type="HSlider" parent="Volume" unique_id=1920447091]
-unique_name_in_owner = true
-layout_mode = 2
-max_value = 1.0
-step = 0.01
-value = 1.0
-
-[node name="SFXVolumeLabel" type="Label" parent="Volume" unique_id=775992233]
-layout_mode = 2
-text = "SFX Volume"
-
-[node name="SFXVolumeSlider" type="HSlider" parent="Volume" unique_id=1711530936]
-unique_name_in_owner = true
-layout_mode = 2
-max_value = 1.0
-step = 0.01
-value = 1.0
-
-[node name="Graphics" type="BoxContainer" parent="." unique_id=1042464327]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -60.5
-offset_top = -43.5
-offset_right = 60.5
-offset_bottom = 92.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_right = -3.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Graphics" unique_id=343389192]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=746526884]
 layout_mode = 2
 
-[node name="FullscreenCheckBox" type="CheckBox" parent="Graphics/VBoxContainer" unique_id=331499760]
+[node name="SettingsPanelLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1610985472]
+layout_mode = 2
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 3
+
+[node name="SettingsTitleHSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=863319614]
+light_mask = 0
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="VolumeVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=697691731]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+
+[node name="MainVolumeHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VolumeVBox" unique_id=924727754]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="MainVolumeLabel" type="Label" parent="MarginContainer/VBoxContainer/VolumeVBox/MainVolumeHBox" unique_id=345036925]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "Main Volume"
+
+[node name="MainMuteButton" type="CheckButton" parent="MarginContainer/VBoxContainer/VolumeVBox/MainVolumeHBox" unique_id=377719730]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Fullscreen"
+size_flags_horizontal = 10
+size_flags_vertical = 4
+text = "Mute"
+alignment = 2
+icon_alignment = 1
 
-[node name="VsyncCheckButton" type="CheckButton" parent="Graphics/VBoxContainer" unique_id=2064975304]
+[node name="MainVolumeSlider" type="HSlider" parent="MarginContainer/VBoxContainer/VolumeVBox" unique_id=1648554294]
+unique_name_in_owner = true
 layout_mode = 2
-disabled = true
-text = "Vsync"
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 2.0
+max_value = 1.0
+step = 0.01
+value = 1.0
 
-[node name="Label" type="Label" parent="Graphics/VBoxContainer" unique_id=949126827]
+[node name="MusicVolumeHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VolumeVBox" unique_id=1581269838]
 layout_mode = 2
+size_flags_vertical = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="MarginContainer/VBoxContainer/VolumeVBox/MusicVolumeHBox" unique_id=1732342825]
+layout_mode = 2
+text = "Music Volume"
+
+[node name="MusicMuteButton" type="CheckButton" parent="MarginContainer/VBoxContainer/VolumeVBox/MusicVolumeHBox" unique_id=2000722345]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+text = "Mute"
+alignment = 2
+icon_alignment = 1
+
+[node name="MusicVolumeSlider" type="HSlider" parent="MarginContainer/VBoxContainer/VolumeVBox" unique_id=1920447091]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="SFXVolumeHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VolumeVBox" unique_id=491926736]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="SFXVolumeLabel" type="Label" parent="MarginContainer/VBoxContainer/VolumeVBox/SFXVolumeHBox" unique_id=775992233]
+layout_mode = 2
+text = "SFX Volume"
+
+[node name="SFXMuteButton" type="CheckButton" parent="MarginContainer/VBoxContainer/VolumeVBox/SFXVolumeHBox" unique_id=1565479990]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+text = "Mute"
+alignment = 2
+icon_alignment = 1
+
+[node name="SFXVolumeSlider" type="HSlider" parent="MarginContainer/VBoxContainer/VolumeVBox" unique_id=1711530936]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=1716764796]
+light_mask = 0
+visibility_layer = 0
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GraphicsVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=343389192]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResolutionLabel" type="Label" parent="MarginContainer/VBoxContainer/GraphicsVBox" unique_id=949126827]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
 text = "Resolution"
 
-[node name="ResolutionOptionButton" type="OptionButton" parent="Graphics/VBoxContainer" unique_id=916546468]
+[node name="ResolutionOptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/GraphicsVBox" unique_id=916546468]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 2
 item_count = 2
 popup/item_0/text = "option 1"
 popup/item_0/id = 0
 popup/item_1/text = "option 2"
 popup/item_1/id = 1
 
-[node name="Close" type="PanelContainer" parent="." unique_id=1917856799]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -97.0
-offset_top = -95.0
-offset_right = 94.0
-offset_bottom = -42.0
-grow_horizontal = 2
-grow_vertical = 0
+[node name="HSeparator3" type="HSeparator" parent="MarginContainer/VBoxContainer/GraphicsVBox" unique_id=1821717006]
+light_mask = 0
+visibility_layer = 0
+layout_mode = 2
+size_flags_vertical = 2
 
-[node name="CloseSettingsButton" type="Button" parent="Close" unique_id=76915350]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/GraphicsVBox" unique_id=1519389662]
+layout_mode = 2
+
+[node name="FullscreenCheckBox" type="CheckBox" parent="MarginContainer/VBoxContainer/GraphicsVBox/HBoxContainer" unique_id=331499760]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fullscreen"
+
+[node name="VsyncCheckButton" type="CheckButton" parent="MarginContainer/VBoxContainer/GraphicsVBox/HBoxContainer" unique_id=2064975304]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Vsync"
+
+[node name="HSeparator4" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=1891009158]
+light_mask = 0
+visibility_layer = 0
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Close" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1917856799]
+layout_mode = 2
+
+[node name="CloseSettingsButton" type="Button" parent="MarginContainer/VBoxContainer/Close" unique_id=76915350]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Close"
+
+[connection signal="toggled" from="MarginContainer/VBoxContainer/VolumeVBox/MainVolumeHBox/MainMuteButton" to="." method="_on_main_mute_button_toggled"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/VolumeVBox/MainVolumeSlider" to="." method="_on_main_volume_slider_value_changed"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/VolumeVBox/MusicVolumeHBox/MusicMuteButton" to="." method="_on_music_mute_button_toggled"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/VolumeVBox/MusicVolumeSlider" to="." method="_on_music_volume_slider_value_changed"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/VolumeVBox/SFXVolumeHBox/SFXMuteButton" to="." method="_on_sfx_mute_button_toggled"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/VolumeVBox/SFXVolumeSlider" to="." method="_on_sfx_volume_slider_value_changed"]
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/GraphicsVBox/ResolutionOptionButton" to="." method="_on_resolution_option_button_item_selected"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/GraphicsVBox/HBoxContainer/FullscreenCheckBox" to="." method="_on_fullscreen_check_box_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/GraphicsVBox/HBoxContainer/VsyncCheckButton" to="." method="_on_vsync_check_button_toggled"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Close/CloseSettingsButton" to="." method="_on_close_settings_button_pressed"]

@@ -7,6 +7,8 @@ extends CanvasLayer
 @onready var exit_button: Button = %ExitButton
 
 func _ready() -> void:
+	var is_desktop := PlatformDetection.can_quit()
+	exit_button.visible = is_desktop
 	hide()
 	settings_panel.hide()
 
