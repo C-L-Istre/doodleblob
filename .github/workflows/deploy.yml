@@ -12,10 +12,7 @@ concurrency:
 
 env:
   GAME_NAME: ${{ github.event.repository.name }}
-
-  PRODUCTION_URL: https://game.fretu.stream
-  STAGING_URL: https://game.fretu.stream/staging
-
+  DOMAIN: game.fretu.stream
   THEME_COLOR: "#00b700"
 
   GODOT: /usr/local/bin/godot
@@ -40,10 +37,10 @@ jobs:
           set -euo pipefail
 
           if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-            echo "GAME_URL=$PRODUCTION_URL" >> "$GITHUB_ENV"
+            echo "GAME_URL=https://$DOMAIN" >> "$GITHUB_ENV"
             echo "IS_STAGING=0" >> "$GITHUB_ENV"
           else
-            echo "GAME_URL=$STAGING_URL" >> "$GITHUB_ENV"
+            echo "GAME_URL=https://$DOMAIN/staging" >> "$GITHUB_ENV"
             echo "IS_STAGING=1" >> "$GITHUB_ENV"
           fi
 
@@ -300,12 +297,12 @@ jobs:
 
           html = html.replace(
               'overflow: hidden;',
-              'overflow: hidden;\\n        width: 100vw;\\n        height: 100vh;'
+              'overflow: hidden;\n        width: 100vw;\n        height: 100vh;'
           )
-
+          
           html = html.replace(
-              '#canvas {\\n        display: block;\\n}',
-              '#canvas {\\n        display: block;\\n        width: 100vw;\\n        height: 100vh;\\n}'
+              '#canvas {\n        display: block;\n}',
+              '#canvas {\n        display: block;\n        width: 100vw;\n        height: 100vh;\n}'
           )
 
           audio_unlock = r'''
@@ -419,6 +416,9 @@ jobs:
 
           KEEP=10
 
+          PROD_TARGET="$(readlink -f "$PRODUCTION" || true)"
+          STAGE_TARGET="$(readlink -f "$STAGING" || true)"
+          
           mapfile -t releases < <(
             find "$RELEASES" \
               -mindepth 1 \
@@ -428,12 +428,14 @@ jobs:
               | sort -nr \
               | cut -d' ' -f2-
           )
-
+          
           count=0
-
           for release in "${releases[@]}"; do
+            if [[ "$release" == "$PROD_TARGET" || "$release" == "$STAGE_TARGET" ]]; then
+              continue
+            fi
+          
             count=$((count + 1))
-
             if [[ "$count" -gt "$KEEP" ]]; then
               rm -rf "$release"
             fi
