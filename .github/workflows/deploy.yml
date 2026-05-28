@@ -147,9 +147,9 @@ jobs:
             p.write_text(html)
             PY
 
-          else
-            echo "bootstrap.js not present, skipping"
-          fi
+              else
+                echo "bootstrap.js not present, skipping"
+              fi
 
       - name: Generate CI-owned manifest
         shell: bash
