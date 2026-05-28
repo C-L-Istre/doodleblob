@@ -33,6 +33,8 @@ var level_paths := [
 # -------------------------
 
 func _ready() -> void:
+	var is_desktop := PlatformDetection.can_quit()
+	exit_game_button.visible = is_desktop
 	panels = [
 		select_level_panel,
 		highscore_panel,
