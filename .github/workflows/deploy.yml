@@ -11,10 +11,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GAME_NAME: ${{ github.event.repository.name }}
-  DOMAIN: game.fretu.stream
-  THEME_COLOR: "#00b700"
-
   GODOT: /usr/local/bin/godot
   WORKSPACE: /var/lib/godot/workspace
   RELEASES: /var/www/godot/releases
@@ -30,6 +26,9 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Load config
+        run: source ci/config.env
 
       - name: Set deployment metadata
         shell: bash
