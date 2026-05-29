@@ -31,9 +31,12 @@ jobs:
         run: |
           set -euo pipefail
           source .github/config.env
-          echo "DOMAIN=$DOMAIN" >> $GITHUB_ENV
-          echo "THEME_COLOR=$THEME_COLOR" >> $GITHUB_ENV
-          echo "GAME_NAME=${GAME_NAME:-${{ github.event.repository.name }}}" >> "$GITHUB_ENV"
+      
+          GAME_NAME="${{ github.event.repository.name }}"
+      
+          echo "DOMAIN=$DOMAIN" >> "$GITHUB_ENV"
+          echo "THEME_COLOR=$THEME_COLOR" >> "$GITHUB_ENV"
+          echo "GAME_NAME=$GAME_NAME" >> "$GITHUB_ENV"
 
       - name: Set deployment metadata
         shell: bash
