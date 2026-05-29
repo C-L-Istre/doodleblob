@@ -26,23 +26,22 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-
+        
       - name: Load config
         shell: bash
         run: |
           set -euo pipefail
       
           python3 - <<'PY' >> "$GITHUB_ENV"
-          import yml
+          import json
       
-          cfg = yml.safe_load(open(".github/config.yml"))
+          cfg = json.load(open(".github/config.json"))
       
           print(f"DOMAIN={cfg['domain']}")
           print(f"THEME_COLOR={cfg['theme_color']}")
           PY
       
-          GAME_NAME="${{ github.event.repository.name }}"
-          echo "GAME_NAME=$GAME_NAME" >> "$GITHUB_ENV"
+          echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
 
       - name: Set deployment metadata
         shell: bash
