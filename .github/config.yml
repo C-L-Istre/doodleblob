@@ -1,0 +1,9 @@
+domain: game.fretu.stream
+theme_color: "#00b700"
+environments:
+  production:
+    path: /var/www/godot/production
+    url_prefix: ""
+  staging:
+    path: /var/www/godot/staging
+    url_prefix: "/staging"
