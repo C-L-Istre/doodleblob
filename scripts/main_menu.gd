@@ -1,95 +1,103 @@
 extends Control
 
-# ---------------------------------
-# Variables
-# ---------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
+# MainMenu
+#
+# Manages the main menu. Handles panel visibility switching (level select,
+# high score, help, settings) and navigation to levels by path.
+#
+# To add levels, append paths to `level_paths`. The ItemList in the level
+# select panel will populate automatically.
+# ──────────────────────────────────────────────────────────────────────────────
 
-@onready var play_game_button = %PlayGameButton
+# ── Level list ────────────────────────────────────────────────────────────────
+# Add one entry per level in the order they should appear in the level select.
 
-@onready var select_level_button = %SelectLevelButton
-@onready var select_level_panel = %SelectLevelPanel
-
-@onready var highscore_button = %HighscoreButton
-@onready var highscore_panel = %HighscorePanel
-
-@onready var help_button = %HelpButton
-@onready var help_panel = %HelpPanel
-
-@onready var settings_button = %SettingsButton
-@onready var settings_panel: Panel = %SettingsPanel
-
-@onready var exit_game_button = %ExitGameButton
-
-var panels: Array[CanvasItem]
-
-var level_paths := [
+var level_paths: Array[String] = [
 	"res://scenes/levels/level_1.tscn",
 	"res://scenes/levels/level_2.tscn",
-	"res://scenes/levels/level_3.tscn"
+	"res://scenes/levels/level_3.tscn",
 ]
 
-# -------------------------
-# Setup
-# -------------------------
+# ── Node references ───────────────────────────────────────────────────────────
+
+@onready var _play_button:         Button     = %PlayGameButton
+@onready var _select_level_button: Button     = %SelectLevelButton
+@onready var _select_level_panel:  ItemList   = %SelectLevelPanel
+@onready var _highscore_button:    Button     = %HighscoreButton
+@onready var _highscore_panel:     Label      = %HighscorePanel
+@onready var _help_button:         Button     = %HelpButton
+@onready var _help_panel:          Control    = %HelpPanel
+@onready var _settings_button:     Button     = %SettingsButton
+@onready var _settings_panel:      Panel      = %SettingsPanel
+@onready var _exit_button:         Button     = %ExitGameButton
+
+var _panels: Array[CanvasItem]
+
+
+# ── Setup ─────────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
-	var is_desktop := PlatformDetection.can_quit()
-	exit_game_button.visible = is_desktop
-	panels = [
-		select_level_panel,
-		highscore_panel,
-		help_panel,
-		settings_panel
+	_exit_button.visible = PlatformDetection.can_quit()
+
+	_panels = [
+		_select_level_panel,
+		_highscore_panel,
+		_help_panel,
+		_settings_panel,
 	]
 
-	play_game_button.pressed.connect(play_game)
-	select_level_button.pressed.connect(show_levels)
-	highscore_button.pressed.connect(view_highscore)
-	help_button.pressed.connect(view_help)
-	settings_button.pressed.connect(open_settings)
-	exit_game_button.pressed.connect(exit_game)
-	
-	highscore_panel.text = "High Score: " + str(ScoreManager.high_score)
-	
-	select_level_panel.item_selected.connect(on_level_selected)
+	_play_button.pressed.connect(_on_play_pressed)
+	_select_level_button.pressed.connect(_on_select_level_pressed)
+	_highscore_button.pressed.connect(_on_highscore_pressed)
+	_help_button.pressed.connect(_on_help_pressed)
+	_settings_button.pressed.connect(_on_settings_pressed)
+	_exit_button.pressed.connect(_on_exit_pressed)
 
-# -------------------------
-# Show only selected panel
-# -------------------------
+	_highscore_panel.text = "High Score: %d" % ScoreManager.high_score
 
-func show_only(node: CanvasItem) -> void:
-	for panel in panels:
+	_select_level_panel.item_selected.connect(_on_level_selected)
+
+
+# ── Panel management ──────────────────────────────────────────────────────────
+
+func _show_only(node: CanvasItem) -> void:
+	for panel in _panels:
 		panel.visible = false
-
 	node.visible = true
 
 
-# ---------------------
-# Button actions
-# ---------------------
+# ── Button handlers ───────────────────────────────────────────────────────────
 
-func play_game() -> void:
-	get_tree().change_scene_to_file("res://scenes/levels/level_1.tscn")
+func _on_play_pressed() -> void:
+	if level_paths.is_empty():
+		push_error("MainMenu: level_paths is empty — add at least one level path.")
+		return
+	get_tree().change_scene_to_file(level_paths[0])
 
-func show_levels() -> void:
-	show_only(select_level_panel)
-	select_level_panel.deselect_all()
 
-func on_level_selected(index: int) -> void:
+func _on_select_level_pressed() -> void:
+	_show_only(_select_level_panel)
+	_select_level_panel.deselect_all()
+
+
+func _on_level_selected(index: int) -> void:
 	if index < 0 or index >= level_paths.size():
 		return
-
 	get_tree().change_scene_to_file(level_paths[index])
 
-func view_highscore() -> void:
-	show_only(highscore_panel)
 
-func view_help() -> void:
-	show_only(help_panel)
+func _on_highscore_pressed() -> void:
+	_show_only(_highscore_panel)
 
-func open_settings() -> void:
-	
-	show_only(settings_panel)
 
-func exit_game() -> void:
+func _on_help_pressed() -> void:
+	_show_only(_help_panel)
+
+
+func _on_settings_pressed() -> void:
+	_show_only(_settings_panel)
+
+
+func _on_exit_pressed() -> void:
 	PlatformDetection.exit_game()
