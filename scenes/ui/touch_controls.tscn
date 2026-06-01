@@ -45,6 +45,7 @@ offset_right = 134.0
 offset_bottom = 134.0
 
 [node name="MenuButton" type="TouchScreenButton" parent="MenuButtonContainer" unique_id=1290261326]
+position = Vector2(32, 32)
 texture_normal = ExtResource("1_6wx45")
 texture_pressed = ExtResource("1_6wx45")
 action = "pause"
@@ -63,6 +64,7 @@ grow_vertical = 0
 text = "Menu"
 
 [node name="PauseMenu" parent="MenuButtonContainer/MenuButton" unique_id=1174273434 instance=ExtResource("5_sayjt")]
+visible = false
 
 [node name="DirectionButtonContainer" type="HBoxContainer" parent="." unique_id=1896679321]
 anchors_preset = 2

@@ -1,16 +1,17 @@
-extends Area2D
+extends Control
 
 # ──────────────────────────────────────────────────────────────────────────────
-# KillZone
+# control_root.gd
 #
-# Area2D that calls die() on any PhysicsBody that enters it.
-# Use for pits, spikes, and any other instant-death hazard.
+# Root script for in-game level scenes. Forwards the "pause" input action to
+# the PauseMenu CanvasLayer. Attach to the root Control node of each level
+# scene that contains a PauseMenu child.
 #
-# Any body that implements die() will be killed — no group check is needed.
-# This keeps the kill zone generic: players, enemies, and destructible objects
-# all respond correctly as long as they implement the die() method.
 # ──────────────────────────────────────────────────────────────────────────────
 
-func _on_body_entered(body: Node) -> void:
-	if body.has_method("die"):
-		body.die()
+@onready var _pause_menu: CanvasLayer = %PauseMenu
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause"):
+		_pause_menu.toggle_pause()

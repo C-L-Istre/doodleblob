@@ -17,14 +17,15 @@ const SPEED:         float = 120.0
 const JUMP_VELOCITY: float = -300.0
 
 @onready var _sprite:    AnimatedSprite2D = $AnimatedSprite2D
-@onready var _collision: CollisionShape2D = $CollisionShape2D
-
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
 ## Called by enemies, kill zones, or any hazard that can kill the player.
-## Reloads the current scene via call_deferred to avoid physics callback issues.
+## Saves the current score as a high score candidate before resetting,
+## then reloads the current scene via call_deferred to avoid physics callback issues.
 func die() -> void:
+	ScoreManager.finish_level()
+	ScoreManager.reset_score()
 	call_deferred("_reload_scene")
 
 

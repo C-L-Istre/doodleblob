@@ -55,16 +55,26 @@ func _ready() -> void:
 	_exit_button.pressed.connect(_on_exit_pressed)
 
 	_highscore_panel.text = "High Score: %d" % ScoreManager.high_score
+	ScoreManager.high_score_changed.connect(_on_high_score_changed)
 
 	_select_level_panel.item_selected.connect(_on_level_selected)
 
-
 # ── Panel management ──────────────────────────────────────────────────────────
 
-func _show_only(node: CanvasItem) -> void:
+# Hide every panel.
+func _close_all() -> void:
 	for panel in _panels:
 		panel.visible = false
-	node.visible = true
+
+
+# Open `node` and close everything else.
+# If `node` is already visible, close everything instead (toggle behaviour).
+func _toggle_panel(node: CanvasItem) -> void:
+	if node.visible:
+		_close_all()
+	else:
+		_close_all()
+		node.visible = true
 
 
 # ── Button handlers ───────────────────────────────────────────────────────────
@@ -73,31 +83,44 @@ func _on_play_pressed() -> void:
 	if level_paths.is_empty():
 		push_error("MainMenu: level_paths is empty — add at least one level path.")
 		return
-	get_tree().change_scene_to_file(level_paths[0])
+
+	ScoreManager.reset_score()
+	call_deferred("_load_level", level_paths[0])
 
 
 func _on_select_level_pressed() -> void:
-	_show_only(_select_level_panel)
-	_select_level_panel.deselect_all()
+	_toggle_panel(_select_level_panel)
+	if not _select_level_panel.visible:
+		_select_level_panel.deselect_all()
 
 
 func _on_level_selected(index: int) -> void:
 	if index < 0 or index >= level_paths.size():
 		return
-	get_tree().change_scene_to_file(level_paths[index])
+
+	ScoreManager.reset_score()
+	call_deferred("_load_level", level_paths[index])
+
+
+func _load_level(path: String) -> void:
+	get_tree().change_scene_to_file(path)
 
 
 func _on_highscore_pressed() -> void:
-	_show_only(_highscore_panel)
+	_toggle_panel(_highscore_panel)
 
 
 func _on_help_pressed() -> void:
-	_show_only(_help_panel)
+	_toggle_panel(_help_panel)
 
 
 func _on_settings_pressed() -> void:
-	_show_only(_settings_panel)
+	_toggle_panel(_settings_panel)
 
 
 func _on_exit_pressed() -> void:
 	PlatformDetection.exit_game()
+
+
+func _on_high_score_changed(new_high: int) -> void:
+	_highscore_panel.text = "High Score: %d" % new_high

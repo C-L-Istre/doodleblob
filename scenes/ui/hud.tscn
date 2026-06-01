@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cb6pqint8i8ck"]
+
+[ext_resource type="Script" uid="uid://b5twxepvqi7mk" path="res://scripts/hud.gd" id="1_0mwgc"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1997154890]
+script = ExtResource("1_0mwgc")
+
+[node name="ScoreContainer" type="HBoxContainer" parent="." unique_id=651561239]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -80.0
+offset_top = 32.0
+offset_right = -33.0
+offset_bottom = 55.0
+grow_horizontal = 0
+
+[node name="ScoreLabel" type="Label" parent="ScoreContainer" unique_id=1849400470]
+unique_name_in_owner = true
+layout_mode = 2

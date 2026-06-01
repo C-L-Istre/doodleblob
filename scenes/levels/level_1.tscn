@@ -1,8 +1,8 @@
 [gd_scene format=4 uid="uid://dbyhga8ebhtki"]
 
-[ext_resource type="Script" uid="uid://bb1pnjhlds5ms" path="res://scripts/control.gd" id="1_bahl2"]
 [ext_resource type="PackedScene" uid="uid://s0hfpnwsx16u" path="res://scenes/characters/player.tscn" id="1_mm8aj"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="2_iwr0g"]
+[ext_resource type="PackedScene" uid="uid://cb6pqint8i8ck" path="res://scenes/ui/hud.tscn" id="2_np2pn"]
 [ext_resource type="Texture2D" uid="uid://bawkmft5csc10" path="res://assets/sprites/blocks/sky.png" id="2_wtwp4"]
 [ext_resource type="Texture2D" uid="uid://chxgv56tu6cpg" path="res://assets/sprites/blocks/water.png" id="3_iwr0g"]
 [ext_resource type="Texture2D" uid="uid://ck4hg4slcqigx" path="res://assets/sprites/blocks/stone.png" id="4_bahl2"]
@@ -21,6 +21,16 @@
 
 [sub_resource type="GDScript" id="GDScript_bahl2"]
 script/source = "extends Node2D
+"
+
+[sub_resource type="GDScript" id="GDScript_np2pn"]
+script/source = "extends Control
+
+@onready var pause_menu: CanvasLayer = %PauseMenu
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed(\"pause\"):
+		pause_menu.toggle_pause()
 "
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nb51f"]
@@ -2211,18 +2221,20 @@ _data = {
 [node name="Level 1" type="Node2D" unique_id=1725077776]
 script = SubResource("GDScript_bahl2")
 
-[node name="Control" type="Control" parent="." unique_id=406943870]
+[node name="ControlRoot" type="Control" parent="." unique_id=406943870]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 0
 offset_right = 36.0
 offset_bottom = 36.0
-script = ExtResource("1_bahl2")
+script = SubResource("GDScript_np2pn")
 
-[node name="PauseMenu" parent="Control" unique_id=355687917 instance=ExtResource("2_iwr0g")]
+[node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("2_iwr0g")]
 unique_name_in_owner = true
 process_mode = 2
 visible = false
+
+[node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_np2pn")]
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
@@ -2357,4 +2369,4 @@ position = Vector2(835, -32)
 [node name="Coin9" parent="Pickups" unique_id=2009393055 instance=ExtResource("8_mkypq")]
 position = Vector2(828, -65)
 
-[node name="TouchControls" parent="." unique_id=1997154890 instance=ExtResource("14_31oqk")]
+[node name="TouchControls" parent="." unique_id=761230126 instance=ExtResource("14_31oqk")]

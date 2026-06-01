@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cvy23l0ouswua"]
 
-[ext_resource type="Script" uid="uid://bb1pnjhlds5ms" path="res://scripts/control.gd" id="1_hq32h"]
+[ext_resource type="Script" uid="uid://bpro0vbnhwtwg" path="res://scripts/control_root.gd" id="1_hq32h"]
 [ext_resource type="PackedScene" uid="uid://beo0q1itvj6hp" path="res://scenes/ui/touch_controls.tscn" id="2_a381f"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="3_g1ai2"]
 [ext_resource type="PackedScene" uid="uid://s0hfpnwsx16u" path="res://scenes/characters/player.tscn" id="4_fwulr"]
@@ -2167,7 +2167,7 @@ sources/6 = SubResource("TileSetAtlasSource_81klo")
 [node name="Level Template" type="Node2D" unique_id=1725077776]
 script = SubResource("GDScript_bahl2")
 
-[node name="Control" type="Control" parent="." unique_id=406943870]
+[node name="ControlRoot" type="Control" parent="." unique_id=406943870]
 process_mode = 3
 visible = false
 layout_mode = 3
@@ -2178,17 +2178,17 @@ offset_right = -188.0
 offset_bottom = 50.0
 script = ExtResource("1_hq32h")
 
-[node name="TouchControls" parent="Control" unique_id=1997154890 instance=ExtResource("2_a381f")]
+[node name="TouchControls" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_a381f")]
 
-[node name="PauseMenu" parent="Control" unique_id=355687917 instance=ExtResource("3_g1ai2")]
+[node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("3_g1ai2")]
 unique_name_in_owner = true
 process_mode = 2
 visible = false
 
-[node name="KillZone" parent="Control" unique_id=2006232834 instance=ExtResource("11_hulh5")]
+[node name="KillZone" parent="ControlRoot" unique_id=2006232834 instance=ExtResource("11_hulh5")]
 position = Vector2(-37, 132)
 
-[node name="LevelEnd" parent="Control" unique_id=11591199 instance=ExtResource("5_a381f")]
+[node name="LevelEnd" parent="ControlRoot" unique_id=11591199 instance=ExtResource("5_a381f")]
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
