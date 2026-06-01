@@ -80,11 +80,8 @@ func _toggle_panel(node: CanvasItem) -> void:
 # ── Button handlers ───────────────────────────────────────────────────────────
 
 func _on_play_pressed() -> void:
-	if level_paths.is_empty():
-		push_error("MainMenu: level_paths is empty — add at least one level path.")
-		return
-
 	ScoreManager.reset_score()
+	HealthManager.reset_game()
 	call_deferred("_load_level", level_paths[0])
 
 
@@ -99,6 +96,7 @@ func _on_level_selected(index: int) -> void:
 		return
 
 	ScoreManager.reset_score()
+	HealthManager.reset_game()
 	call_deferred("_load_level", level_paths[index])
 
 

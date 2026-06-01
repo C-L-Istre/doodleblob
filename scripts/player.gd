@@ -26,7 +26,13 @@ const JUMP_VELOCITY: float = -300.0
 func die() -> void:
 	ScoreManager.finish_level()
 	ScoreManager.reset_score()
-	call_deferred("_reload_scene")
+	call_deferred("_handle_death")
+	
+func _handle_death() -> void:
+	HealthManager.lose_life()
+
+	if HealthManager.lives > 0:
+		get_tree().reload_current_scene()
 
 
 # ── Private ───────────────────────────────────────────────────────────────────

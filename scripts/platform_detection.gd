@@ -23,6 +23,18 @@ func get_platform() -> PlatformType:
 		_:
 			return PlatformType.WEB
 
+func has_touch() -> bool:
+	match get_platform():
+		PlatformType.MOBILE:
+			return true
+
+		PlatformType.WEB:
+			return DisplayServer.is_touchscreen_available()
+
+		PlatformType.DESKTOP:
+			return false
+
+	return false
 
 ## Returns true only on desktop platforms. Use this to gate exit buttons,
 ## resolution controls, and other desktop-only UI.

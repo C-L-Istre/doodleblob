@@ -2229,12 +2229,14 @@ offset_right = 36.0
 offset_bottom = 36.0
 script = SubResource("GDScript_np2pn")
 
+[node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_np2pn")]
+
+[node name="TouchControls" parent="ControlRoot" unique_id=761230126 instance=ExtResource("14_31oqk")]
+
 [node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("2_iwr0g")]
 unique_name_in_owner = true
 process_mode = 2
 visible = false
-
-[node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_np2pn")]
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
@@ -2368,5 +2370,3 @@ position = Vector2(835, -32)
 
 [node name="Coin9" parent="Pickups" unique_id=2009393055 instance=ExtResource("8_mkypq")]
 position = Vector2(828, -65)
-
-[node name="TouchControls" parent="." unique_id=761230126 instance=ExtResource("14_31oqk")]

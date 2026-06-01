@@ -2,11 +2,13 @@
 
 [ext_resource type="Texture2D" uid="uid://b1xxg8i8ascce" path="res://icon.svg" id="1_6wx45"]
 [ext_resource type="Texture2D" uid="uid://cik47pmkbif4j" path="res://assets/sprites/characters/Doodleblob-walk-left.png" id="1_notdv"]
+[ext_resource type="Script" uid="uid://cft5ioqhcqsif" path="res://scripts/touch_controls.gd" id="1_vs7rr"]
 [ext_resource type="Texture2D" uid="uid://c4eqc31y00e1r" path="res://assets/sprites/characters/Doodleblob-walk-right.png" id="2_c1tq5"]
 [ext_resource type="Texture2D" uid="uid://iajx3hi7jtpk" path="res://assets/sprites/characters/Doodleblob-jump-icon.png" id="4_pefoi"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="5_sayjt"]
 
 [node name="TouchControls" type="CanvasLayer" unique_id=1997154890]
+script = ExtResource("1_vs7rr")
 
 [node name="crouch" type="TouchScreenButton" parent="." unique_id=1581638040]
 visible = false

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bpro0vbnhwtwg" path="res://scripts/control_root.gd" id="1_qi5uv"]
 [ext_resource type="PackedScene" uid="uid://beo0q1itvj6hp" path="res://scenes/ui/touch_controls.tscn" id="2_f6egh"]
+[ext_resource type="PackedScene" uid="uid://cb6pqint8i8ck" path="res://scenes/ui/hud.tscn" id="2_t4txi"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="3_t4txi"]
 [ext_resource type="PackedScene" uid="uid://s0hfpnwsx16u" path="res://scenes/characters/player.tscn" id="4_apo5x"]
 [ext_resource type="PackedScene" uid="uid://cgolhqm2ftq5r" path="res://scenes/misc/level_exit.tscn" id="4_f6egh"]
@@ -2178,19 +2179,13 @@ offset_right = -188.0
 offset_bottom = 50.0
 script = ExtResource("1_qi5uv")
 
-[node name="TouchControls" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_f6egh")]
+[node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_t4txi")]
+
+[node name="TouchControls" parent="ControlRoot" unique_id=482803810 instance=ExtResource("2_f6egh")]
 
 [node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("3_t4txi")]
 unique_name_in_owner = true
 process_mode = 2
-visible = false
-
-[node name="LevelEnd" parent="ControlRoot" unique_id=11591199 instance=ExtResource("4_f6egh")]
-visible = false
-position = Vector2(183, -59)
-next_level_path = "uid://dka21svgen1vb"
-
-[node name="KillZone" parent="ControlRoot" unique_id=2006232834 instance=ExtResource("11_o3ttr")]
 visible = false
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
@@ -2218,6 +2213,15 @@ tile_set = SubResource("TileSet_wrm1d")
 [node name="foreground" type="TileMapLayer" parent="Terrain" unique_id=397218643]
 z_index = 10
 tile_set = SubResource("TileSet_tgy6u")
+
+[node name="LevelEnd" parent="Terrain" unique_id=11591199 instance=ExtResource("4_f6egh")]
+visible = false
+position = Vector2(-45, -49)
+next_level_path = "uid://dka21svgen1vb"
+
+[node name="KillZone" parent="Terrain" unique_id=2006232834 instance=ExtResource("11_o3ttr")]
+visible = false
+position = Vector2(-228, 10)
 
 [node name="NPCs" type="Node" parent="." unique_id=1615409849]
 
