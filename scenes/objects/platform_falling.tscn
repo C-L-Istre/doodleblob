@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dy4d1g1dgbsy"]
+
+[ext_resource type="Texture2D" uid="uid://06nndi6b7eb2" path="res://assets/sprites/platforms/platform.png" id="1_5vb7o"]
+[ext_resource type="Script" uid="uid://tw6lvp4ib3f7" path="res://scripts/platform_falling.gd" id="1_a03rk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q8qnd"]
+size = Vector2(32, 8)
+
+[node name="PlatformFalling" type="AnimatableBody2D" unique_id=1537497389]
+script = ExtResource("1_a03rk")
+
+[node name="PlatformSprite" type="Sprite2D" parent="." unique_id=190106472]
+texture = ExtResource("1_5vb7o")
+
+[node name="PlatformCollisionShape2D" type="CollisionShape2D" parent="." unique_id=185282607]
+shape = SubResource("RectangleShape2D_q8qnd")
+one_way_collision = true

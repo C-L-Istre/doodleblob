@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://cbnx51ouraho8" path="res://scenes/misc/kill_zone.tscn" id="15_wtwp4"]
 [ext_resource type="PackedScene" uid="uid://cgolhqm2ftq5r" path="res://scenes/misc/level_exit.tscn" id="18_np2pn"]
 [ext_resource type="PackedScene" uid="uid://vpkouj5jdv0" path="res://scenes/objects/boat.tscn" id="18_v6ha0"]
+[ext_resource type="PackedScene" uid="uid://dy4d1g1dgbsy" path="res://scenes/objects/platform_falling.tscn" id="19_gmpev"]
 
 [sub_resource type="GDScript" id="GDScript_bahl2"]
 script/source = "extends Node2D
@@ -2186,7 +2187,7 @@ length = 0.001
 
 [sub_resource type="Animation" id="Animation_3dryh"]
 resource_name = "move"
-length = 1.5333333
+length = 1.5
 loop_mode = 2
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -2195,7 +2196,7 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.5333333),
+"times": PackedFloat32Array(0, 1.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(638, -47), Vector2(766, -47)]
@@ -2324,6 +2325,9 @@ position = Vector2(911, -27)
 
 [node name="Platform" parent="Platforms" unique_id=657030689 instance=ExtResource("9_ndtll")]
 position = Vector2(70, -82)
+
+[node name="Platform2" parent="Platforms" unique_id=1257610992 instance=ExtResource("19_gmpev")]
+position = Vector2(853, -48)
 
 [node name="Pickups" type="Node" parent="." unique_id=1059442413]
 

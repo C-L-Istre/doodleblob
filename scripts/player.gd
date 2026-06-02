@@ -24,7 +24,6 @@ const JUMP_VELOCITY: float = -300.0
 ## Saves the current score as a high score candidate before resetting,
 ## then reloads the current scene via call_deferred to avoid physics callback issues.
 func die() -> void:
-	ScoreManager.finish_level()
 	ScoreManager.reset_score()
 	call_deferred("_handle_death")
 	
@@ -36,10 +35,6 @@ func _handle_death() -> void:
 
 
 # ── Private ───────────────────────────────────────────────────────────────────
-
-func _reload_scene() -> void:
-	get_tree().reload_current_scene()
-
 
 func _physics_process(delta: float) -> void:
 	# Gravity
@@ -72,3 +67,12 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0.0, SPEED)
 
 	move_and_slide()
+
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+
+		if collision.get_normal().y < -0.7:
+			var collider := collision.get_collider()
+
+			if collider and collider.has_method("activate"):
+				collider.activate()
