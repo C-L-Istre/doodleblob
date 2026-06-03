@@ -3,7 +3,7 @@ extends AnimatableBody2D
 # ──────────────────────────────────────────────────────────────────────────────
 # Falling Platform
 #
-# Falls shortly after the one way collision detects a player
+# Falls shortly after detecting a player
 #
 # ──────────────────────────────────────────────────────────────────────────────
 

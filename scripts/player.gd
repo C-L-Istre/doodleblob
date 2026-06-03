@@ -18,6 +18,8 @@ const JUMP_VELOCITY: float = -300.0
 
 @onready var _sprite:    AnimatedSprite2D = $AnimatedSprite2D
 
+var _nearby_interactable: Node
+
 # ── Public API ────────────────────────────────────────────────────────────────
 
 ## Called by enemies, kill zones, or any hazard that can kill the player.
@@ -33,6 +35,12 @@ func _handle_death() -> void:
 	if HealthManager.lives > 0:
 		get_tree().reload_current_scene()
 
+func _interact() -> void:
+	print(_nearby_interactable)
+	print(_nearby_interactable.get_class())
+
+	if _nearby_interactable:
+		_nearby_interactable.interact(self)
 
 # ── Private ───────────────────────────────────────────────────────────────────
 
@@ -76,3 +84,6 @@ func _physics_process(delta: float) -> void:
 
 			if collider and collider.has_method("activate"):
 				collider.activate()
+
+	if Input.is_action_just_pressed("interact"):
+		_interact()
