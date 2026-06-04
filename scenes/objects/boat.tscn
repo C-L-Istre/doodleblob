@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://vpkouj5jdv0"]
+
+[ext_resource type="Texture2D" uid="uid://bhdd4dvk10i36" path="res://assets/sprites/vehicles/boat.png" id="1_es54b"]
+[ext_resource type="Script" uid="uid://dptccx5jrvn3v" path="res://scripts/boat.gd" id="1_v81bm"]
+[ext_resource type="Shader" uid="uid://cxusnwaa4mga0" path="res://assets/shaders/boat.gdshader" id="2_dd8b2"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w0k4f"]
+shader = ExtResource("2_dd8b2")
+shader_parameter/fade_alpha = 1.0
+shader_parameter/split_y = 0.690000032775
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v81bm"]
+size = Vector2(26, 1)
+
+[node name="Boat" type="AnimatableBody2D" unique_id=1537497389]
+scale = Vector2(2, 2)
+script = ExtResource("1_v81bm")
+
+[node name="BoatSprite" type="Sprite2D" parent="." unique_id=303104944]
+unique_name_in_owner = true
+z_index = 10
+material = SubResource("ShaderMaterial_w0k4f")
+texture = ExtResource("1_es54b")
+
+[node name="HullCollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1456608052]
+position = Vector2(-16, 16)
+polygon = PackedVector2Array(3, -8.5, 9, -2.5, 21, -2.5, 27, -8.5, 29, -8.5, 29, -9, 27, -9, 21, -3, 9, -3, 4, -8, 4, -9, 3, -9)
+one_way_collision = true
+
+[node name="RayCastRight" type="RayCast2D" parent="." unique_id=1705921469]
+position = Vector2(0, 7.5)
+target_position = Vector2(20, 0)
+
+[node name="RayCastLeft" type="RayCast2D" parent="." unique_id=680833606]
+position = Vector2(0, 7.5)
+target_position = Vector2(-20, 0)
+
+[node name="ActivationArea2D" type="Area2D" parent="." unique_id=1621109264]
+collision_layer = 0
+collision_mask = 2
+
+[node name="ActivationCollisionShape2D" type="CollisionShape2D" parent="ActivationArea2D" unique_id=464801930]
+position = Vector2(0, 7)
+shape = SubResource("RectangleShape2D_v81bm")
+
+[connection signal="body_entered" from="ActivationArea2D" to="." method="_on_activation_area_2d_body_entered"]
+[connection signal="body_exited" from="ActivationArea2D" to="." method="_on_activation_area_2d_body_exited"]

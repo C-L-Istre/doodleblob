@@ -175,3 +175,9 @@ metadata/_aseprite_wizard_source_file_hash_ = "21b8adbb60129c2a6536904b196e5304"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=231977585]
 position = Vector2(1.5, -16)
 shape = SubResource("RectangleShape2D_cvnsp")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=208033090]
+offset = Vector2(0, -40)
+zoom = Vector2(2, 2)
+limit_bottom = 100
+limit_smoothed = true

@@ -1,7 +1,16 @@
 extends Area2D
 
-@onready var animation_player: AnimationPlayer = $AnimationPlayer
+# ──────────────────────────────────────────────────────────────────────────────
+# Coin (pickup)
+#
+# Calls ScoreManager.add_point() when collected, then plays the "pickup"
+# animation. The AnimationPlayer should queue_free() the node at the end of
+# the "pickup" animation via an Animation Track call.
+# ──────────────────────────────────────────────────────────────────────────────
 
-func _on_body_entered(_body):
+@onready var _anim: AnimationPlayer = $AnimationPlayer
+
+
+func _on_body_entered(_body: Node) -> void:
 	ScoreManager.add_point()
-	animation_player.play("pickup")
+	_anim.play("pickup")

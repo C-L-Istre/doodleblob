@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://7cd1csawdkwd"]
 
+[ext_resource type="Script" uid="uid://wcqac0b40qt6" path="res://scripts/triangela.gd" id="1_7l541"]
 [ext_resource type="Texture2D" uid="uid://d3iamh3holr21" path="res://assets/sprites/npcs/PrincessTriangela.png" id="1_l8kju"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_i3o2p"]
+[ext_resource type="FontFile" uid="uid://c41fabxxnq1jr" path="res://assets/fonts/Tiny5/Tiny5-Regular.ttf" id="4_4kfs6"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qplbt"]
 atlas = ExtResource("1_l8kju")
@@ -27,7 +30,11 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_27vpw"]
 size = Vector2(10, 26)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7l541"]
+size = Vector2(64, 52)
+
 [node name="Triangela" type="CharacterBody2D" unique_id=1107866423]
+script = ExtResource("1_7l541")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=379029911]
 sprite_frames = SubResource("SpriteFrames_s5r76")
@@ -38,3 +45,40 @@ frame_progress = 0.1764631
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=307942677]
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_27vpw")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1621709192]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -48.0
+offset_right = 16.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DialogLabel" type="Label" parent="MarginContainer" unique_id=695719462]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("3_i3o2p")
+horizontal_alignment = 1
+
+[node name="PromptLabel" type="Label" parent="MarginContainer" unique_id=686740844]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_4kfs6")
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+
+[node name="Area2D" type="Area2D" parent="." unique_id=8339693]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=84602459]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_7l541")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

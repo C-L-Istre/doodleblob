@@ -1,93 +1,106 @@
 extends Control
 
-# ---------------------------------
-# Variables
-# ---------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
+# MainMenu
+#
+# Manages the main menu. Panel visibility, level navigation, and high score
+# display. All button signals are connected in the scene editor.
+#
+# Inspector setup:
+#   level_paths — one entry per level scene, in play order
+#   panels      — every panel that should close when another opens
+#                 (SelectLevelPanel, HighscorePanel, HelpPanel, SettingsPanel)
+#
+# Editor signal connections required:
+#   ScoreManager.high_score_changed → _on_high_score_changed
+# ──────────────────────────────────────────────────────────────────────────────
 
-@onready var play_game_button = %PlayGameButton
+## Scenes to load in order. Add entries here to expose levels in level select.
+@export var level_paths: Array[String] = []
 
-@onready var select_level_button = %SelectLevelButton
-@onready var select_level_panel = %SelectLevelPanel
+@onready var _highscore_panel:    Label    = %HighscorePanel
+@onready var _select_level_panel: ItemList = %SelectLevelPanel
+@onready var _exit_button:        Button   = %ExitGameButton
 
-@onready var highscore_button = %HighscoreButton
-@onready var highscore_panel = %HighscorePanel
+# Built from unique-name refs — all panels already have unique_name_in_owner = true
+# so no Inspector setup is required.
+var _panels: Array[CanvasItem]
 
-@onready var help_button = %HelpButton
-@onready var help_panel = %HelpPanel
-
-@onready var settings_button = %SettingsButton
-@onready var settings_panel: Panel = %SettingsPanel
-
-@onready var exit_game_button = %ExitGameButton
-
-var panels: Array[CanvasItem]
-
-var level_paths := [
-	"res://scenes/levels/level_1.tscn",
-	"res://scenes/levels/level_2.tscn",
-	"res://scenes/levels/level_3.tscn"
-]
-
-# -------------------------
-# Setup
-# -------------------------
 
 func _ready() -> void:
-	panels = [
-		select_level_panel,
-		highscore_panel,
-		help_panel,
-		settings_panel
+	_panels = [
+		%SelectLevelPanel,
+		%HighscorePanel,
+		%HelpPanel,
+		%SettingsPanel,
 	]
+	_exit_button.visible = PlatformDetection.can_quit()
+	_highscore_panel.text = "High Score: %d" % ScoreManager.high_score
+	# high_score_changed has no editor connection in the scene — kept in code.
+	ScoreManager.high_score_changed.connect(_on_high_score_changed)
 
-	play_game_button.pressed.connect(play_game)
-	select_level_button.pressed.connect(show_levels)
-	highscore_button.pressed.connect(view_highscore)
-	help_button.pressed.connect(view_help)
-	settings_button.pressed.connect(open_settings)
-	exit_game_button.pressed.connect(exit_game)
-	
-	highscore_panel.text = "High Score: " + str(ScoreManager.high_score)
-	
-	select_level_panel.item_selected.connect(on_level_selected)
 
-# -------------------------
-# Show only selected panel
-# -------------------------
+# ── Panel management ──────────────────────────────────────────────────────────
 
-func show_only(node: CanvasItem) -> void:
-	for panel in panels:
+func _close_all() -> void:
+	for panel in _panels:
 		panel.visible = false
 
-	node.visible = true
+
+func _toggle_panel(node: CanvasItem) -> void:
+	if node.visible:
+		_close_all()
+	else:
+		_close_all()
+		node.visible = true
 
 
-# ---------------------
-# Button actions
-# ---------------------
+# ── Button handlers (connect in editor) ───────────────────────────────────────
 
-func play_game() -> void:
-	get_tree().change_scene_to_file("res://scenes/levels/level_1.tscn")
+func _on_play_game_button_pressed() -> void:
+	if level_paths.is_empty():
+		push_error("MainMenu: level_paths is empty — add at least one entry in the Inspector.")
+		return
+	ScoreManager.reset_score()
+	HealthManager.reset_game()
+	call_deferred("_load_level", level_paths[0])
 
-func show_levels() -> void:
-	show_only(select_level_panel)
-	select_level_panel.deselect_all()
 
-func on_level_selected(index: int) -> void:
+func _on_select_level_button_pressed() -> void:
+	_toggle_panel(_select_level_panel)
+	if not _select_level_panel.visible:
+		_select_level_panel.deselect_all()
+
+
+func _on_select_level_panel_item_selected(index: int) -> void:
 	if index < 0 or index >= level_paths.size():
 		return
+	ScoreManager.reset_score()
+	HealthManager.reset_game()
+	call_deferred("_load_level", level_paths[index])
 
-	get_tree().change_scene_to_file(level_paths[index])
 
-func view_highscore() -> void:
-	show_only(highscore_panel)
+func _on_highscore_button_pressed() -> void:
+	_toggle_panel(_highscore_panel)
 
-func view_help() -> void:
-	show_only(help_panel)
 
-func open_settings() -> void:
-	
-	show_only(settings_panel)
+func _on_help_button_pressed() -> void:
+	_toggle_panel(%HelpPanel)
 
-func exit_game() -> void:
+
+func _on_settings_button_pressed() -> void:
+	_toggle_panel(%SettingsPanel)
+
+
+func _on_exit_game_button_pressed() -> void:
 	PlatformDetection.exit_game()
+
+
+func _on_high_score_changed(new_high: int) -> void:
+	_highscore_panel.text = "High Score: %d" % new_high
+
+
+# ── Private ───────────────────────────────────────────────────────────────────
+
+func _load_level(path: String) -> void:
+	get_tree().change_scene_to_file(path)

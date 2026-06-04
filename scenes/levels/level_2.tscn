@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://2vq50hudycot"]
 
-[ext_resource type="Script" uid="uid://bb1pnjhlds5ms" path="res://scripts/control.gd" id="1_v8d84"]
+[ext_resource type="Script" uid="uid://bpro0vbnhwtwg" path="res://scripts/control_root.gd" id="1_v8d84"]
 [ext_resource type="PackedScene" uid="uid://beo0q1itvj6hp" path="res://scenes/ui/touch_controls.tscn" id="2_gw1l3"]
+[ext_resource type="PackedScene" uid="uid://cb6pqint8i8ck" path="res://scenes/ui/hud.tscn" id="2_r88tb"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="3_p4se4"]
 [ext_resource type="PackedScene" uid="uid://s0hfpnwsx16u" path="res://scenes/characters/player.tscn" id="4_sibr7"]
 [ext_resource type="PackedScene" uid="uid://cgolhqm2ftq5r" path="res://scenes/misc/level_exit.tscn" id="5_tv7cl"]
@@ -12,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://deq3o3t1fydlr" path="res://assets/sprites/blocks/grass.png" id="12_7d3nu"]
 [ext_resource type="Texture2D" uid="uid://bap2o0pnclv8" path="res://assets/sprites/blocks/sand.png" id="13_r6ket"]
 [ext_resource type="PackedScene" uid="uid://cbnx51ouraho8" path="res://scenes/misc/kill_zone.tscn" id="14_xworo"]
+[ext_resource type="PackedScene" uid="uid://dy4d1g1dgbsy" path="res://scenes/objects/platform_falling.tscn" id="15_1yj8c"]
 [ext_resource type="PackedScene" uid="uid://cc0ruoxphh202" path="res://scenes/objects/platform.tscn" id="16_rvwo1"]
 
 [sub_resource type="GDScript" id="GDScript_bahl2"]
@@ -2165,10 +2167,10 @@ sources/4 = SubResource("TileSetAtlasSource_22asu")
 sources/5 = SubResource("TileSetAtlasSource_fkdbe")
 sources/6 = SubResource("TileSetAtlasSource_81klo")
 
-[node name="Level Template" type="Node2D" unique_id=1725077776]
+[node name="Level 2" type="Node2D" unique_id=1725077776]
 script = SubResource("GDScript_bahl2")
 
-[node name="Control" type="Control" parent="." unique_id=406943870]
+[node name="ControlRoot" type="Control" parent="." unique_id=406943870]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 0
@@ -2178,34 +2180,19 @@ offset_right = -188.0
 offset_bottom = 50.0
 script = ExtResource("1_v8d84")
 
-[node name="TouchControls" parent="Control" unique_id=1997154890 instance=ExtResource("2_gw1l3")]
+[node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_r88tb")]
 
-[node name="PauseMenu" parent="Control" unique_id=355687917 instance=ExtResource("3_p4se4")]
+[node name="TouchControls" parent="ControlRoot" unique_id=2036451349 instance=ExtResource("2_gw1l3")]
+
+[node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("3_p4se4")]
 unique_name_in_owner = true
-process_mode = 2
 visible = false
-
-[node name="KillZone" parent="Control" unique_id=2006232834 instance=ExtResource("14_xworo")]
-visible = false
-position = Vector2(-37, 132)
-
-[node name="LevelEnd" parent="Control" unique_id=11591199 instance=ExtResource("5_tv7cl")]
-visible = false
-position = Vector2(128, -24)
-next_level_path = "uid://bpmotoamehaeo"
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
 [node name="Player" parent="PCs" unique_id=551637077 instance=ExtResource("4_sibr7")]
 z_index = 10
 position = Vector2(-128, -64)
-
-[node name="Camera2D" type="Camera2D" parent="PCs/Player" unique_id=1159279511]
-position = Vector2(0, 5)
-offset = Vector2(0, -40)
-zoom = Vector2(4, 4)
-limit_bottom = 100
-limit_smoothed = true
 
 [node name="Terrain" type="Node" parent="." unique_id=1500458828]
 
@@ -2220,6 +2207,14 @@ tile_set = SubResource("TileSet_wrm1d")
 z_index = 10
 tile_set = SubResource("TileSet_tgy6u")
 
+[node name="KillZone" parent="Terrain" unique_id=2006232834 instance=ExtResource("14_xworo")]
+visible = false
+position = Vector2(-265, 142)
+
+[node name="LevelEnd" parent="Terrain" unique_id=11591199 instance=ExtResource("5_tv7cl")]
+position = Vector2(1015, -198)
+next_level_path = "uid://bpmotoamehaeo"
+
 [node name="NPCs" type="Node" parent="." unique_id=1615409849]
 
 [node name="Enemies" type="Node" parent="." unique_id=756238706]
@@ -2232,3 +2227,81 @@ tile_set = SubResource("TileSet_tgy6u")
 position = Vector2(-127, -47)
 
 [node name="Pickups" type="Node" parent="." unique_id=1059442413]
+
+[node name="PlatformFalling" parent="." unique_id=22870850 instance=ExtResource("15_1yj8c")]
+position = Vector2(-87, -54)
+
+[node name="PlatformFalling2" parent="." unique_id=360448035 instance=ExtResource("15_1yj8c")]
+position = Vector2(-46, -62)
+
+[node name="PlatformFalling3" parent="." unique_id=366047246 instance=ExtResource("15_1yj8c")]
+position = Vector2(-6, -67)
+
+[node name="PlatformFalling4" parent="." unique_id=285001346 instance=ExtResource("15_1yj8c")]
+position = Vector2(35, -73)
+
+[node name="PlatformFalling5" parent="." unique_id=928462580 instance=ExtResource("15_1yj8c")]
+position = Vector2(76, -80)
+
+[node name="PlatformFalling6" parent="." unique_id=1440071609 instance=ExtResource("15_1yj8c")]
+position = Vector2(116, -85)
+
+[node name="PlatformFalling7" parent="." unique_id=434858243 instance=ExtResource("15_1yj8c")]
+position = Vector2(156, -94)
+
+[node name="PlatformFalling8" parent="." unique_id=625210452 instance=ExtResource("15_1yj8c")]
+position = Vector2(198, -101)
+
+[node name="PlatformFalling9" parent="." unique_id=398014872 instance=ExtResource("15_1yj8c")]
+position = Vector2(241, -109)
+
+[node name="PlatformFalling10" parent="." unique_id=807625290 instance=ExtResource("15_1yj8c")]
+position = Vector2(282, -118)
+
+[node name="PlatformFalling11" parent="." unique_id=957317829 instance=ExtResource("15_1yj8c")]
+position = Vector2(334, -126)
+
+[node name="PlatformFalling12" parent="." unique_id=1307925497 instance=ExtResource("15_1yj8c")]
+position = Vector2(381, -130)
+
+[node name="PlatformFalling13" parent="." unique_id=1509857655 instance=ExtResource("15_1yj8c")]
+position = Vector2(423, -137)
+
+[node name="PlatformFalling14" parent="." unique_id=153343972 instance=ExtResource("15_1yj8c")]
+position = Vector2(470, -141)
+
+[node name="PlatformFalling15" parent="." unique_id=1156671010 instance=ExtResource("15_1yj8c")]
+position = Vector2(508, -151)
+
+[node name="PlatformFalling16" parent="." unique_id=1049869348 instance=ExtResource("15_1yj8c")]
+position = Vector2(555, -155)
+
+[node name="PlatformFalling17" parent="." unique_id=1299274777 instance=ExtResource("15_1yj8c")]
+position = Vector2(597, -162)
+
+[node name="PlatformFalling18" parent="." unique_id=1300211378 instance=ExtResource("15_1yj8c")]
+position = Vector2(644, -166)
+
+[node name="PlatformFalling19" parent="." unique_id=1289242685 instance=ExtResource("15_1yj8c")]
+position = Vector2(676, -180)
+
+[node name="PlatformFalling20" parent="." unique_id=1236999579 instance=ExtResource("15_1yj8c")]
+position = Vector2(723, -184)
+
+[node name="PlatformFalling21" parent="." unique_id=1764748898 instance=ExtResource("15_1yj8c")]
+position = Vector2(765, -191)
+
+[node name="PlatformFalling22" parent="." unique_id=1870555029 instance=ExtResource("15_1yj8c")]
+position = Vector2(812, -195)
+
+[node name="PlatformFalling23" parent="." unique_id=310630557 instance=ExtResource("15_1yj8c")]
+position = Vector2(850, -205)
+
+[node name="PlatformFalling24" parent="." unique_id=469766432 instance=ExtResource("15_1yj8c")]
+position = Vector2(897, -209)
+
+[node name="PlatformFalling25" parent="." unique_id=845676567 instance=ExtResource("15_1yj8c")]
+position = Vector2(939, -216)
+
+[node name="PlatformFalling26" parent="." unique_id=1619901510 instance=ExtResource("15_1yj8c")]
+position = Vector2(986, -220)
