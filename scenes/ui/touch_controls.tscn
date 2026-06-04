@@ -4,8 +4,12 @@
 [ext_resource type="Texture2D" uid="uid://cik47pmkbif4j" path="res://assets/sprites/characters/Doodleblob-walk-left.png" id="1_notdv"]
 [ext_resource type="Script" uid="uid://cft5ioqhcqsif" path="res://scripts/touch_controls.gd" id="1_vs7rr"]
 [ext_resource type="Texture2D" uid="uid://c4eqc31y00e1r" path="res://assets/sprites/characters/Doodleblob-walk-right.png" id="2_c1tq5"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_0l8t7"]
 [ext_resource type="Texture2D" uid="uid://iajx3hi7jtpk" path="res://assets/sprites/characters/Doodleblob-jump-icon.png" id="4_pefoi"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="5_sayjt"]
+[ext_resource type="Texture2D" uid="uid://dwys4pw32vlab" path="res://assets/sprites/characters/Doodleblob-crouch.png" id="6_esiwu"]
+[ext_resource type="Texture2D" uid="uid://deo64ywebw7y4" path="res://assets/placeholder/32x32_placeholder_texture_2d.tres" id="7_oc0ds"]
+[ext_resource type="Texture2D" uid="uid://bd10j131t2wey" path="res://assets/sprites/npcs/KingOct.png" id="9_oc0ds"]
 
 [node name="TouchControls" type="CanvasLayer" unique_id=1997154890]
 script = ExtResource("1_vs7rr")
@@ -42,135 +46,217 @@ texture_normal = ExtResource("1_6wx45")
 texture_pressed = ExtResource("1_6wx45")
 action = "ui_end"
 
-[node name="MenuButtonContainer" type="HBoxContainer" parent="." unique_id=1080875536]
-offset_right = 134.0
-offset_bottom = 134.0
-
-[node name="MenuButton" type="TouchScreenButton" parent="MenuButtonContainer" unique_id=1290261326]
-position = Vector2(32, 32)
-texture_normal = ExtResource("1_6wx45")
-texture_pressed = ExtResource("1_6wx45")
-action = "pause"
-
-[node name="Label" type="Label" parent="MenuButtonContainer/MenuButton" unique_id=1559993191]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -22.5
-offset_top = -23.0
-offset_right = 22.5
-grow_horizontal = 2
-grow_vertical = 0
-text = "Menu"
-
-[node name="PauseMenu" parent="MenuButtonContainer/MenuButton" unique_id=1174273434 instance=ExtResource("5_sayjt")]
-visible = false
-
-[node name="DirectionButtonContainer" type="HBoxContainer" parent="." unique_id=1896679321]
+[node name="DirectionButtonBox" type="HBoxContainer" parent="." unique_id=903044446]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 32.0
-offset_top = -160.0
-offset_right = 327.0
-offset_bottom = -21.0
+offset_top = -80.0
+offset_right = 212.0
 grow_vertical = 0
+alignment = 1
 
-[node name="LeftButton" type="TouchScreenButton" parent="DirectionButtonContainer" unique_id=955666584]
-scale = Vector2(3, 3)
+[node name="LeftButtonMargin" type="MarginContainer" parent="DirectionButtonBox" unique_id=2047009981]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="LeftButtonPanel" type="Panel" parent="DirectionButtonBox/LeftButtonMargin" unique_id=713927437]
+layout_mode = 2
+
+[node name="LeftButtonCenter" type="CenterContainer" parent="DirectionButtonBox/LeftButtonMargin" unique_id=1032595075]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="LeftButton" type="TouchScreenButton" parent="DirectionButtonBox/LeftButtonMargin/LeftButtonCenter" unique_id=955666584]
+scale = Vector2(2, 2)
 texture_normal = ExtResource("1_notdv")
-texture_pressed = ExtResource("1_notdv")
+texture_pressed = ExtResource("7_oc0ds")
 action = "move_left"
 visibility_mode = 1
 
-[node name="Label" type="Label" parent="DirectionButtonContainer/LeftButton" unique_id=2053723891]
-anchors_preset = -1
-anchor_top = 1.789
-anchor_bottom = 1.789
-offset_left = 0.33333337
-offset_top = -31.248003
-offset_right = 40.333332
-offset_bottom = -8.248001
-grow_vertical = 0
-text = "Left"
-
-[node name="Panel" type="Panel" parent="DirectionButtonContainer/LeftButton" unique_id=808627394]
-z_index = -1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -36.0
-offset_right = 36.0
-grow_vertical = 0
-
-[node name="RightButton" type="TouchScreenButton" parent="DirectionButtonContainer" unique_id=346669371]
-position = Vector2(192, 0)
-scale = Vector2(3, 3)
-texture_normal = ExtResource("2_c1tq5")
-texture_pressed = ExtResource("2_c1tq5")
-action = "move_right"
-visibility_mode = 1
-
-[node name="Panel2" type="Panel" parent="DirectionButtonContainer/RightButton" unique_id=294640801]
-z_index = -1
+[node name="LeftButtonLabel" type="Label" parent="DirectionButtonBox/LeftButtonMargin/LeftButtonCenter/LeftButton" unique_id=2053723891]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -18.0
-offset_top = -36.0
-offset_right = 18.0
+offset_left = -13.0
+offset_right = 13.0
+offset_bottom = 8.0
 grow_horizontal = 2
 grow_vertical = 0
-metadata/_edit_use_anchors_ = true
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("3_0l8t7")
+theme_override_font_sizes/font_size = 8
+text = "Left"
 
-[node name="Label" type="Label" parent="DirectionButtonContainer/RightButton" unique_id=1773745155]
-offset_left = -3.0
-offset_top = 26.666666
-offset_right = 38.0
-offset_bottom = 49.666664
+[node name="RightButtonMargin" type="MarginContainer" parent="DirectionButtonBox" unique_id=448670235]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_bottom = 32
+
+[node name="RightButtonPanel" type="Panel" parent="DirectionButtonBox/RightButtonMargin" unique_id=742129682]
+layout_mode = 2
+
+[node name="RightButtonCenter" type="CenterContainer" parent="DirectionButtonBox/RightButtonMargin" unique_id=284008762]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="RightButton" type="TouchScreenButton" parent="DirectionButtonBox/RightButtonMargin/RightButtonCenter" unique_id=346669371]
+scale = Vector2(2, 2)
+texture_normal = ExtResource("2_c1tq5")
+texture_pressed = ExtResource("7_oc0ds")
+action = "move_right"
+visibility_mode = 1
+
+[node name="RightButtonLabel" type="Label" parent="DirectionButtonBox/RightButtonMargin/RightButtonCenter/RightButton" unique_id=1773745155]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_right = 16.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_0l8t7")
+theme_override_font_sizes/font_size = 8
 text = "Right"
 metadata/_edit_use_anchors_ = true
 
-[node name="ActionButtonContainer" type="HBoxContainer" parent="." unique_id=651561239]
+[node name="ActionButtonBox" type="HBoxContainer" parent="." unique_id=1016364128]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -173.0
-offset_top = -163.0
-offset_right = -44.0
-offset_bottom = -31.0
+offset_left = -212.0
+offset_top = -96.0
 grow_horizontal = 0
 grow_vertical = 0
+alignment = 1
 
-[node name="JumpButton" type="TouchScreenButton" parent="ActionButtonContainer" unique_id=1931118649]
-rotation = -0.27052605
-scale = Vector2(2.9999998, 2.9999998)
+[node name="LeftButtonMargin" type="MarginContainer" parent="ActionButtonBox" unique_id=1157247138]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="LeftButtonPanel" type="Panel" parent="ActionButtonBox/LeftButtonMargin" unique_id=438165204]
+layout_mode = 2
+
+[node name="LeftButtonCenter" type="CenterContainer" parent="ActionButtonBox/LeftButtonMargin" unique_id=155401381]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="InteractButton" type="TouchScreenButton" parent="ActionButtonBox/LeftButtonMargin/LeftButtonCenter" unique_id=674034480]
+scale = Vector2(2, 2)
+texture_normal = ExtResource("6_esiwu")
+texture_pressed = ExtResource("7_oc0ds")
+action = "interact"
+visibility_mode = 1
+
+[node name="InteractLabel" type="Label" parent="ActionButtonBox/LeftButtonMargin/LeftButtonCenter/InteractButton" unique_id=816421771]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -19.5
+offset_right = 19.5
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_0l8t7")
+theme_override_font_sizes/font_size = 8
+text = "Action"
+metadata/_edit_use_anchors_ = true
+
+[node name="RightButtonMargin" type="MarginContainer" parent="ActionButtonBox" unique_id=1277695041]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="RightButtonPanel" type="Panel" parent="ActionButtonBox/RightButtonMargin" unique_id=977914491]
+layout_mode = 2
+
+[node name="RightButtonCenter" type="CenterContainer" parent="ActionButtonBox/RightButtonMargin" unique_id=1708126952]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="JumpButton" type="TouchScreenButton" parent="ActionButtonBox/RightButtonMargin/RightButtonCenter" unique_id=968576433]
+scale = Vector2(2, 2)
 texture_normal = ExtResource("4_pefoi")
-texture_pressed = ExtResource("4_pefoi")
+texture_pressed = ExtResource("7_oc0ds")
 action = "jump"
 visibility_mode = 1
 
-[node name="Panel3" type="Panel" parent="ActionButtonContainer/JumpButton" unique_id=67231611]
-z_index = -1
-anchors_preset = 3
-anchor_left = 1.0
+[node name="JumpLabel" type="Label" parent="ActionButtonBox/RightButtonMargin/RightButtonCenter/JumpButton" unique_id=1613255739]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -15.0
+offset_right = 15.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_0l8t7")
+theme_override_font_sizes/font_size = 8
+text = "Jump"
+metadata/_edit_use_anchors_ = true
+
+[node name="MenuMargin" type="MarginContainer" parent="." unique_id=534439311]
+offset_right = 8.0
+offset_bottom = 8.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="CenterContainer" type="CenterContainer" parent="MenuMargin" unique_id=1251111641]
+layout_mode = 2
+
+[node name="MenuButton" type="TouchScreenButton" parent="MenuMargin/CenterContainer" unique_id=1290261326]
+texture_normal = ExtResource("9_oc0ds")
+texture_pressed = ExtResource("7_oc0ds")
+action = "pause"
+
+[node name="Label" type="Label" parent="MenuMargin/CenterContainer/MenuButton" unique_id=1559993191]
+anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -36.0
-offset_top = -36.0
-grow_horizontal = 0
+offset_bottom = 8.0
+grow_horizontal = 2
 grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("3_0l8t7")
+theme_override_font_sizes/font_size = 8
+text = "Menu"
+horizontal_alignment = 1
 
-[node name="Label" type="Label" parent="ActionButtonContainer/JumpButton" unique_id=1849400470]
-offset_left = -5.94946
-offset_top = 23.94771
-offset_right = 35.05054
-offset_bottom = 46.947712
-text = "Jump"
+[node name="PauseMenu" parent="MenuMargin/CenterContainer/MenuButton" unique_id=1174273434 instance=ExtResource("5_sayjt")]
+visible = false

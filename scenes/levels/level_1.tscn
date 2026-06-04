@@ -2225,7 +2225,6 @@ script = SubResource("GDScript_np2pn")
 
 [node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("2_iwr0g")]
 unique_name_in_owner = true
-process_mode = 2
 visible = false
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
@@ -2233,12 +2232,6 @@ visible = false
 [node name="Player" parent="PCs" unique_id=551637077 instance=ExtResource("1_mm8aj")]
 z_index = 10
 position = Vector2(-128, -64)
-
-[node name="Camera2D" type="Camera2D" parent="PCs/Player" unique_id=1159279511]
-offset = Vector2(0, -40)
-zoom = Vector2(4, 4)
-limit_bottom = 100
-limit_smoothed = true
 
 [node name="NPCs" type="Node" parent="." unique_id=1615409849]
 

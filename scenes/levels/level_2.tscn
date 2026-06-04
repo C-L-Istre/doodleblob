@@ -2182,25 +2182,17 @@ script = ExtResource("1_v8d84")
 
 [node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_r88tb")]
 
+[node name="TouchControls" parent="ControlRoot" unique_id=2036451349 instance=ExtResource("2_gw1l3")]
+
 [node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("3_p4se4")]
 unique_name_in_owner = true
-process_mode = 2
 visible = false
-
-[node name="TouchControls" parent="ControlRoot" unique_id=2036451349 instance=ExtResource("2_gw1l3")]
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
 [node name="Player" parent="PCs" unique_id=551637077 instance=ExtResource("4_sibr7")]
 z_index = 10
 position = Vector2(-128, -64)
-
-[node name="Camera2D" type="Camera2D" parent="PCs/Player" unique_id=1159279511]
-position = Vector2(0, 5)
-offset = Vector2(0, -40)
-zoom = Vector2(4, 4)
-limit_bottom = 100
-limit_smoothed = true
 
 [node name="Terrain" type="Node" parent="." unique_id=1500458828]
 

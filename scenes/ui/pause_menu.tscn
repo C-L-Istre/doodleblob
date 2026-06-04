@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://otq5i4wgqibl" path="res://scripts/pause_menu.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="2_0lmf7"]
+[ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_8uki6"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_0bnpd"]
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=1174273434]
 process_mode = 3
@@ -20,16 +22,23 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -200.0
-offset_right = 150.0
-offset_bottom = 200.0
+offset_left = -68.0
+offset_top = -128.5
+offset_right = 68.0
+offset_bottom = 128.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=400973095]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
-[node name="Title" type="Label" parent="Panel/VBoxContainer" unique_id=378132844]
+[node name="PauseMenuLabel" type="Label" parent="Panel/VBoxContainer" unique_id=378132844]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_8uki6")
 text = "PAUSED"
 horizontal_alignment = 1
 
@@ -48,31 +57,47 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Resume"
 
 [node name="SettingsButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer" unique_id=2072559907]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Settings"
 
 [node name="SettingsPanel" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer/SettingsButton" unique_id=312149562 instance=ExtResource("2_0lmf7")]
 unique_name_in_owner = true
-layout_mode = 0
+visible = false
+layout_mode = 1
 anchors_preset = 0
-offset_left = 293.0
-offset_top = -107.0
-offset_right = 509.0
-offset_bottom = 316.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 395.0
+offset_top = -2.5
+offset_right = 395.0
+offset_bottom = -2.5
+grow_horizontal = 1
+grow_vertical = 1
+scale = Vector2(0.75, 0.75)
 
 [node name="MainMenuButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer" unique_id=656031257]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Main Menu"
 
 [node name="ExitButton" type="Button" parent="Panel/VBoxContainer/MarginContainer/ButtonContainer" unique_id=412490237]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Exit Game"
+
+[connection signal="pressed" from="Panel/VBoxContainer/MarginContainer/ButtonContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/MarginContainer/ButtonContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/MarginContainer/ButtonContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/MarginContainer/ButtonContainer/ExitButton" to="." method="_on_exit_button_pressed"]
