@@ -262,8 +262,19 @@ jobs:
 
           # Allow pinch-to-zoom on mobile.
           html = html.replace(
-              '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">',
-              '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+              '#canvas {\n        display: block;\n}',
+              '''#canvas {
+                  display: block;
+                  width: 100vw;
+                  height: 100vh;
+          
+                  image-rendering: pixelated;
+                  image-rendering: crisp-edges;
+          
+                  position: fixed;
+                  left: 0;
+                  top: 0;
+              }'''
           )
 
           # Remove Godot's manifest link; CI generates manifest.webmanifest instead.
