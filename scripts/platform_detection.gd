@@ -23,6 +23,7 @@ func get_platform() -> PlatformType:
 		_:
 			return PlatformType.WEB
 
+## Returns true on mobile and on web builds running on a touchscreen device.
 func has_touch() -> bool:
 	match get_platform():
 		PlatformType.MOBILE:

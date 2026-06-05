@@ -10,9 +10,6 @@ extends Control
 #   level_paths — one entry per level scene, in play order
 #   panels      — every panel that should close when another opens
 #                 (SelectLevelPanel, HighscorePanel, HelpPanel, SettingsPanel)
-#
-# Editor signal connections required:
-#   ScoreManager.high_score_changed → _on_high_score_changed
 # ──────────────────────────────────────────────────────────────────────────────
 
 ## Scenes to load in order. Add entries here to expose levels in level select.

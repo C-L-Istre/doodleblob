@@ -559,6 +559,19 @@ ScoreManager.high_score        # int (read)
 To remove the score system, delete `score_manager.gd`, remove it from `[autoload]` in
 `project.godot`, and remove `ScoreManager.add_point()` calls from pickup scripts.
 
+**`HealthManager`** (`scripts/health_manager.gd`)
+
+Tracks lives and drives game-over transitions. Emits `lives_changed` (HUD),
+`life_lost` (player reloads scene), and loads `game_over.tscn` directly when
+lives reach zero. Call `reset_game()` at the start of a new game.
+
+```gdscript
+HealthManager.lose_life()           # called from player.die()
+HealthManager.gain_life(amount)     # power-up, milestone reward
+HealthManager.reset_game()          # reset to STARTING_LIVES
+HealthManager.lives                 # int (read)
+```
+
 **`Music`** (`scenes/misc/music.tscn`)
 
 An `AudioStreamPlayer2D` scene configured as an autoload. Because it persists across
@@ -591,7 +604,7 @@ to expose more levels in the level select list.
 In-game pause overlay. Handles resume, settings panel, return to main menu, and exit.
 Sets `process_mode = PROCESS_MODE_ALWAYS` so it receives input while the tree is paused.
 
-**`scripts/game_root.gd`** *(formerly `control.gd`)*
+**`scripts/control_root.gd`**
 
 Root script for in-game scenes. Holds a reference to the pause menu `CanvasLayer` and
 forwards the `pause` input action to it. Attach to the root `Control` node of each
@@ -716,6 +729,25 @@ Edit the `KEEP` variable in the `Cleanup old releases` step in `deploy.yml`:
 ---
 
 ## Troubleshooting
+
+### Text or sprites are blurry at non-native resolutions
+
+Enable integer scaling in Project Settings → Display → Window → Stretch → **Scale Mode: `integer`**.
+
+Integer scaling only scales the viewport to exact whole multiples (1×, 2×, 3×…) so every
+pixel and glyph lands on an exact boundary. Fractional scaling introduces sub-pixel offsets
+that blur text regardless of stretch mode or renderer.
+
+On web, the `Mode` setting (`canvas_items` vs `viewport`) has no visible effect on
+sharpness — the browser controls the final canvas scaling step, so both modes look
+identical. Integer scaling is the only setting that matters for clarity.
+
+**Trade-off:** at resolutions that aren't an exact multiple of the base viewport (640×360),
+the engine falls back to the next lower whole multiple and fills the gap with black bars.
+At 1920×1080 the scale is an exact 3× (no bars). At 1366×768 it would be 2× with bars.
+This is expected behaviour for pixel-perfect rendering.
+
+Currently using viewport, expand, fractional with good results on web.
 
 ### Game is blank or audio doesn't work after load
 

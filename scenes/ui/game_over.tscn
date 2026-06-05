@@ -6,6 +6,7 @@
 
 [node name="GameOver" type="CanvasLayer" unique_id=354981234]
 script = ExtResource("1_60xr3")
+restart_scene = "uid://dbyhga8ebhtki"
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1994689248]
 anchors_preset = 8
