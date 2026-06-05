@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://wcqac0b40qt6" path="res://scripts/triangela.gd" id="1_7l541"]
 [ext_resource type="Texture2D" uid="uid://d3iamh3holr21" path="res://assets/sprites/npcs/PrincessTriangela.png" id="1_l8kju"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_i3o2p"]
-[ext_resource type="FontFile" uid="uid://c41fabxxnq1jr" path="res://assets/fonts/Tiny5/Tiny5-Regular.ttf" id="4_4kfs6"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="4_4kfs6"]
+
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qplbt"]
 atlas = ExtResource("1_l8kju")
