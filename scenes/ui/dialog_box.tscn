@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://1h48hjny4p0b"]
+
+[ext_resource type="Script" uid="uid://clohqj88gfa0y" path="res://scripts/dialog_box.gd" id="1_hhmjc"]
+[ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_rm1mb"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_xovei"]
+
+[node name="DialogBox" type="CanvasLayer" unique_id=941438766 groups=["dialog_box"]]
+process_mode = 3
+layer = 5
+visible = false
+script = ExtResource("1_hhmjc")
+chars_per_second = 24.0
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1033502616]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -503.0
+offset_top = -265.0
+offset_right = 503.0
+offset_bottom = 265.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1003931251]
+layout_mode = 2
+
+[node name="CenterContainer2" type="CenterContainer" parent="CenterContainer/VBoxContainer" unique_id=1008709694]
+layout_mode = 2
+
+[node name="SpeakerContainer" type="PanelContainer" parent="CenterContainer/VBoxContainer/CenterContainer2" unique_id=578196420]
+custom_minimum_size = Vector2(180, 32)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/CenterContainer2/SpeakerContainer" unique_id=1254988022]
+layout_mode = 2
+
+[node name="PortraitRect" type="TextureRect" parent="CenterContainer/VBoxContainer/CenterContainer2/SpeakerContainer/HBoxContainer" unique_id=1125420671]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SpeakerLabel" type="Label" parent="CenterContainer/VBoxContainer/CenterContainer2/SpeakerContainer/HBoxContainer" unique_id=1283235129]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_rm1mb")
+text = "Triangela"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DialogContainer" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=1520626099]
+custom_minimum_size = Vector2(180, 32)
+layout_mode = 2
+
+[node name="DialogLabel" type="Label" parent="CenterContainer/VBoxContainer/DialogContainer" unique_id=2118554443]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 120)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_xovei")
+autowrap_mode = 3
+
+[node name="ContinueContainer" type="MarginContainer" parent="CenterContainer" unique_id=2057438625]
+layout_mode = 2
+theme_override_constants/margin_top = 240
+
+[node name="ContinueLabel" type="Label" parent="CenterContainer/ContinueContainer" unique_id=440902247]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_rm1mb")
+text = "Continue [F]"
+horizontal_alignment = 1
+vertical_alignment = 1
