@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cb6pqint8i8ck" path="res://scenes/ui/hud.tscn" id="2_np2pn"]
 [ext_resource type="Texture2D" uid="uid://bawkmft5csc10" path="res://assets/sprites/blocks/sky.png" id="2_wtwp4"]
 [ext_resource type="Texture2D" uid="uid://chxgv56tu6cpg" path="res://assets/sprites/blocks/water.png" id="3_iwr0g"]
+[ext_resource type="PackedScene" uid="uid://1h48hjny4p0b" path="res://scenes/ui/dialog_box.tscn" id="4_7h2jl"]
 [ext_resource type="Texture2D" uid="uid://ck4hg4slcqigx" path="res://assets/sprites/blocks/stone.png" id="4_bahl2"]
 [ext_resource type="Texture2D" uid="uid://gvaq62ucnx7w" path="res://assets/sprites/blocks/dirt.png" id="5_np2pn"]
 [ext_resource type="Texture2D" uid="uid://deq3o3t1fydlr" path="res://assets/sprites/blocks/grass.png" id="6_v6ha0"]
@@ -2227,6 +2228,9 @@ script = SubResource("GDScript_np2pn")
 unique_name_in_owner = true
 visible = false
 
+[node name="DialogBox" parent="ControlRoot" unique_id=941438766 instance=ExtResource("4_7h2jl")]
+unique_name_in_owner = true
+
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
 [node name="Player" parent="PCs" unique_id=551637077 instance=ExtResource("1_mm8aj")]
@@ -2236,7 +2240,7 @@ position = Vector2(-128, -64)
 [node name="NPCs" type="Node" parent="." unique_id=1615409849]
 
 [node name="Triangela" parent="NPCs" unique_id=1107866423 instance=ExtResource("10_7h2jl")]
-position = Vector2(110, -32)
+position = Vector2(109, -31)
 
 [node name="Enemies" type="Node" parent="." unique_id=756238706]
 
@@ -2244,6 +2248,7 @@ position = Vector2(110, -32)
 position = Vector2(206, -31)
 
 [node name="SqBear" type="Label" parent="Enemies/Bear" unique_id=1362725059]
+visible = false
 modulate = Color(0.39607844, 0.30588236, 0.17254902, 1)
 z_index = 5
 offset_left = -35.0

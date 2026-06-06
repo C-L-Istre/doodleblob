@@ -11,6 +11,7 @@ extends Control
 #   panels      — every panel that should close when another opens
 #                 (SelectLevelPanel, HighscorePanel, HelpPanel, SettingsPanel)
 # ──────────────────────────────────────────────────────────────────────────────
+# ScoreManager.high_score_changed is connected in code — no editor connection in the scene.
 
 ## Scenes to load in order. Add entries here to expose levels in level select.
 @export var level_paths: Array[String] = []

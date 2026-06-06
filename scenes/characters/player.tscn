@@ -178,6 +178,5 @@ shape = SubResource("RectangleShape2D_cvnsp")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=208033090]
 offset = Vector2(0, -40)
-zoom = Vector2(2, 2)
 limit_bottom = 100
 limit_smoothed = true

@@ -3,10 +3,7 @@
 [ext_resource type="Script" uid="uid://cxfqdtjw3vg4v" path="res://scripts/settings_panel.gd" id="1_ea4bf"]
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="1_qm286"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="2_i3lpr"]
-[ext_resource type="Theme" uid="uid://gyfkm6q0rnyg" path="res://assets/fonts/new_theme.tres" id="4_5qqek"]
-
-[sub_resource type="Theme" id="Theme_i3lpr"]
-default_font = ExtResource("2_i3lpr")
+[ext_resource type="Theme" uid="uid://gyfkm6q0rnyg" path="res://assets/fonts/PixelOperator8.tres" id="4_5qqek"]
 
 [node name="Panel" type="Panel" unique_id=1988029234]
 anchors_preset = 14
@@ -168,7 +165,7 @@ text = "Resolution"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 2
-theme = SubResource("Theme_i3lpr")
+theme = ExtResource("4_5qqek")
 theme_override_fonts/font = ExtResource("2_i3lpr")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer/GraphicsVBox" unique_id=1519389662]
