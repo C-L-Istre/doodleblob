@@ -17,7 +17,7 @@ Hoo-RAH!!!"
 
 [sub_resource type="Resource" id="DialogData_Triangela"]
 script = ExtResource("6_161ud")
-speaker = "Princess Triangela"
+speaker = "King Octavius"
 portrait = ExtResource("4_tc4wk")
 start_node = "root"
 nodes = Array[ExtResource("2_vexs0")]([SubResource("Node_root")])
