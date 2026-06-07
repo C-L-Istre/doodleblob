@@ -12,7 +12,7 @@ extends CanvasLayer
 #   SettingsPanel → Visibility : Hidden
 # ──────────────────────────────────────────────────────────────────────────────
 
-@onready var _settings_panel: Panel  = %SettingsPanel
+@onready var _settings_panel: PanelContainer  = %SettingsPanel
 @onready var _exit_button:    Button = %ExitButton
 
 var _panels:      Array[CanvasItem]

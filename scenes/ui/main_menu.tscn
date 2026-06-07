@@ -42,14 +42,12 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Play Game"
-icon = ExtResource("2_uhagc")
 
 [node name="SelectLevelButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=447735588]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Select Level"
-icon = ExtResource("2_uhagc")
 
 [node name="SelectLevelPanel" type="ItemList" parent="MarginContainer/VBoxContainer/SelectLevelButton" unique_id=418572927]
 unique_name_in_owner = true
@@ -80,7 +78,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "High Score"
-icon = ExtResource("2_uhagc")
 
 [node name="HighscorePanel" type="Label" parent="MarginContainer/VBoxContainer/HighscoreButton" unique_id=2145263567]
 unique_name_in_owner = true
@@ -103,7 +100,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Help"
-icon = ExtResource("2_uhagc")
 
 [node name="HelpPanel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HelpButton" unique_id=1586638106]
 unique_name_in_owner = true
@@ -137,7 +133,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Settings"
-icon = ExtResource("2_uhagc")
 
 [node name="SettingsPanel" parent="MarginContainer/VBoxContainer/SettingsButton" unique_id=1009959844 instance=ExtResource("4_btxxm")]
 unique_name_in_owner = true
@@ -157,7 +152,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Exit"
-icon = ExtResource("2_uhagc")
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/SelectLevelButton" to="." method="_on_select_level_button_pressed"]
