@@ -37,6 +37,18 @@ func _ready() -> void:
 	# high_score_changed has no editor connection in the scene — kept in code.
 	ScoreManager.high_score_changed.connect(_on_high_score_changed)
 
+	# Wire hover-matching focus styles and set initial focus so the menu is
+	# immediately keyboard/gamepad navigable. Called after visibility is set so
+	# ExitGameButton is correctly skipped when hidden.
+	MenuNav.setup([
+		%PlayGameButton,
+		%SelectLevelButton,
+		%HighscoreButton,
+		%HelpButton,
+		%SettingsButton,
+		%ExitGameButton,
+	])
+
 
 # ── Panel management ──────────────────────────────────────────────────────────
 

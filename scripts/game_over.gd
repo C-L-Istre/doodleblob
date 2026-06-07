@@ -17,6 +17,7 @@ extends CanvasLayer
 
 func _ready() -> void:
 	_exit_button.visible = PlatformDetection.can_quit()
+	MenuNav.setup([%PlayButton, %MainMenuButton2, %ExitButton])
 
 
 # ── Button handlers (connect in editor) ───────────────────────────────────────
@@ -30,6 +31,7 @@ func _on_play_button_pressed() -> void:
 	HealthManager.reset_game()
 	get_tree().change_scene_to_file(restart_scene)
 
+
 func _on_main_menu_button_pressed() -> void:
 	ScoreManager.finish_level()
 	ScoreManager.reset_score()
@@ -38,4 +40,4 @@ func _on_main_menu_button_pressed() -> void:
 
 
 func _on_exit_button_pressed() -> void:
-	get_tree().quit()
+	PlatformDetection.exit_game()
