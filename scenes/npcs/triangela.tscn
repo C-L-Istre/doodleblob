@@ -41,7 +41,7 @@ next = "quest_prompt"
 
 [sub_resource type="Resource" id="Choice_FineIllGo"]
 script = ExtResource("6_dchoice")
-text = "Fine. I'll look for him."
+text = "Fine. I'll look I guess..."
 next = "accept"
 
 [sub_resource type="Resource" id="Choice_YeahNo"]
@@ -118,8 +118,9 @@ autoplay = "idle"
 frame_progress = 0.1764631
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=307942677]
-position = Vector2(0, 3)
+position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_27vpw")
+disabled = true
 
 [node name="PromptContainer" type="MarginContainer" parent="." unique_id=1621709192]
 anchors_preset = 15

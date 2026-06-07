@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://2vq50hudycot"]
 
+[ext_resource type="Script" uid="uid://13hrpmfwx0o8" path="res://scripts/level.gd" id="1_ndlae"]
 [ext_resource type="Script" uid="uid://bpro0vbnhwtwg" path="res://scripts/control_root.gd" id="1_v8d84"]
 [ext_resource type="PackedScene" uid="uid://beo0q1itvj6hp" path="res://scenes/ui/touch_controls.tscn" id="2_gw1l3"]
 [ext_resource type="PackedScene" uid="uid://cb6pqint8i8ck" path="res://scenes/ui/hud.tscn" id="2_r88tb"]
@@ -15,10 +16,6 @@
 [ext_resource type="PackedScene" uid="uid://cbnx51ouraho8" path="res://scenes/misc/kill_zone.tscn" id="14_xworo"]
 [ext_resource type="PackedScene" uid="uid://dy4d1g1dgbsy" path="res://scenes/objects/platform_falling.tscn" id="15_1yj8c"]
 [ext_resource type="PackedScene" uid="uid://cc0ruoxphh202" path="res://scenes/objects/platform.tscn" id="16_rvwo1"]
-
-[sub_resource type="GDScript" id="GDScript_bahl2"]
-script/source = "extends Node2D
-"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nb51f"]
 texture = ExtResource("8_wikm6")
@@ -2168,7 +2165,7 @@ sources/5 = SubResource("TileSetAtlasSource_fkdbe")
 sources/6 = SubResource("TileSetAtlasSource_81klo")
 
 [node name="Level 2" type="Node2D" unique_id=1725077776]
-script = SubResource("GDScript_bahl2")
+script = ExtResource("1_ndlae")
 
 [node name="ControlRoot" type="Control" parent="." unique_id=406943870]
 process_mode = 3

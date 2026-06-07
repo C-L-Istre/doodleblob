@@ -95,11 +95,23 @@ func advance() -> void:
 
 
 # ── Input — choice navigation ──────────────────────────────────────────────────
-
+ 
 func _unhandled_input(event: InputEvent) -> void:
-	if not visible or not _showing_choices:
+	if not visible:
 		return
-
+ 
+	# ui_accept (Enter / A button) mirrors the interact action so players can
+	# use standard menu-confirm keys to advance dialog without pressing F/Y.
+	# interact itself is handled by player.gd to avoid binding it to A/Space
+	# which would also trigger jump.
+	if event.is_action_pressed("ui_accept"):
+		advance()
+		get_viewport().set_input_as_handled()
+		return
+ 
+	if not _showing_choices:
+		return
+ 
 	if event.is_action_pressed("ui_up"):
 		_selected_choice = max(0, _selected_choice - 1)
 		_update_choice_highlights()
@@ -108,6 +120,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_selected_choice = min(_visible_choices.size() - 1, _selected_choice + 1)
 		_update_choice_highlights()
 		get_viewport().set_input_as_handled()
+ 
+ 
 
 
 # ── Private: typewriter ────────────────────────────────────────────────────────
@@ -145,7 +159,7 @@ func _finish_typing() -> void:
 
 	if _current_node.choices.is_empty():
 		# Linear node — show continue/close prompt.
-		continue_label.text    = "Continue [F]" if _current_node.next != "" else "Close [F]"
+		continue_label.text    = "Continue [Interact]" if _current_node.next != "" else "Close [Interact]"
 		continue_label.visible = true
 	else:
 		# Branching node — filter by quest conditions then show.

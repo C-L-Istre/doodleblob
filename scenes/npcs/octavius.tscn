@@ -41,8 +41,10 @@ size = Vector2(10, 26)
 size = Vector2(64, 52)
 
 [node name="KingOctavius" type="CharacterBody2D" unique_id=1107866423]
+scale = Vector2(2, 2)
 script = ExtResource("1_uujmy")
 dialog_data = SubResource("DialogData_Triangela")
+prompt_text = "Press [Interact] to Talk"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=379029911]
 sprite_frames = SubResource("SpriteFrames_s5r76")
@@ -53,6 +55,7 @@ frame_progress = 0.1764631
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=307942677]
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_27vpw")
+disabled = true
 
 [node name="PromptContainer" type="MarginContainer" parent="." unique_id=1621709192]
 anchors_preset = 15
