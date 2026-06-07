@@ -24,6 +24,9 @@
 
 [sub_resource type="GDScript" id="GDScript_bahl2"]
 script/source = "extends Node2D
+
+func _ready() -> void:
+	QuestManager.register(preload(\"res://resources/quests/find_the_king.tres\"))
 "
 
 [sub_resource type="GDScript" id="GDScript_np2pn"]

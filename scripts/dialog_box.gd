@@ -30,6 +30,7 @@ signal dialog_ended
 ## Characters revealed per second during the typewriter effect.
 @export var chars_per_second: float = 48.0
 
+## Texture used as the cursor beside the selected choice row.
 @export var choice_cursor_texture: Texture2D
 
 @onready var speaker_label:     Label         = %SpeakerLabel
@@ -39,14 +40,17 @@ signal dialog_ended
 @onready var continue_label:    Label         = %ContinueLabel
 
 var _data:            DialogData
-var _node_map:        Dictionary  # String → DialogNode
+var _node_map:        Dictionary           # String → DialogNode
 var _current_node:    DialogNode
-var _is_typing:       bool   = false
-var _char_timer:      float  = 0.0
-var _char_index:      int    = 0
-var _full_text:       String = ""
-var _showing_choices: bool   = false
-var _selected_choice: int    = 0
+var _is_typing:       bool              = false
+var _char_timer:      float             = 0.0
+var _char_index:      int               = 0
+var _full_text:       String            = ""
+var _showing_choices: bool              = false
+var _selected_choice: int               = 0
+## Subset of _current_node.choices that pass their condition check.
+## All choice-related indexing uses this list, not the raw node list.
+var _visible_choices: Array[DialogChoice] = []
 
 
 # ── Public API ─────────────────────────────────────────────────────────────────
@@ -101,7 +105,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_update_choice_highlights()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_down"):
-		_selected_choice = min(_current_node.choices.size() - 1, _selected_choice + 1)
+		_selected_choice = min(_visible_choices.size() - 1, _selected_choice + 1)
 		_update_choice_highlights()
 		get_viewport().set_input_as_handled()
 
@@ -144,7 +148,7 @@ func _finish_typing() -> void:
 		continue_label.text    = "Continue [F]" if _current_node.next != "" else "Close [F]"
 		continue_label.visible = true
 	else:
-		# Branching node — show choice list.
+		# Branching node — filter by quest conditions then show.
 		_show_choices()
 
 
@@ -163,39 +167,57 @@ func _goto_node(node_id: String) -> void:
 		return
 
 	_current_node             = _node_map[node_id]
+	_visible_choices          = []
 	_showing_choices          = false
 	choices_container.visible = false
+
+	# Fire the node's quest event immediately on entry, before the typewriter.
+	QuestManager.fire_event(_current_node.quest_event)
+
 	_show_text(_current_node.text)
 
 
 func _show_choices() -> void:
+	# Build the filtered list — hide any choice whose condition isn't met.
+	_visible_choices = []
+	for choice: DialogChoice in _current_node.choices:
+		if QuestManager.check_condition(choice.condition):
+			_visible_choices.append(choice)
+
+	# If all choices were filtered out, fall through to linear behaviour.
+	if _visible_choices.is_empty():
+		_showing_choices       = false
+		var has_next: bool     = _current_node.next != ""
+		continue_label.text    = "Continue [F]" if has_next else "Close [F]"
+		continue_label.visible = true
+		return
+
 	_showing_choices = true
 	_selected_choice = 0
 
-	# Rebuild labels (free handles any leftover from a previous node).
+	# Rebuild choice rows — free() removes old ones immediately so
+	# get_children() is clean before we add new ones.
 	for child in choices_container.get_children():
 		child.free()
 
 	# Inherit the dialog font so choices visually match the dialog text.
 	var font: Font = dialog_label.get_theme_font("font")
 
-	for choice: DialogChoice in _current_node.choices:
+	for choice: DialogChoice in _visible_choices:
 		var row := HBoxContainer.new()
 
 		var cursor := TextureRect.new()
-		cursor.texture = choice_cursor_texture
-		cursor.visible = false
+		cursor.texture            = choice_cursor_texture
+		cursor.visible            = false
 		cursor.custom_minimum_size = Vector2(8, 8)
 
 		var lbl := Label.new()
 		lbl.text = choice.text
-
 		if font:
 			lbl.add_theme_font_override("font", font)
 
 		row.add_child(cursor)
 		row.add_child(lbl)
-
 		choices_container.add_child(row)
 
 	choices_container.visible = true
@@ -204,19 +226,20 @@ func _show_choices() -> void:
 
 func _update_choice_highlights() -> void:
 	var rows: Array = choices_container.get_children()
-
 	for i in rows.size():
-		var row := rows[i] as HBoxContainer
-
+		var row    := rows[i] as HBoxContainer
 		var cursor := row.get_child(0) as TextureRect
-		var label := row.get_child(1) as Label
-
+		var lbl    := row.get_child(1) as Label
 		cursor.visible = (i == _selected_choice)
-		label.text = _current_node.choices[i].text
+		lbl.text       = _visible_choices[i].text
 
 
 func _confirm_choice() -> void:
-	var choice: DialogChoice = _current_node.choices[_selected_choice]
+	var choice: DialogChoice = _visible_choices[_selected_choice]
+
+	# Fire the choice's quest event before navigating away.
+	QuestManager.fire_event(choice.quest_event)
+
 	if choice.next == "":
 		_close()
 	else:
@@ -226,6 +249,7 @@ func _confirm_choice() -> void:
 func _close() -> void:
 	_node_map                 = {}
 	_current_node             = null
+	_visible_choices          = []
 	_showing_choices          = false
 	choices_container.visible = false
 	hide()

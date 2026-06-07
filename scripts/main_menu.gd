@@ -2,16 +2,7 @@ extends Control
 
 # ──────────────────────────────────────────────────────────────────────────────
 # MainMenu
-#
-# Manages the main menu. Panel visibility, level navigation, and high score
-# display. All button signals are connected in the scene editor.
-#
-# Inspector setup:
-#   level_paths — one entry per level scene, in play order
-#   panels      — every panel that should close when another opens
-#                 (SelectLevelPanel, HighscorePanel, HelpPanel, SettingsPanel)
 # ──────────────────────────────────────────────────────────────────────────────
-# ScoreManager.high_score_changed is connected in code — no editor connection in the scene.
 
 ## Scenes to load in order. Add entries here to expose levels in level select.
 @export var level_paths: Array[String] = []
@@ -26,20 +17,10 @@ var _panels: Array[CanvasItem]
 
 
 func _ready() -> void:
-	_panels = [
-		%SelectLevelPanel,
-		%HighscorePanel,
-		%HelpPanel,
-		%SettingsPanel,
-	]
+	_panels = [%SelectLevelPanel, %HighscorePanel, %HelpPanel, %SettingsPanel]
 	_exit_button.visible = PlatformDetection.can_quit()
 	_highscore_panel.text = "High Score: %d" % ScoreManager.high_score
-	# high_score_changed has no editor connection in the scene — kept in code.
 	ScoreManager.high_score_changed.connect(_on_high_score_changed)
-
-	# Wire hover-matching focus styles and set initial focus so the menu is
-	# immediately keyboard/gamepad navigable. Called after visibility is set so
-	# ExitGameButton is correctly skipped when hidden.
 	MenuNav.setup([
 		%PlayGameButton,
 		%SelectLevelButton,
@@ -65,7 +46,7 @@ func _toggle_panel(node: CanvasItem) -> void:
 		node.visible = true
 
 
-# ── Button handlers (connect in editor) ───────────────────────────────────────
+# ── Button handlers ───────────────────────────────────────────────────────────
 
 func _on_play_game_button_pressed() -> void:
 	if level_paths.is_empty():
@@ -73,6 +54,7 @@ func _on_play_game_button_pressed() -> void:
 		return
 	ScoreManager.reset_score()
 	HealthManager.reset_game()
+	QuestManager.reset()
 	call_deferred("_load_level", level_paths[0])
 
 
@@ -87,6 +69,7 @@ func _on_select_level_panel_item_selected(index: int) -> void:
 		return
 	ScoreManager.reset_score()
 	HealthManager.reset_game()
+	QuestManager.reset()
 	call_deferred("_load_level", level_paths[index])
 
 
@@ -109,8 +92,6 @@ func _on_exit_game_button_pressed() -> void:
 func _on_high_score_changed(new_high: int) -> void:
 	_highscore_panel.text = "High Score: %d" % new_high
 
-
-# ── Private ───────────────────────────────────────────────────────────────────
 
 func _load_level(path: String) -> void:
 	get_tree().change_scene_to_file(path)

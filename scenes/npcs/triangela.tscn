@@ -16,8 +16,10 @@ next = "info"
 
 [sub_resource type="Resource" id="Choice_IllHelp"]
 script = ExtResource("6_dchoice")
-text = "I'll help find him!"
+text = "I guess I'll help."
 next = "accept"
+quest_event = "advance:find_the_king:accepted"
+condition = "active:find_the_king"
 
 [sub_resource type="Resource" id="Choice_NotMyProblem"]
 script = ExtResource("6_dchoice")
@@ -29,6 +31,7 @@ script = ExtResource("5_dnode")
 node_id = "root"
 text = "Hmmmph... My Dad's missing or something!"
 choices = Array[ExtResource("6_dchoice")]([SubResource("Choice_TellMore"), SubResource("Choice_IllHelp"), SubResource("Choice_NotMyProblem")])
+quest_event = "start:find_the_king"
 
 [sub_resource type="Resource" id="Node_info"]
 script = ExtResource("5_dnode")

@@ -22,6 +22,7 @@ buses/default_bus_layout="uid://c2jbxgy8gk2dh"
 [autoload]
 
 PlatformDetection="*uid://kyj800t3ae2f"
+QuestManager="*uid://c21yexodo1vqp"
 HealthManager="*uid://bs10dpdaybt8"
 ScoreManager="*uid://f26k77trdccc"
 Music="*uid://cxq1ikg7pavn7"
