@@ -3,126 +3,230 @@ extends CanvasLayer
 # ──────────────────────────────────────────────────────────────────────────────
 # DialogBox
 #
-# Screen-space dialog UI. Lives as a child of ControlRoot in the level scene
-# so it renders over everything at any resolution and survives camera movement.
+# Screen-space dialog UI with branching tree support.
+# Lives as a child of ControlRoot so it renders over everything.
 #
 # Flow:
 #   NPC.interact(player) → player.start_dialog(data)
-#     → DialogBox.start(data)
-#     → dialog_started emitted → Player freezes input
-#     → player advances lines with the "interact" action
-#     → dialog_ended emitted → Player restores input
+#     → DialogBox.start(data)   → dialog_started emitted  → Player freezes
+#     → typewriter plays        → choices appear OR continue prompt
+#     → player navigates with ui_up/ui_down, confirms with interact
+#     → dialog_ended emitted    → Player restores input
 #
-# Scene setup — expected child nodes (all unique_name_in_owner = true):
-#   %SpeakerLabel    : Label          — NPC name
-#   %PortraitRect    : TextureRect    — NPC portrait; hidden when portrait = null
-#   %DialogLabel     : Label          — current line text
-#   %ContinueLabel   : Label          — "▼" or "[F]" prompt; hidden while typing
-#
-# The root CanvasLayer should be set:
-#   visible     = false   (in the scene; shown by start())
-#   layer       = 5       (above game world, below PauseMenu at layer 10)
-#   process_mode = Always (so input works if the tree is ever paused)
+# Scene setup — expected child nodes (unique_name_in_owner = true):
+#   %SpeakerLabel      : Label         — NPC name
+#   %PortraitRect      : TextureRect   — NPC portrait; hidden when null
+#   %DialogLabel       : Label         — current node text
+#   %ChoicesContainer  : VBoxContainer — choice labels; visible only when branching
+#   %ContinueLabel     : Label         — "Continue / Close [F]"; visible only when linear
 # ──────────────────────────────────────────────────────────────────────────────
 
-## Emitted when a conversation begins. Player connects to this to freeze input.
+## Emitted when a conversation begins. Player connects to freeze input.
 signal dialog_started
 
-## Emitted when the last line is dismissed. Player connects to restore input.
+## Emitted when the last node is dismissed. Player connects to restore input.
 signal dialog_ended
 
 ## Characters revealed per second during the typewriter effect.
-@export var chars_per_second: float = 40.0
+@export var chars_per_second: float = 48.0
 
-@onready var speaker_label:  Label       = %SpeakerLabel
-@onready var portrait_rect:  TextureRect = %PortraitRect
-@onready var dialog_label:   Label       = %DialogLabel
-@onready var continue_label: Label       = %ContinueLabel
+@export var choice_cursor_texture: Texture2D
 
-var _lines:        Array[String] = []
-var _current_line: int           = 0
-var _is_typing:    bool          = false
-var _char_timer:   float         = 0.0
-var _char_index:   int           = 0
-var _full_text:    String        = ""
+@onready var speaker_label:     Label         = %SpeakerLabel
+@onready var portrait_rect:     TextureRect   = %PortraitRect
+@onready var dialog_label:      Label         = %DialogLabel
+@onready var choices_container: VBoxContainer = %ChoicesContainer
+@onready var continue_label:    Label         = %ContinueLabel
 
-# ── Public API ────────────────────────────────────────────────────────────────
+var _data:            DialogData
+var _node_map:        Dictionary  # String → DialogNode
+var _current_node:    DialogNode
+var _is_typing:       bool   = false
+var _char_timer:      float  = 0.0
+var _char_index:      int    = 0
+var _full_text:       String = ""
+var _showing_choices: bool   = false
+var _selected_choice: int    = 0
+
+
+# ── Public API ─────────────────────────────────────────────────────────────────
 
 ## Start a conversation. Called by the player on behalf of an NPC.
-## Does nothing if data has no lines.
 func start(data: DialogData) -> void:
-	if data.lines.is_empty():
+	if data.nodes.is_empty():
 		return
 
-	_lines = data.lines
-	_current_line = 0
+	_data = data
+	_build_node_map()
 
-	speaker_label.text = data.speaker
-	portrait_rect.texture = data.portrait
-	portrait_rect.visible = data.portrait != null
-	continue_label.visible = false
+	speaker_label.text        = data.speaker
+	portrait_rect.texture     = data.portrait
+	portrait_rect.visible     = data.portrait != null
+	continue_label.visible    = false
+	choices_container.visible = false
 
 	show()
-
-	# Wait one frame after show() so the label's layout is ready before
-	# the typewriter starts writing. Without this, text may not appear.
 	await get_tree().process_frame
-
 	dialog_started.emit()
-	_show_line(_lines[0])
+	_goto_node(data.start_node)
 
 
-## Advance to the next line, or close if on the last line.
-## Called by the player when the interact action is pressed.
+## Advance or confirm. Routed here by the player when the interact action fires.
+##   Typing         → skip to full text immediately.
+##   Choices shown  → confirm the currently selected choice.
+##   Linear prompt  → advance to next node, or close if terminal.
 func advance() -> void:
 	if _is_typing:
 		_finish_typing()
 		return
 
-	_current_line += 1
+	if _showing_choices:
+		_confirm_choice()
+		return
 
-	if _current_line >= _lines.size():
+	if _current_node == null or _current_node.next == "":
 		_close()
 	else:
-		_show_line(_lines[_current_line])
+		_goto_node(_current_node.next)
 
 
-# ── Private ───────────────────────────────────────────────────────────────────
+# ── Input — choice navigation ──────────────────────────────────────────────────
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible or not _showing_choices:
+		return
+
+	if event.is_action_pressed("ui_up"):
+		_selected_choice = max(0, _selected_choice - 1)
+		_update_choice_highlights()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_down"):
+		_selected_choice = min(_current_node.choices.size() - 1, _selected_choice + 1)
+		_update_choice_highlights()
+		get_viewport().set_input_as_handled()
+
+
+# ── Private: typewriter ────────────────────────────────────────────────────────
 
 func _process(delta: float) -> void:
 	if not _is_typing:
 		return
 
 	_char_timer += delta
-
 	var chars_to_add: int = int(_char_timer * chars_per_second)
 	if chars_to_add < 1:
 		return
 
-	_char_timer   = 0.0
-	_char_index   = min(_char_index + chars_to_add, _full_text.length())
+	_char_timer = 0.0
+	_char_index = min(_char_index + chars_to_add, _full_text.length())
 	dialog_label.text = _full_text.left(_char_index)
 
 	if _char_index >= _full_text.length():
 		_finish_typing()
 
 
-func _show_line(text: String) -> void:
-	_full_text      = text
-	_char_index     = 0
-	_char_timer     = 0.0
-	_is_typing      = true
-	dialog_label.text      = ""
-	continue_label.visible = false
+func _show_text(text: String) -> void:
+	_full_text                = text
+	_char_index               = 0
+	_char_timer               = 0.0
+	_is_typing                = true
+	dialog_label.text         = ""
+	continue_label.visible    = false
+	choices_container.visible = false
 
 
 func _finish_typing() -> void:
-	_is_typing              = false
-	dialog_label.text      = _full_text
-	continue_label.visible = true
+	_is_typing        = false
+	dialog_label.text = _full_text
+
+	if _current_node.choices.is_empty():
+		# Linear node — show continue/close prompt.
+		continue_label.text    = "Continue [F]" if _current_node.next != "" else "Close [F]"
+		continue_label.visible = true
+	else:
+		# Branching node — show choice list.
+		_show_choices()
+
+
+# ── Private: branching ─────────────────────────────────────────────────────────
+
+func _build_node_map() -> void:
+	_node_map = {}
+	for node: DialogNode in _data.nodes:
+		_node_map[node.node_id] = node
+
+
+func _goto_node(node_id: String) -> void:
+	if not _node_map.has(node_id):
+		push_warning("DialogBox: unknown node_id '%s' — closing." % node_id)
+		_close()
+		return
+
+	_current_node             = _node_map[node_id]
+	_showing_choices          = false
+	choices_container.visible = false
+	_show_text(_current_node.text)
+
+
+func _show_choices() -> void:
+	_showing_choices = true
+	_selected_choice = 0
+
+	# Rebuild labels (free handles any leftover from a previous node).
+	for child in choices_container.get_children():
+		child.free()
+
+	# Inherit the dialog font so choices visually match the dialog text.
+	var font: Font = dialog_label.get_theme_font("font")
+
+	for choice: DialogChoice in _current_node.choices:
+		var row := HBoxContainer.new()
+
+		var cursor := TextureRect.new()
+		cursor.texture = choice_cursor_texture
+		cursor.visible = false
+		cursor.custom_minimum_size = Vector2(8, 8)
+
+		var lbl := Label.new()
+		lbl.text = choice.text
+
+		if font:
+			lbl.add_theme_font_override("font", font)
+
+		row.add_child(cursor)
+		row.add_child(lbl)
+
+		choices_container.add_child(row)
+
+	choices_container.visible = true
+	_update_choice_highlights()
+
+
+func _update_choice_highlights() -> void:
+	var rows: Array = choices_container.get_children()
+
+	for i in rows.size():
+		var row := rows[i] as HBoxContainer
+
+		var cursor := row.get_child(0) as TextureRect
+		var label := row.get_child(1) as Label
+
+		cursor.visible = (i == _selected_choice)
+		label.text = _current_node.choices[i].text
+
+
+func _confirm_choice() -> void:
+	var choice: DialogChoice = _current_node.choices[_selected_choice]
+	if choice.next == "":
+		_close()
+	else:
+		_goto_node(choice.next)
 
 
 func _close() -> void:
-	_lines = []
+	_node_map                 = {}
+	_current_node             = null
+	_showing_choices          = false
+	choices_container.visible = false
 	hide()
 	dialog_ended.emit()

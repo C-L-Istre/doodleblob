@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 # ──────────────────────────────────────────────────────────────────────────────
-# NPC (Triangela)
+# NPC
 #
 # Proximity-based interactable NPC. Registers itself with the player when in
 # range so the player's "interact" action opens the dialog box.

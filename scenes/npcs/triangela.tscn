@@ -1,11 +1,66 @@
 [gd_scene format=3 uid="uid://7cd1csawdkwd"]
 
-[ext_resource type="Script" uid="uid://wcqac0b40qt6" path="res://scripts/triangela.gd" id="1_7l541"]
+[ext_resource type="Script" uid="uid://dxpuc7dbb532e" path="res://scripts/npc.gd" id="1_7l541"]
 [ext_resource type="Texture2D" uid="uid://d3iamh3holr21" path="res://assets/sprites/npcs/PrincessTriangela.png" id="1_l8kju"]
 [ext_resource type="Script" uid="uid://eatc5v34vqd" path="res://scripts/dialog_data.gd" id="2_4kfs6"]
 [ext_resource type="Texture2D" uid="uid://b503qcg7obv1h" path="res://assets/sprites/npcs/PrincessTriangela1.png" id="2_xrwyx"]
 [ext_resource type="Texture2D" uid="uid://dtvrhnhfotawu" path="res://assets/sprites/npcs/PrincessTriangela2.png" id="3_ncrxr"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="4_4kfs6"]
+[ext_resource type="Script" uid="uid://40yblr5l8mf3" path="res://scripts/dialog_node.gd" id="5_dnode"]
+[ext_resource type="Script" uid="uid://bcwcobxymunmv" path="res://scripts/dialog_choice.gd" id="6_dchoice"]
+
+[sub_resource type="Resource" id="Choice_TellMore"]
+script = ExtResource("6_dchoice")
+text = "Why should I care?"
+next = "info"
+
+[sub_resource type="Resource" id="Choice_IllHelp"]
+script = ExtResource("6_dchoice")
+text = "I'll help find him!"
+next = "accept"
+
+[sub_resource type="Resource" id="Choice_NotMyProblem"]
+script = ExtResource("6_dchoice")
+text = "Not my problem."
+next = "decline"
+
+[sub_resource type="Resource" id="Node_root"]
+script = ExtResource("5_dnode")
+node_id = "root"
+text = "Hmmmph... My Dad's missing or something!"
+choices = Array[ExtResource("6_dchoice")]([SubResource("Choice_TellMore"), SubResource("Choice_IllHelp"), SubResource("Choice_NotMyProblem")])
+
+[sub_resource type="Resource" id="Node_info"]
+script = ExtResource("5_dnode")
+node_id = "info"
+text = "He's like... the King?"
+next = "quest_prompt"
+
+[sub_resource type="Resource" id="Choice_FineIllGo"]
+script = ExtResource("6_dchoice")
+text = "Fine. I'll look for him."
+next = "accept"
+
+[sub_resource type="Resource" id="Choice_YeahNo"]
+script = ExtResource("6_dchoice")
+text = "Yeah, no."
+next = "decline"
+
+[sub_resource type="Resource" id="Node_quest_prompt"]
+script = ExtResource("5_dnode")
+node_id = "quest_prompt"
+text = "Soooo... are you gonna look for him or what?"
+choices = Array[ExtResource("6_dchoice")]([SubResource("Choice_FineIllGo"), SubResource("Choice_YeahNo")])
+
+[sub_resource type="Resource" id="Node_accept"]
+script = ExtResource("5_dnode")
+node_id = "accept"
+text = "Good..."
+
+[sub_resource type="Resource" id="Node_decline"]
+script = ExtResource("5_dnode")
+node_id = "decline"
+text = "Ugh. WHATEVER!!!"
 
 [sub_resource type="AnimatedTexture" id="AnimatedTexture_ihb1n"]
 frames = 2
@@ -14,12 +69,12 @@ frame_0/duration = 0.6
 frame_1/texture = ExtResource("3_ncrxr")
 frame_1/duration = 0.2
 
-[sub_resource type="Resource" id="Resource_hx1mh"]
+[sub_resource type="Resource" id="DialogData_Triangela"]
 script = ExtResource("2_4kfs6")
 speaker = "Princess Triangela"
-lines = Array[String](["Hmmmph...", "My Dad's missing or whatever...", "He's like...", " ...the King?
-", "Soooooooo... ", "...you should probably go find him?"])
 portrait = SubResource("AnimatedTexture_ihb1n")
+start_node = "root"
+nodes = Array[ExtResource("5_dnode")]([SubResource("Node_root"), SubResource("Node_info"), SubResource("Node_quest_prompt"), SubResource("Node_accept"), SubResource("Node_decline")])
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qplbt"]
 atlas = ExtResource("1_l8kju")
@@ -51,7 +106,7 @@ size = Vector2(64, 52)
 
 [node name="Triangela" type="CharacterBody2D" unique_id=1107866423]
 script = ExtResource("1_7l541")
-dialog_data = SubResource("Resource_hx1mh")
+dialog_data = SubResource("DialogData_Triangela")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=379029911]
 sprite_frames = SubResource("SpriteFrames_s5r76")
@@ -63,7 +118,7 @@ frame_progress = 0.1764631
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_27vpw")
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1621709192]
+[node name="PromptContainer" type="MarginContainer" parent="." unique_id=1621709192]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -74,7 +129,7 @@ offset_bottom = -25.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PromptLabel" type="Label" parent="MarginContainer" unique_id=686740844]
+[node name="PromptLabel" type="Label" parent="PromptContainer" unique_id=686740844]
 unique_name_in_owner = true
 z_index = 20
 layout_mode = 2
@@ -82,13 +137,13 @@ theme_override_fonts/font = ExtResource("4_4kfs6")
 theme_override_font_sizes/font_size = 8
 horizontal_alignment = 1
 
-[node name="Area2D" type="Area2D" parent="." unique_id=8339693]
+[node name="PromptArea" type="Area2D" parent="." unique_id=8339693]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=84602459]
+[node name="PromptCollision" type="CollisionShape2D" parent="PromptArea" unique_id=84602459]
 position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_7l541")
 
-[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
-[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]
+[connection signal="body_entered" from="PromptArea" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="PromptArea" to="." method="_on_area_2d_body_exited"]

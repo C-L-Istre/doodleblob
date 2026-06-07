@@ -1,10 +1,25 @@
 [gd_scene format=3 uid="uid://c84of0lh6sffq"]
 
 [ext_resource type="Texture2D" uid="uid://bd7bltnjslrxl" path="res://assets/sprites/enemies/SquareBear.png" id="1_aquv5"]
-[ext_resource type="Script" uid="uid://btxet1vmejij5" path="res://scripts/enemy.gd" id="1_v0uag"]
+[ext_resource type="Script" uid="uid://dxl4pl2stf1t7" path="res://scripts/enemy_npc.gd" id="1_mdfxs"]
+[ext_resource type="Script" uid="uid://40yblr5l8mf3" path="res://scripts/dialog_node.gd" id="2_8wwsp"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_rlgh2"]
+[ext_resource type="Script" uid="uid://bcwcobxymunmv" path="res://scripts/dialog_choice.gd" id="3_uofs1"]
+[ext_resource type="Script" uid="uid://eatc5v34vqd" path="res://scripts/dialog_data.gd" id="5_n2qvb"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_mdfxs"]
-size = Vector2(26, 26)
+[sub_resource type="Resource" id="Resource_nn2c0"]
+script = ExtResource("2_8wwsp")
+node_id = "root"
+text = "It's a living..."
+metadata/_custom_type_script = "uid://40yblr5l8mf3"
+
+[sub_resource type="Resource" id="Resource_xjjix"]
+script = ExtResource("5_n2qvb")
+speaker = "Square Bear"
+portrait = ExtResource("1_aquv5")
+start_node = "root"
+nodes = Array[ExtResource("2_8wwsp")]([SubResource("Resource_nn2c0")])
+metadata/_custom_type_script = "uid://eatc5v34vqd"
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_a5djg"]
 animations = [{
@@ -17,21 +32,69 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Bear" type="Area2D" unique_id=1518300592]
-collision_mask = 2
-script = ExtResource("1_v0uag")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mdfxs"]
+size = Vector2(26, 26)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=104046962]
-shape = SubResource("RectangleShape2D_mdfxs")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rlgh2"]
+size = Vector2(26, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2s465"]
+size = Vector2(64, 52)
+
+[node name="SqBear" type="CharacterBody2D" unique_id=17198639]
+script = ExtResource("1_mdfxs")
+speed = 48.0
+dialog_data = SubResource("Resource_xjjix")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1131798373]
+unique_name_in_owner = true
 sprite_frames = SubResource("SpriteFrames_a5djg")
 frame_progress = 0.053356078
 
+[node name="EnemyCollision" type="CollisionShape2D" parent="." unique_id=104046962]
+shape = SubResource("RectangleShape2D_mdfxs")
+
 [node name="RayCastRight" type="RayCast2D" parent="." unique_id=1623374849]
+unique_name_in_owner = true
 target_position = Vector2(20, 0)
 
 [node name="RayCastLeft" type="RayCast2D" parent="." unique_id=877884964]
+unique_name_in_owner = true
 target_position = Vector2(-20, 0)
 
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[node name="DamageArea" type="Area2D" parent="." unique_id=1518300592]
+collision_mask = 2
+
+[node name="DamageCollision" type="CollisionShape2D" parent="DamageArea" unique_id=962632421]
+shape = SubResource("RectangleShape2D_rlgh2")
+
+[node name="InteractArea" type="Area2D" parent="." unique_id=996877506]
+collision_layer = 0
+collision_mask = 2
+
+[node name="PromptCollision" type="CollisionShape2D" parent="InteractArea" unique_id=1246480702]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_2s465")
+
+[node name="PromptContainer" type="MarginContainer" parent="InteractArea" unique_id=1385707161]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -48.0
+offset_right = 16.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PromptLabel" type="Label" parent="InteractArea/PromptContainer" unique_id=1294162533]
+unique_name_in_owner = true
+z_index = 20
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_rlgh2")
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+
+[connection signal="body_entered" from="DamageArea" to="." method="_on_damage_area_body_entered"]
+[connection signal="body_entered" from="InteractArea" to="." method="_on_interact_area_body_entered"]
+[connection signal="body_exited" from="InteractArea" to="." method="_on_interact_area_body_exited"]

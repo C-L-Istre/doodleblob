@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://c3lhiktqof7sv"]
+
+[ext_resource type="Script" uid="uid://81u3mxgihuvi" path="res://scripts/game_won.gd" id="1_i08ax"]
+[ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_1fn78"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_r3ef2"]
+
+[node name="GameWon" type="CanvasLayer" unique_id=354981234]
+script = ExtResource("1_i08ax")
+restart_scene = "uid://dbyhga8ebhtki"
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1994689248]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -43.5
+offset_top = -11.5
+offset_right = 43.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=593800724]
+layout_mode = 2
+
+[node name="GameWonLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=535423041]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("2_1fn78")
+text = "You Won!"
+
+[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=477483]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_r3ef2")
+text = "Play Again"
+
+[node name="MainMenuButton2" type="Button" parent="CenterContainer/VBoxContainer" unique_id=220326486]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_r3ef2")
+text = "Main Menu"
+
+[node name="ExitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1177768792]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_r3ef2")
+text = "Exit Game"
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/MainMenuButton2" to="." method="_on_main_menu_button_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

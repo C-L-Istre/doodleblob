@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bpmotoamehaeo"]
+[gd_scene format=4 uid="uid://bpmotoamehaeo"]
 
 [ext_resource type="Script" uid="uid://bpro0vbnhwtwg" path="res://scripts/control_root.gd" id="1_qi5uv"]
 [ext_resource type="PackedScene" uid="uid://beo0q1itvj6hp" path="res://scenes/ui/touch_controls.tscn" id="2_f6egh"]
@@ -7,13 +7,14 @@
 [ext_resource type="PackedScene" uid="uid://s0hfpnwsx16u" path="res://scenes/characters/player.tscn" id="4_apo5x"]
 [ext_resource type="PackedScene" uid="uid://cgolhqm2ftq5r" path="res://scenes/misc/level_exit.tscn" id="4_f6egh"]
 [ext_resource type="Texture2D" uid="uid://bawkmft5csc10" path="res://assets/sprites/blocks/sky.png" id="5_josfm"]
+[ext_resource type="PackedScene" uid="uid://1h48hjny4p0b" path="res://scenes/ui/dialog_box.tscn" id="5_t4txi"]
 [ext_resource type="Texture2D" uid="uid://chxgv56tu6cpg" path="res://assets/sprites/blocks/water.png" id="6_lgrx1"]
 [ext_resource type="Texture2D" uid="uid://ck4hg4slcqigx" path="res://assets/sprites/blocks/stone.png" id="7_fhpes"]
 [ext_resource type="Texture2D" uid="uid://gvaq62ucnx7w" path="res://assets/sprites/blocks/dirt.png" id="8_vmg1d"]
 [ext_resource type="Texture2D" uid="uid://deq3o3t1fydlr" path="res://assets/sprites/blocks/grass.png" id="9_1nwmf"]
 [ext_resource type="Texture2D" uid="uid://bap2o0pnclv8" path="res://assets/sprites/blocks/sand.png" id="10_5f5xw"]
 [ext_resource type="PackedScene" uid="uid://cbnx51ouraho8" path="res://scenes/misc/kill_zone.tscn" id="11_o3ttr"]
-[ext_resource type="PackedScene" uid="uid://cc0ruoxphh202" path="res://scenes/objects/platform.tscn" id="12_kdsi4"]
+[ext_resource type="PackedScene" uid="uid://bjss8576j0j5j" path="res://scenes/npcs/octavius.tscn" id="15_apo5x"]
 
 [sub_resource type="GDScript" id="GDScript_bahl2"]
 script/source = "extends Node2D
@@ -2166,67 +2167,67 @@ sources/4 = SubResource("TileSetAtlasSource_22asu")
 sources/5 = SubResource("TileSetAtlasSource_fkdbe")
 sources/6 = SubResource("TileSetAtlasSource_81klo")
 
-[node name="Level 3" type="Node2D" unique_id=1725077776]
+[node name="Level Template" type="Node2D" unique_id=1725077776]
 script = SubResource("GDScript_bahl2")
 
 [node name="ControlRoot" type="Control" parent="." unique_id=406943870]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 0
-offset_left = -228.0
-offset_top = 10.0
-offset_right = -188.0
-offset_bottom = 50.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_qi5uv")
 
 [node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_t4txi")]
 
-[node name="TouchControls" parent="ControlRoot" unique_id=482803810 instance=ExtResource("2_f6egh")]
+[node name="TouchControls" parent="ControlRoot" unique_id=1524801131 instance=ExtResource("2_f6egh")]
+visible = false
 
 [node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("3_t4txi")]
 unique_name_in_owner = true
 visible = false
 
+[node name="DialogBox" parent="ControlRoot" unique_id=941438766 instance=ExtResource("5_t4txi")]
+
+[node name="World" type="Node" parent="." unique_id=1500458828]
+
+[node name="background" type="TileMapLayer" parent="World" unique_id=424574868]
+z_index = -10
+position = Vector2(218, -20)
+tile_set = SubResource("TileSet_exi56")
+
+[node name="midground" type="TileMapLayer" parent="World" unique_id=2045717440]
+position = Vector2(218, -20)
+tile_map_data = PackedByteArray("AAAGAAEAAAAAAAAAAAAHAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAAIAAEAAAAAAAAAAAAJAAEAAAAAAAAAAAAKAAEAAAAAAAAAAAALAAEAAAAAAAAAAAAMAAEAAAAAAAAAAAANAAEAAAAAAAAAAAAOAAEAAAAAAAAAAAAPAAEAAAAAAAAAAAAQAAEAAAAAAAAAAAARAAEAAAAAAAAAAAASAAEAAAAAAAAAAAAUAAEAAAAAAAAAAAATAAEAAAAAAAAAAAAVAAEAAAAAAAAAAAAWAAEAAAAAAAAAAAAXAAEAAAAAAAAAAAAYAAEAAAAAAAAAAAAZAAEAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_wrm1d")
+
+[node name="foreground" type="TileMapLayer" parent="World" unique_id=397218643]
+z_index = 10
+position = Vector2(218, -20)
+tile_set = SubResource("TileSet_tgy6u")
+
+[node name="KillZone" parent="World" unique_id=2006232834 instance=ExtResource("11_o3ttr")]
+position = Vector2(0, 128)
+
+[node name="LevelEnd" parent="World" unique_id=11591199 instance=ExtResource("4_f6egh")]
+position = Vector2(630, 0)
+next_level_path = "uid://c3lhiktqof7sv"
+
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
 [node name="Player" parent="PCs" unique_id=551637077 instance=ExtResource("4_apo5x")]
 z_index = 10
-position = Vector2(-128, -64)
-
-[node name="Terrain" type="Node" parent="." unique_id=1500458828]
-
-[node name="background" type="TileMapLayer" parent="Terrain" unique_id=424574868]
-z_index = -10
-tile_set = SubResource("TileSet_exi56")
-
-[node name="midground" type="TileMapLayer" parent="Terrain" unique_id=2045717440]
-tile_set = SubResource("TileSet_wrm1d")
-
-[node name="foreground" type="TileMapLayer" parent="Terrain" unique_id=397218643]
-z_index = 10
-tile_set = SubResource("TileSet_tgy6u")
-
-[node name="LevelEnd" parent="Terrain" unique_id=11591199 instance=ExtResource("4_f6egh")]
-visible = false
-position = Vector2(-45, -49)
-next_level_path = "uid://dka21svgen1vb"
-
-[node name="KillZone" parent="Terrain" unique_id=2006232834 instance=ExtResource("11_o3ttr")]
-visible = false
-position = Vector2(-228, 10)
+position = Vector2(320, -64)
 
 [node name="NPCs" type="Node" parent="." unique_id=1615409849]
+
+[node name="KingOctavius" parent="NPCs" unique_id=1107866423 instance=ExtResource("15_apo5x")]
+position = Vector2(587, -20)
 
 [node name="Enemies" type="Node" parent="." unique_id=756238706]
 
 [node name="Blocks" type="Node" parent="." unique_id=177775713]
 
 [node name="Platforms" type="Node" parent="." unique_id=880496009]
-
-[node name="Platform" parent="Platforms" unique_id=1537497389 instance=ExtResource("12_kdsi4")]
-position = Vector2(-127, -47)
-
-[node name="Platform2" parent="Platforms" unique_id=583461408 instance=ExtResource("12_kdsi4")]
-position = Vector2(-77, -59)
 
 [node name="Pickups" type="Node" parent="." unique_id=1059442413]
