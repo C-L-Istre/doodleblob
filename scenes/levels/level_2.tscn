@@ -2207,6 +2207,7 @@ position = Vector2(0, 128)
 
 [node name="LevelEnd" parent="World" unique_id=11591199 instance=ExtResource("14_7d3nu")]
 position = Vector2(360, 0)
+next_level_path = "uid://bpmotoamehaeo"
 
 [node name="PCs" type="Node" parent="." unique_id=1693464031]
 
