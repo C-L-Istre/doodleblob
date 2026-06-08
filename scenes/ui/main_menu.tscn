@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://dka21svgen1vb"]
 
 [ext_resource type="Script" uid="uid://pouuwnhtfhe4" path="res://scripts/main_menu.gd" id="1_m1kxf"]
-[ext_resource type="Texture2D" uid="uid://deo64ywebw7y4" path="res://assets/placeholder/32x32_placeholder_texture_2d.tres" id="2_uhagc"]
-[ext_resource type="Texture2D" uid="uid://bd10j131t2wey" path="res://assets/sprites/npcs/KingOct.png" id="3_uhagc"]
+[ext_resource type="PackedScene" uid="uid://c8tlie5surrfd" path="res://scenes/ui/level_select_panel.tscn" id="3_uhagc"]
 [ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="4_btxxm"]
-[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="4_uhagc"]
+[ext_resource type="PackedScene" uid="uid://jjq7dwrgsl8r" path="res://scenes/ui/highscore_panel.tscn" id="6_q85j6"]
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="6_wb0q5"]
+[ext_resource type="PackedScene" uid="uid://rt5q532rnwcb" path="res://scenes/ui/help_panel.tscn" id="7_8g5eo"]
 
 [node name="MainMenu" type="Control" unique_id=740505111]
 process_mode = 3
@@ -20,143 +20,89 @@ level_paths = Array[String](["res://scenes/levels/level_1.tscn", "res://scenes/l
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=899812157]
 layout_mode = 1
-anchors_preset = 4
+anchors_preset = 8
+anchor_left = 0.5
 anchor_top = 0.5
+anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -99.0
 offset_top = -178.0
-offset_right = 151.0
+offset_right = 99.0
 offset_bottom = 178.0
+grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=608265347]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1098347214]
+layout_mode = 2
+
+[node name="MenuButtonContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=608265347]
 layout_mode = 2
 mouse_filter = 2
 alignment = 1
 
-[node name="PlayGameButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=470539406]
+[node name="PlayGameButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=470539406]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Play Game"
 
-[node name="SelectLevelButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=447735588]
+[node name="SelectLevelButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=447735588]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Select Level"
 
-[node name="SelectLevelPanel" type="ItemList" parent="MarginContainer/VBoxContainer/SelectLevelButton" unique_id=418572927]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 228.0
-offset_top = -44.0
-offset_right = 228.0
-offset_bottom = 177.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("4_uhagc")
-item_count = 4
-item_0/text = "Level 1"
-item_0/icon = ExtResource("2_uhagc")
-item_1/text = "Level 2"
-item_1/icon = ExtResource("2_uhagc")
-item_2/text = "Level 3"
-item_2/icon = ExtResource("2_uhagc")
-item_3/text = "Bonus"
-item_3/icon = ExtResource("3_uhagc")
-
-[node name="HighscoreButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2133948144]
+[node name="HighscoreButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=2133948144]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "High Score"
 
-[node name="HighscorePanel" type="Label" parent="MarginContainer/VBoxContainer/HighscoreButton" unique_id=2145263567]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0680001
-anchor_top = 0.13800001
-anchor_right = 1.0680001
-anchor_bottom = 0.13800001
-offset_left = -8.82402
-offset_top = 2.4799995
-offset_right = 383.17596
-offset_bottom = 34.48
-theme_override_fonts/font = ExtResource("4_uhagc")
-text = "Itsada high score! "
-
-[node name="HelpButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=832029591]
+[node name="HelpButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=832029591]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Help"
 
-[node name="HelpPanel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HelpButton" unique_id=1586638106]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.9330001
-anchor_right = 1.9330001
-offset_left = -199.39401
-offset_top = 2.0
-offset_right = 206.60599
-offset_bottom = 40.0
-tooltip_text = "Ughhh....
-
-If you REALLY need to know:
-
-Use WASD or Arrow keys to move (D-Pad or either Joystick when using a controller)
-
-Jump with the JUMP button (W, Space, Up arrow, D-pad up, A Button)
-
-Mobile controls are on the screen (Left, Right, Jump).
-
-And if you actually found and read all of this then you probably could have figured it out on your own
-
-C-L-I"
-theme_override_fonts/normal_font = ExtResource("4_uhagc")
-text = "Figure it out! You ain't never played a game before?"
-
-[node name="SettingsButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1892021837]
+[node name="SettingsButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=1892021837]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Settings"
 
-[node name="SettingsPanel" parent="MarginContainer/VBoxContainer/SettingsButton" unique_id=1009959844 instance=ExtResource("4_btxxm")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 240.0
-offset_top = -240.0
-offset_right = 360.0
-offset_bottom = 60.0
-grow_vertical = 0
-
-[node name="ExitGameButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=129122344]
+[node name="ExitGameButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=129122344]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Exit"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/SelectLevelButton" to="." method="_on_select_level_button_pressed"]
-[connection signal="item_selected" from="MarginContainer/VBoxContainer/SelectLevelButton/SelectLevelPanel" to="." method="_on_select_level_panel_item_selected"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/HighscoreButton" to="." method="_on_highscore_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/HelpButton" to="." method="_on_help_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/ExitGameButton" to="." method="_on_exit_game_button_pressed"]
+[node name="LevelSelectPanel" parent="MarginContainer/HBoxContainer" unique_id=975218639 instance=ExtResource("3_uhagc")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="HighscorePanel" parent="MarginContainer/HBoxContainer" unique_id=762392332 instance=ExtResource("6_q85j6")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="HelpPanel" parent="MarginContainer/HBoxContainer" unique_id=102503026 instance=ExtResource("7_8g5eo")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SettingsPanel" parent="MarginContainer/HBoxContainer" unique_id=1009959844 instance=ExtResource("4_btxxm")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/SelectLevelButton" to="." method="_on_select_level_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/HighscoreButton" to="." method="_on_highscore_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/HelpButton" to="." method="_on_help_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/ExitGameButton" to="." method="_on_exit_game_button_pressed"]

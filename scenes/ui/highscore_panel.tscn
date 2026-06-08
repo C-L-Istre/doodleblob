@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://jjq7dwrgsl8r"]
+
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="1_ad08j"]
+[ext_resource type="Script" uid="uid://dlww58oe7lnnu" path="res://scripts/highscore_panel.gd" id="1_fjoho"]
+
+[node name="HighscorePanel" type="PanelContainer" unique_id=762392332]
+script = ExtResource("1_fjoho")
+
+[node name="HighscoreLabel" type="Label" parent="." unique_id=1466847742]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_ad08j")
+text = "Itsada high score! "
