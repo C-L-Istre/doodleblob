@@ -18,13 +18,14 @@ func _ready() -> void:
 	exit_button.visible = PlatformDetection.can_quit()
 	MenuNav.setup([
 		%PlayGameButton,
-		%SelectLevelButton,
+		%LevelSelectButton,
 		%HighscoreButton,
 		%HelpButton,
 		%SettingsButton,
 		%ExitGameButton,
 	])
 	level_select_panel.level_selected.connect(_on_level_selected)
+	level_select_panel.panel_closed.connect(_on_level_select_closed)
 	_close_all()
 
 # ── Panel management ──────────────────────────────────────────────────────────
@@ -48,7 +49,7 @@ func _on_play_game_button_pressed() -> void:
 	var first_level: String = level_select_panel.get_first_level()
 
 	if first_level.is_empty():
-		push_error("No levels configured in SelectLevelPanel.")
+		push_error("No levels configured in LevelSelectPanel.")
 		return
 
 	ScoreManager.reset_score()
@@ -57,11 +58,17 @@ func _on_play_game_button_pressed() -> void:
 
 	call_deferred("_load_level", first_level)
 
-
-func _on_select_level_button_pressed() -> void:
+func _on_level_select_button_pressed() -> void:
 	_toggle_panel(level_select_panel)
-	if not level_select_panel.visible:
+
+	if level_select_panel.visible:
+		level_select_panel.grab_list_focus()
+	else:
 		level_select_panel.deselect_all()
+
+
+func _on_level_select_closed() -> void:
+	_close_all()
 
 
 func _on_level_selected(path: String) -> void:

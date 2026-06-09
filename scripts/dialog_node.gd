@@ -8,7 +8,7 @@ extends Resource
 # then does one of two things:
 #
 #   choices non-empty → show choice buttons; player picks one.
-#   choices empty     → show "Continue / Close [F]" prompt.
+#   choices empty     → show "Continue" / "Close" prompt.
 #                         next non-empty → advance to that node.
 #                         next empty     → close the dialog.
 #

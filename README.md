@@ -138,8 +138,10 @@ your-game/
 │       ├── pickups/
 │       └── platforms/
 │
-├── audio/
-│   └── default_bus_layout.tres  # Three buses: Master, Music, SFX
+├── default_bus_layout.tres      # Three buses: Master (0), Music (1), SFX (2)
+│
+├── resources/
+│   └── quests/                  # Quest .tres files (e.g. find_the_king.tres)
 │
 ├── scenes/
 │   ├── characters/
@@ -150,9 +152,14 @@ your-game/
 │   │   ├── kill_zone.tscn
 │   │   ├── level_exit.tscn
 │   │   └── music.tscn           # Autoloaded AudioStreamPlayer
+│   ├── npcs/
+│   │   └── npc_template.tscn    # Starting point for new NPCs
 │   ├── objects/
 │   ├── pickups/
 │   └── ui/
+│       ├── dialog_box.tscn      # Branching dialog overlay
+│       ├── game_end.tscn        # Win / game-over screen
+│       ├── hud.tscn             # Score + lives overlay
 │       ├── main_menu.tscn
 │       ├── pause_menu.tscn
 │       ├── settings_panel.tscn
@@ -521,112 +528,344 @@ Update their `export_path` values for your machine before using them locally; th
 paths are not used by CI.
 
 ---
+## GDScript Modules
 
-## Included GDScript Modules
-
-These scripts are included as a functional starting point. They are designed to be
-adapted or removed — none of them contain hardcoded game content.
+These scripts are included as working examples for various functions.
 
 ### Autoloads
 
-These are registered in `project.godot` under `[autoload]` and are globally accessible
-by name in any script.
+Registered in `project.godot` under `[autoload]` and globally accessible by name.
+Call `reset()` / `reset_game()` / `reset_score()` on all three stateful autoloads at the
+start of every new game so session state does not leak between runs.
+
+---
 
 **`PlatformDetection`** (`scripts/platform_detection.gd`)
 
 Detects the current runtime platform. Used by UI scripts to conditionally show or hide
-controls that only make sense on desktop (exit button, resolution/fullscreen settings).
+desktop-only controls (exit button, resolution/fullscreen/vsync settings).
 
 ```gdscript
-PlatformDetection.get_platform()   # → PlatformType enum (DESKTOP, WEB, MOBILE)
-PlatformDetection.can_quit()       # → bool; false on web and mobile
-PlatformDetection.exit_game()      # platform-aware quit — no-op on web/mobile
+PlatformDetection.get_platform()   # -> PlatformType enum (DESKTOP, WEB, MOBILE)
+PlatformDetection.can_quit()       # -> bool; false on web and mobile
+PlatformDetection.has_touch()      # -> bool; true on mobile and touchscreen web
+PlatformDetection.exit_game()      # platform-aware quit -- no-op on web/mobile
 ```
+
+---
 
 **`ScoreManager`** (`scripts/score_manager.gd`)
 
-Tracks an integer current score and high score. Persists high score between sessions
-using `user://save.cfg`.
+Tracks the current session score and all-time high score. High score persists between
+sessions in `user://save.cfg`. Connect to `score_changed` to drive HUD labels reactively.
 
 ```gdscript
-ScoreManager.add_point()       # increment current score by 1
-ScoreManager.finish_level()    # update high score if current score exceeds it
-ScoreManager.reset_score()     # reset current score to 0
-ScoreManager.current_score     # int (read)
-ScoreManager.high_score        # int (read)
+ScoreManager.add_point()        # increment current score by 1
+ScoreManager.finish_level()     # save high score if current score beats it
+ScoreManager.reset_score()      # reset current score to 0
+ScoreManager.current_score      # int (read)
+ScoreManager.high_score         # int (read)
+# Signals: score_changed(new_score: int), high_score_changed(new_high: int)
 ```
 
-To remove the score system, delete `score_manager.gd`, remove it from `[autoload]` in
-`project.godot`, and remove `ScoreManager.add_point()` calls from pickup scripts.
+To remove the score system: delete `score_manager.gd`, remove it from `[autoload]`, and
+remove `ScoreManager.add_point()` calls from pickup scripts.
+
+---
 
 **`HealthManager`** (`scripts/health_manager.gd`)
 
-Tracks lives and drives game-over transitions. Emits `lives_changed` (HUD),
-`life_lost` (player reloads scene), and loads `game_over.tscn` directly when
-lives reach zero. Call `reset_game()` at the start of a new game.
+Tracks lives and drives end-of-game transitions. Emits `lives_changed` (drives the HUD)
+and `life_lost` (player script reloads the current scene). When lives reach zero it loads
+`game_end.tscn` directly. Call `reset_game()` at the start of a new game -- lives carry
+forward between levels and should not be reset mid-run.
 
 ```gdscript
 HealthManager.lose_life()           # called from player.die()
 HealthManager.gain_life(amount)     # power-up, milestone reward
-HealthManager.reset_game()          # reset to STARTING_LIVES
+HealthManager.reset_game()          # reset to STARTING_LIVES (default 3)
 HealthManager.lives                 # int (read)
+# Signals: lives_changed(lives: int), life_lost()
 ```
+
+---
+
+**`QuestManager`** (`scripts/quest_manager.gd`)
+
+Tracks quest and objective state for the current play session. State persists across
+scene loads because this is an autoload; call `reset()` at the start of a new game.
+
+Register `Quest` resources in each level's `_ready()` -- registration is idempotent so
+re-entering a level never resets in-progress quests. Wire event and condition strings
+directly in the Inspector on `DialogNode` and `DialogChoice` nodes.
+
+```gdscript
+# Registration
+QuestManager.register(quest: Quest)          # idempotent; call in level._ready()
+
+# State queries
+QuestManager.is_inactive(quest_id)           # -> bool
+QuestManager.is_active(quest_id)             # -> bool
+QuestManager.is_complete(quest_id)           # -> bool
+QuestManager.all_complete()                  # -> bool; true when every registered quest is done
+
+# Mutations (usually driven by dialog events, not called directly)
+QuestManager.start_quest(quest_id)
+QuestManager.advance_objective(quest_id, obj_id, amount)
+QuestManager.complete_quest(quest_id)
+QuestManager.reset()                         # call at start of new game
+
+# Dialog integration (called automatically by DialogBox)
+QuestManager.fire_event(event: String)       # "start:id", "advance:id:obj", "complete:id"
+QuestManager.check_condition(cond: String)   # "active:id", "complete:id", "inactive:id"
+# Signals: quest_started, quest_completed, quest_failed, objective_advanced
+```
+
+Event and condition string formats are fully documented in `quest_manager.gd`.
+
+---
 
 **`Music`** (`scenes/misc/music.tscn`)
 
-An `AudioStreamPlayer2D` scene configured as an autoload. Because it persists across
-scene changes, background music continues uninterrupted between levels. Assign your
-background track to the stream property and set the bus to `Music`.
+An `AudioStreamPlayer` scene configured as an autoload. Persists across scene changes so
+background music continues uninterrupted between levels. Assign your track to the
+`stream` property and set the bus to `Music`.
+
+---
 
 ### UI Scripts
 
-**`scripts/settings_panel.gd`**
+**`scripts/menu_nav.gd`** -- Static utility class (no instance needed).
 
-A `Panel` node that manages audio and display settings. Audio settings (volume + mute
-for Main, Music, and SFX buses) work on all platforms. Display settings (resolution,
-fullscreen, vsync) are shown only on desktop and hidden on web and mobile.
+Wires keyboard/gamepad navigation for any list of `Button` nodes. Copies the `hover`
+StyleBox onto the `focus` slot so the keyboard cursor looks identical to the mouse
+highlight. Godot's built-in focus system then handles `ui_up` / `ui_down` navigation
+and `ui_accept` confirmation automatically.
 
-Settings persist to `user://settings.cfg` immediately on change — no save button required.
+```gdscript
+MenuNav.setup(buttons)         # style + grab focus; use for menus visible from _ready()
+MenuNav.style(buttons)         # style only; use for menus that start hidden
+MenuNav.focus_first(buttons)   # grab focus only; call when showing a hidden menu
+```
+
+---
+
+**`scripts/main_menu.gd`** / **`scenes/ui/main_menu.tscn`**
+
+Manages the main menu. Handles panel visibility switching for level select, high score,
+help, and settings sub-panels. Connects to `LevelSelectPanel.level_selected` in code to
+start a level. Resets all manager state (score, health, quests) before loading.
+
+---
+
+**`scripts/level_select_panel.gd`** / **`scenes/ui/level_select_panel.tscn`**
+
+Embedded panel inside the main menu. Maintains a single source of truth: `level_paths`.
+The `ItemList` is rebuilt from that array in `_ready()` -- display names are derived
+automatically from filenames (`level_1.tscn` -> "Level 1"). Emits `level_selected(path)`
+when the player picks a level.
+
+To add or remove levels: edit the `level_paths` array on the `LevelSelectPanel` node in
+the Inspector -- no code changes required.
+
+---
+
+**`scripts/highscore_panel.gd`** / **`scenes/ui/highscore_panel.tscn`**
+
+Embedded panel inside the main menu. Displays the high score from `ScoreManager` and
+stays in sync via the `high_score_changed` signal. No external calls needed -- the
+panel self-initialises and self-updates.
+
+---
+
+**`scripts/hud.gd`** / **`scenes/ui/hud.tscn`**
+
+In-game overlay showing score and lives. Seeds from autoload state in `_ready()` and
+stays in sync via signals connected in code (autoloads do not appear in the editor's
+connection dialog). Override `_format_score()` and `_format_lives()` to change the
+display style.
+
+---
+
+**`scripts/game_end.gd`** / **`scenes/ui/game_end.tscn`**
+
+Combined win/lose screen loaded by `HealthManager` when lives reach zero, or by
+`LevelExit` when the player exits the final level. The headline reads "Game Won" if
+`win_quest_id` names a completed quest, "Game Over" otherwise. Set both `restart_scene`
+and `win_quest_id` in the Inspector.
+
+---
+
+**`scripts/settings_panel.gd`** / **`scenes/ui/settings_panel.tscn`**
+
+Manages audio and display settings. Audio controls (Main / Music / SFX volume + mute)
+work on all platforms. Display controls (resolution, fullscreen, vsync) are shown only
+on desktop. Settings persist to `user://settings.cfg` immediately -- no save button.
 
 ```
-Audio buses expected: index 0 = Master, 1 = Music, 2 = SFX
-(matches the included audio/default_bus_layout.tres)
+Audio buses: index 0 = Master | 1 = Music | 2 = SFX
+(matches default_bus_layout.tres at the project root)
 ```
 
-**`scripts/main_menu.gd`**
+---
 
-Manages the main menu. Handles panel visibility switching (level select, high score
-display, help, settings). Level paths are stored in a `level_paths` array — add entries
-to expose more levels in the level select list.
+**`scripts/pause_menu.gd`** / **`scenes/ui/pause_menu.tscn`**
 
-**`scripts/pause_menu.gd`**
+In-game pause overlay. `Process Mode = Always` so it receives input while the tree is
+paused. Returns to main menu by resetting all manager state and unpausing first.
 
-In-game pause overlay. Handles resume, settings panel, return to main menu, and exit.
-Sets `process_mode = PROCESS_MODE_ALWAYS` so it receives input while the tree is paused.
+---
 
 **`scripts/control_root.gd`**
 
-Root script for in-game scenes. Holds a reference to the pause menu `CanvasLayer` and
-forwards the `pause` input action to it. Attach to the root `Control` node of each
-level scene.
+Attach to the root `Control` node of each level scene. Forwards the `pause` input action
+to the `PauseMenu` child CanvasLayer. The node must have `Process Mode = Always` set in
+the scene so that the pause input fires even when `get_tree().paused` is true.
+
+---
 
 ### Gameplay Scripts
 
-These are minimal, ready-to-extend implementations:
+**`scripts/player.gd`** -- `CharacterBody2D`
 
-**`scripts/player.gd`** — `CharacterBody2D` with gravity, WASD/arrow/gamepad movement,
-animated sprite flipping, and a `die()` method that reloads the current scene. The
-player is registered in the `player` global group.
+WASD/arrow/gamepad movement, gravity, animated sprite flipping. Registered in the
+`player` group. Implements the full interactable and dialog interface:
 
-**`scripts/enemy.gd`** — Patrol enemy using two `RayCast2D` nodes to detect ledges and
-walls, reversing direction on contact. Calls `die()` on any body that enters its
-`Area2D`.
+- `die()` -- deferred call to `HealthManager.lose_life()`
+- `set_interactable(node)` / `clear_interactable(node)` -- called by NPC detection areas
+- `start_dialog(data: DialogData)` -- called by interactables in their `interact()` method
 
-**`scripts/kill_zone.gd`** — `Area2D` that calls `die()` on any body that enters it.
-Use for pits, spikes, and other instant-death hazards.
+`HealthManager.life_lost` is connected in code (not the editor) because it must fire in
+every level without per-scene wiring.
 
-**`scripts/level_exit.gd`** — `Area2D` that calls `change_scene_to_file()` when a body
-in the `player` group enters. Set `next_level_path` in the inspector.
+---
+
+**`scripts/npc.gd`**
+
+Stationary interactable NPC. Set `dialog_data` and `prompt_text` in the Inspector.
+The detection `Area2D`'s `body_entered` / `body_exited` signals connect in the editor to
+`_on_area_2d_body_entered` / `_on_area_2d_body_exited`.
+
+---
+
+**`scripts/enemy_npc.gd`** -- `CharacterBody2D`
+
+Patrolling enemy that can also be talked to. Has two `Area2D` children:
+
+- `DamageArea` (small) -- player contact calls `die()`
+- `InteractArea` (larger) -- player enters range, prompt appears; pressing interact opens
+  dialog and pauses patrol until the conversation ends
+
+Signal connections (wire in editor): `DamageArea.body_entered -> _on_damage_area_body_entered`,
+`InteractArea.body_entered/exited -> _on_interact_area_body_entered/exited`.
+
+---
+
+**`scripts/enemy.gd`** -- simple patrol on `Area2D`
+
+Lighter-weight patrol enemy. Uses `_process` and direct `position.x` mutation rather
+than `move_and_slide`. Calls `die()` on body contact.
+
+---
+
+**`scripts/kill_zone.gd`** -- `Area2D`
+
+Calls `die()` on any body that enters it. Use for pits, spikes, and other instant-death
+hazards. No group check -- any node implementing `die()` is affected.
+
+---
+
+**`scripts/level_exit.gd`** -- `Area2D`
+
+Transitions to `next_level_path` when the player enters. Leave `next_level_path` empty
+on the final level -- the player is sent to `game_end.tscn` automatically and the
+`win_quest_id` on that scene determines the win/lose headline.
+
+---
+
+**`scripts/level.gd`** -- `Node2D`
+
+Attach to each level's root node. Registers `Quest` resources with `QuestManager` in
+`_ready()`. Registration is idempotent -- existing quest progress is never reset.
+
+```
+Inspector setup per level:
+  quests -- drag .tres Quest resources here; leave empty for levels with no quest content
+```
+
+Register on levels that contain quest-related NPCs or a final exit that checks quest
+completion. Skip pure-traversal levels -- `QuestManager` carries state between scenes.
+
+---
+
+**`scripts/platform_falling.gd`** -- `AnimatableBody2D`
+
+Starts falling after `fall_delay` seconds when `activate()` is called. Triggered
+automatically by `player.gd` when the player lands on any body that has an `activate()`
+method. `queue_free()`s itself after falling past `despawn_depth`.
+
+---
+
+**`scripts/coin.gd`** -- `Area2D`
+
+Calls `ScoreManager.add_point()` on body contact, then plays the `"pickup"` animation.
+The `AnimationPlayer` should call `queue_free()` at the end of that animation via an
+Animation Track call.
+
+---
+
+**`scripts/boat.gd`** -- `AnimatableBody2D`
+
+Patrol platform that activates (starts moving) when the player steps on it. A
+`ShaderMaterial` on `BoatSprite` fades the sail so the player remains visible while
+riding. Deactivates when the player leaves.
+
+---
+
+### Dialog System
+
+The dialog system is built from three `Resource` types and one `CanvasLayer` scene.
+
+**`scripts/dialog_data.gd`** -- root resource for a conversation. Set `speaker`,
+optionally `portrait`, `start_node`, and populate `nodes` with `DialogNode` entries.
+
+**`scripts/dialog_node.gd`** -- one node in the tree. Set `text` (typewriters in),
+`next` (for linear nodes), or `choices` (for branching nodes). Set `quest_event` in the
+Quest group to fire a `QuestManager` event when this node is first displayed.
+
+**`scripts/dialog_choice.gd`** -- one branch option. Set `text` (label shown), `next`
+(destination node ID, empty to close), `quest_event` (fires on confirm), and `condition`
+(hides this choice unless the named quest is in the required state).
+
+**`scenes/ui/dialog_box.tscn`** -- the on-screen UI. Typewriter effect, cursor-navigable
+choice list (`ui_up` / `ui_down`), confirm with `interact` (F/Y) or `ui_accept`
+(Enter/A). Emits `dialog_started` / `dialog_ended` to freeze/unfreeze the player.
+
+```
+Event string format (DialogNode.quest_event, DialogChoice.quest_event):
+  "start:quest_id"
+  "advance:quest_id:objective_id"
+  "complete:quest_id"
+  "fail:quest_id"
+
+Condition string format (DialogChoice.condition):
+  "inactive:quest_id"   -- show only before the quest starts
+  "active:quest_id"     -- show only while the quest is in progress
+  "complete:quest_id"   -- show only after the quest is finished
+  "failed:quest_id"     -- show only if the quest failed
+```
+
+### Quest System
+
+**`scripts/quest.gd`** -- data resource. Set `quest_id` (used in all event strings),
+`title`, `description`, and populate `objectives`.
+
+**`scripts/quest_objective.gd`** -- one step. Set `objective_id`, `description`, and
+`required_count` (how many `advance:` events satisfy it; default 1).
+
+Save quests as `.tres` files in `resources/quests/`. Load them with `preload()` and pass
+to `QuestManager.register()` in the relevant level's `_ready()` via the `quests` export
+array on the level's `level.gd` script.
 
 ---
 
@@ -664,18 +903,19 @@ The canonical URL, Open Graph tags, sitemap reference, and manifest `start_url` 
 
 ### Add Levels
 
-In `main_menu.gd`, append to `level_paths`:
+Open `scenes/ui/level_select_panel.tscn` in the editor. Select the `LevelSelectPanel`
+root node and add entries to `level_paths` in the Inspector -- one path per level, in
+display order. The `ItemList` repopulates automatically from this array; display names
+are derived from filenames (`level_2.tscn` -> "Level 2").
 
-```gdscript
-var level_paths: Array[String] = [
-    "res://scenes/levels/level_1.tscn",
-    "res://scenes/levels/level_2.tscn",
-    "res://scenes/levels/level_3.tscn",
-]
-```
+Do not add `level_template.tscn` to `level_paths` -- it is a scene scaffold, not a
+playable level.
 
-The level select `ItemList` in the main menu scene will populate automatically for any
-number of entries. Start from `scenes/levels/level_template.tscn` for new levels.
+For levels that contain quest content, also add the relevant `.tres` Quest resource(s)
+to the `quests` array on that level's root node (`level.gd`). See `level.gd` for the
+registration rule.
+
+Start new levels from `scenes/levels/level_template.tscn`.
 
 ### Add More Score Types
 
@@ -706,10 +946,10 @@ Edit the `KEEP` variable in the `Cleanup old releases` step in `deploy.yml`:
 ### Using Gitea
 
 1. Replace `actions/checkout@v4` with the Gitea-hosted checkout action
-2. Replace the runner registration block — Gitea uses a different token endpoint
+2. Replace the runner registration block -- Gitea uses a different token endpoint
    (`/api/v1/repos/{owner}/{repo}/actions/runners/registration-token`) and registration
    flags
-3. `GAME_NAME` currently uses `github.event.repository.name` — replace with the Gitea
+3. `GAME_NAME` currently uses `github.event.repository.name` -- replace with the Gitea
    equivalent or hardcode it in `config.json`
 
 ---
@@ -747,7 +987,7 @@ the engine falls back to the next lower whole multiple and fills the gap with bl
 At 1920×1080 the scale is an exact 3× (no bars). At 1366×768 it would be 2× with bars.
 This is expected behaviour for pixel-perfect rendering.
 
-Currently using viewport, expand, fractional with good results on web.
+Currently using viewport, expand, scale_mode=off with good results on web.
 
 ### Game is blank or audio doesn't work after load
 

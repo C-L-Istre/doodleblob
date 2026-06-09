@@ -10,15 +10,22 @@ extends CanvasLayer
 #   NPC.interact(player) → player.start_dialog(data)
 #     → DialogBox.start(data)   → dialog_started emitted  → Player freezes
 #     → typewriter plays        → choices appear OR continue prompt
-#     → player navigates with ui_up/ui_down, confirms with interact
+#     → player navigates with ui_up/ui_down
+#     → player confirms with interact (F/Y) OR ui_accept (Enter/A)
 #     → dialog_ended emitted    → Player restores input
+#
+# Input note — why interact and ui_accept are separate actions:
+#   jump is bound to A/Space, so interact cannot also use those keys without
+#   causing simultaneous jump+interact near an NPC. interact stays on F/Y
+#   for gameplay triggering; ui_accept is handled here as a second path so
+#   keyboard (Enter) and gamepad (A) feel consistent with menus.
 #
 # Scene setup — expected child nodes (unique_name_in_owner = true):
 #   %SpeakerLabel      : Label         — NPC name
 #   %PortraitRect      : TextureRect   — NPC portrait; hidden when null
 #   %DialogLabel       : Label         — current node text
-#   %ChoicesContainer  : VBoxContainer — choice labels; visible only when branching
-#   %ContinueLabel     : Label         — "Continue / Close [F]"; visible only when linear
+#   %ChoicesContainer  : VBoxContainer — choice rows; visible only when branching
+#   %ContinueLabel     : Label         — "Continue" / "Close"; visible only for linear nodes
 # ──────────────────────────────────────────────────────────────────────────────
 
 ## Emitted when a conversation begins. Player connects to freeze input.
@@ -99,7 +106,7 @@ func advance() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
- 
+
 	# ui_accept (Enter / A button) mirrors the interact action so players can
 	# use standard menu-confirm keys to advance dialog without pressing F/Y.
 	# interact itself is handled by player.gd to avoid binding it to A/Space
@@ -108,10 +115,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		advance()
 		get_viewport().set_input_as_handled()
 		return
- 
+
 	if not _showing_choices:
 		return
- 
+
 	if event.is_action_pressed("ui_up"):
 		_selected_choice = max(0, _selected_choice - 1)
 		_update_choice_highlights()
@@ -120,8 +127,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		_selected_choice = min(_visible_choices.size() - 1, _selected_choice + 1)
 		_update_choice_highlights()
 		get_viewport().set_input_as_handled()
- 
- 
 
 
 # ── Private: typewriter ────────────────────────────────────────────────────────
@@ -202,7 +207,7 @@ func _show_choices() -> void:
 	if _visible_choices.is_empty():
 		_showing_choices       = false
 		var has_next: bool     = _current_node.next != ""
-		continue_label.text    = "Continue [F]" if has_next else "Close [F]"
+		continue_label.text    = "Continue [Interact]" if has_next else "Close [Interact]"
 		continue_label.visible = true
 		return
 

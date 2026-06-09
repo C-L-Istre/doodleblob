@@ -12,7 +12,7 @@ extends CharacterBody2D
 #                  Player presses interact → dialog opens, patrol pauses.
 #
 # Scene setup (connect signals in the editor):
-#   DamageArea.body_entered     → _on_kill_area_body_entered
+#   DamageArea.body_entered     → _on_damage_area_body_entered
 #   InteractArea.body_entered → _on_interact_area_body_entered
 #   InteractArea.body_exited  → _on_interact_area_body_exited
 #   %PromptLabel : Label      — world-space prompt above NPC

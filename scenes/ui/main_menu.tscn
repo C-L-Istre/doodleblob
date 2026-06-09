@@ -49,7 +49,7 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Play Game"
 
-[node name="SelectLevelButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=447735588]
+[node name="LevelSelectButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=447735588]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
@@ -100,7 +100,7 @@ visible = false
 layout_mode = 2
 
 [connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/SelectLevelButton" to="." method="_on_select_level_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/LevelSelectButton" to="." method="_on_level_select_button_pressed"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/HighscoreButton" to="." method="_on_highscore_button_pressed"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/HelpButton" to="." method="_on_help_button_pressed"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
