@@ -24,10 +24,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -99.0
-offset_top = -178.0
-offset_right = 99.0
-offset_bottom = 178.0
+offset_left = -101.0
+offset_top = -90.0
+offset_right = 101.0
+offset_bottom = 90.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 8
@@ -83,6 +83,7 @@ text = "Exit"
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+level_paths = Array[String](["res://scenes/levels/level_1.tscn", "res://scenes/levels/level_2.tscn", "res://scenes/levels/level_3.tscn"])
 
 [node name="HighscorePanel" parent="MarginContainer/HBoxContainer" unique_id=762392332 instance=ExtResource("6_q85j6")]
 unique_name_in_owner = true
@@ -98,6 +99,7 @@ layout_mode = 2
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+size_flags_vertical = 1
 
 [connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/LevelSelectButton" to="." method="_on_level_select_button_pressed"]

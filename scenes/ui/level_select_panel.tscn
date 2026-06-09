@@ -3,23 +3,28 @@
 [ext_resource type="Script" uid="uid://cg2lxnyrlml0p" path="res://scripts/level_select_panel.gd" id="1_uhg1d"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="1_ww1po"]
 
-[node name="LevelSelectPanel" type="PanelContainer" unique_id=975218639]
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_right = 160.0
+[node name="LevelSelectPanel" type="PanelContainer" unique_id=1944754846]
+custom_minimum_size = Vector2(400, 160)
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -80.0
+offset_right = 400.0
+offset_bottom = 80.0
 grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_uhg1d")
 level_paths = Array[String](["res://scenes/levels/level_1.tscn", "res://scenes/levels/level_2.tscn", "res://scenes/levels/level_3.tscn", "res://scenes/levels/level_template.tscn"])
 
 [node name="LevelList" type="ItemList" parent="." unique_id=1446043780]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(240, 160)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+size_flags_horizontal = 6
+size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("1_ww1po")
 allow_reselect = true
+auto_width = true
+auto_height = true
 
 [connection signal="item_clicked" from="LevelList" to="." method="_on_level_list_item_clicked"]

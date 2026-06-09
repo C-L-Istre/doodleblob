@@ -69,11 +69,6 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
-func _on_damage_area_body_entered(body: Node2D) -> void:
-	if body.has_method("die"):
-		body.die()
-
-
 func show_prompt() -> void:
 	_prompt_label.visible = true
 
@@ -107,3 +102,8 @@ func _on_interact_area_body_entered(body: Node2D) -> void:
 func _on_interact_area_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		body.clear_interactable(self)
+
+
+func _on_damage_area_body_entered(body: Node2D) -> void:
+	if body.has_method("die"):
+		body.die()

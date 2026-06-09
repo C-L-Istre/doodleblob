@@ -5,8 +5,8 @@ extends Control
 # ──────────────────────────────────────────────────────────────────────────────
 
 @onready var level_select_panel: PanelContainer = %LevelSelectPanel
-@onready var highscore_panel: PanelContainer = %HighscorePanel
-@onready var exit_button:        Button   = %ExitGameButton
+@onready var highscore_panel:    PanelContainer = %HighscorePanel
+@onready var exit_button:                Button = %ExitGameButton
 
 # Built from unique-name refs — all panels already have unique_name_in_owner = true
 # so no Inspector setup is required.
