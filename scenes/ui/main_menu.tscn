@@ -7,6 +7,8 @@
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="6_wb0q5"]
 [ext_resource type="PackedScene" uid="uid://rt5q532rnwcb" path="res://scenes/ui/help_panel.tscn" id="7_8g5eo"]
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_uhagc"]
+
 [node name="MainMenu" type="Control" unique_id=740505111]
 process_mode = 3
 layout_mode = 3
@@ -17,93 +19,109 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_m1kxf")
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=899812157]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1098347214]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -101.0
-offset_top = -90.0
-offset_right = 101.0
-offset_bottom = 90.0
+offset_left = -99.0
+offset_top = -160.0
+offset_right = 99.0
+offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer" unique_id=1542251084]
+custom_minimum_size = Vector2(180, 320)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/PanelContainer" unique_id=899812157]
+layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1098347214]
-layout_mode = 2
-
-[node name="MenuButtonContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=608265347]
+[node name="MenuButtonContainer" type="VBoxContainer" parent="HBoxContainer/PanelContainer/MarginContainer" unique_id=608265347]
 layout_mode = 2
 mouse_filter = 2
 alignment = 1
 
-[node name="PlayGameButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=470539406]
+[node name="PlayGameButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer" unique_id=470539406]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Play Game"
 
-[node name="LevelSelectButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=447735588]
+[node name="LevelSelectButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer" unique_id=447735588]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Select Level"
 
-[node name="HighscoreButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=2133948144]
+[node name="HighscoreButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer" unique_id=2133948144]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "High Score"
 
-[node name="HelpButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=832029591]
+[node name="HelpButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer" unique_id=832029591]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Help"
 
-[node name="SettingsButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=1892021837]
+[node name="SettingsButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer" unique_id=1892021837]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Settings"
 
-[node name="ExitGameButton" type="Button" parent="MarginContainer/HBoxContainer/MenuButtonContainer" unique_id=129122344]
+[node name="ExitGameButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer" unique_id=129122344]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_wb0q5")
 text = "Exit"
 
-[node name="LevelSelectPanel" parent="MarginContainer/HBoxContainer" unique_id=975218639 instance=ExtResource("3_uhagc")]
+[node name="LevelSelectPanel" parent="HBoxContainer" unique_id=975218639 instance=ExtResource("3_uhagc")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 level_paths = Array[String](["res://scenes/levels/level_1.tscn", "res://scenes/levels/level_2.tscn", "res://scenes/levels/level_3.tscn"])
 
-[node name="HighscorePanel" parent="MarginContainer/HBoxContainer" unique_id=762392332 instance=ExtResource("6_q85j6")]
+[node name="HighscorePanel" parent="HBoxContainer" unique_id=762392332 instance=ExtResource("6_q85j6")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="HelpPanel" parent="MarginContainer/HBoxContainer" unique_id=102503026 instance=ExtResource("7_8g5eo")]
+[node name="HelpPanel" parent="HBoxContainer" unique_id=102503026 instance=ExtResource("7_8g5eo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="SettingsPanel" parent="MarginContainer/HBoxContainer" unique_id=1009959844 instance=ExtResource("4_btxxm")]
+[node name="SettingsPanel" parent="HBoxContainer" unique_id=1009959844 instance=ExtResource("4_btxxm")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_vertical = 1
 
-[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/LevelSelectButton" to="." method="_on_level_select_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/HighscoreButton" to="." method="_on_highscore_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/HelpButton" to="." method="_on_help_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/MenuButtonContainer/ExitGameButton" to="." method="_on_exit_game_button_pressed"]
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1663028501]
+z_index = -5
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("PlaceholderTexture2D_uhagc")
+
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/LevelSelectButton" to="." method="_on_level_select_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/HighscoreButton" to="." method="_on_highscore_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/HelpButton" to="." method="_on_help_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/ExitGameButton" to="." method="_on_exit_game_button_pressed"]

@@ -662,8 +662,22 @@ start a level. Resets all manager state (score, health, quests) before loading.
 
 Embedded panel inside the main menu. Maintains a single source of truth: `level_paths`.
 The `ItemList` is rebuilt from that array in `_ready()` -- display names are derived
-automatically from filenames (`level_1.tscn` -> "Level 1"). Emits `level_selected(path)`
-when the player picks a level.
+automatically from filenames (`level_1.tscn` -> "Level 1").
+
+Input model -- two paths, no overlap:
+- **Mouse**: `item_clicked` signal -> `_on_level_list_item_clicked` -> `_confirm_selection`
+- **Keyboard/gamepad**: `_unhandled_input` catches `ui_accept` while the list has focus
+
+The `ItemList`'s `focus_exited` signal auto-closes the panel when the player tabs or
+clicks away, emitting `panel_closed` so `main_menu._on_level_select_closed` can call
+`_close_all()`.
+
+```gdscript
+panel.get_first_level()   # -> String; used by Play Game to skip the selector
+panel.grab_list_focus()   # give focus + select item 0; call after making panel visible
+panel.deselect_all()      # clear selection; called on close to avoid stale state
+# Signals: level_selected(path: String), panel_closed
+```
 
 To add or remove levels: edit the `level_paths` array on the `LevelSelectPanel` node in
 the Inspector -- no code changes required.

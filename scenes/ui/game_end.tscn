@@ -4,7 +4,9 @@
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_6b57o"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_ddffr"]
 
-[node name="GameWon" type="CanvasLayer" unique_id=354981234]
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_s8urn"]
+
+[node name="GameEnd" type="CanvasLayer" unique_id=354981234]
 script = ExtResource("1_s8urn")
 restart_scene = "uid://dbyhga8ebhtki"
 win_quest_id = "find_the_king"
@@ -29,11 +31,14 @@ layout_mode = 2
 
 [node name="WinLoseLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=535423041]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("2_6b57o")
-text = "You Won!"
+text = "Game End"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=477483]
 unique_name_in_owner = true
@@ -55,6 +60,17 @@ custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_ddffr")
 text = "Exit Game"
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=921533021]
+z_index = -5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("PlaceholderTexture2D_s8urn")
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
