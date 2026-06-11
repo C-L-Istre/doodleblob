@@ -43,6 +43,8 @@ next = "quest_prompt"
 script = ExtResource("6_dchoice")
 text = "Fine. I'll look I guess..."
 next = "accept"
+quest_event = "advance:find_the_king:accepted"
+condition = "active:find_the_king"
 
 [sub_resource type="Resource" id="Choice_YeahNo"]
 script = ExtResource("6_dchoice")
@@ -54,6 +56,7 @@ script = ExtResource("5_dnode")
 node_id = "quest_prompt"
 text = "Soooo... are you gonna look for him or what?"
 choices = Array[ExtResource("6_dchoice")]([SubResource("Choice_FineIllGo"), SubResource("Choice_YeahNo")])
+quest_event = "start:find_the_king"
 
 [sub_resource type="Resource" id="Node_accept"]
 script = ExtResource("5_dnode")
