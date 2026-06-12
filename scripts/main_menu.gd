@@ -56,6 +56,7 @@ func _toggle_panel(node: CanvasItem) -> void:
 # ── Button handlers (connect in editor) ───────────────────────────────────────
 
 func _on_play_game_button_pressed() -> void:
+	print("PLAY CLICKED")
 	var first_level: String = level_select_panel.get_first_level()
 	if first_level.is_empty():
 		push_error("MainMenu: no levels configured in LevelSelectPanel.level_paths.")

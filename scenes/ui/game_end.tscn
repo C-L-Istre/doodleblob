@@ -31,11 +31,12 @@ layout_mode = 2
 
 [node name="WinLoseLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=535423041]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("2_6b57o")
+theme_override_font_sizes/font_size = 32
 text = "Game End"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -62,6 +63,7 @@ theme_override_fonts/font = ExtResource("3_ddffr")
 text = "Exit Game"
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=921533021]
+show_behind_parent = true
 z_index = -5
 anchors_preset = 15
 anchor_right = 1.0
@@ -70,6 +72,7 @@ offset_top = 4.0
 offset_bottom = 4.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = SubResource("PlaceholderTexture2D_s8urn")
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]

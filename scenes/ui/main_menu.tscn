@@ -108,6 +108,7 @@ layout_mode = 2
 size_flags_vertical = 1
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1663028501]
+show_behind_parent = true
 z_index = -5
 layout_mode = 1
 anchors_preset = 15
@@ -115,6 +116,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = SubResource("PlaceholderTexture2D_uhagc")
 expand_mode = 2
 

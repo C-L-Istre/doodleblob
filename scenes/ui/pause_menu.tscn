@@ -37,16 +37,21 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="PauseMenuLabel" type="Label" parent="PausePanel/VBoxContainer" unique_id=378132844]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_fonts/font = ExtResource("2_8uki6")
+theme_override_font_sizes/font_size = 32
 text = "PAUSED"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PausePanel/VBoxContainer" unique_id=1112512053]
 layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="PausePanel/VBoxContainer/HBoxContainer" unique_id=663497672]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 20
@@ -58,28 +63,28 @@ theme_override_constants/separation = 10
 
 [node name="ResumeButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=1499615217]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 45)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Resume"
 
 [node name="SettingsButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=2072559907]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 45)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Settings"
 
 [node name="MainMenuButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=656031257]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 45)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Main Menu"
 
 [node name="ExitButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=412490237]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 45)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Exit Game"
