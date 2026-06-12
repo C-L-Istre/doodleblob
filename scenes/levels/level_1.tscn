@@ -2280,6 +2280,11 @@ tile_set = SubResource("TileSet_tgy6u")
 position = Vector2(1349, 16)
 next_level_path = "uid://2vq50hudycot"
 
+[node name="LevelEnd" parent="Terrain/LevelEnd" unique_id=11591199 instance=ExtResource("18_np2pn")]
+position = Vector2(-1646, 24)
+scale = Vector2(2, 2)
+next_level_path = "uid://bpmotoamehaeo"
+
 [node name="KillZone" parent="Terrain" unique_id=2006232834 instance=ExtResource("15_wtwp4")]
 visible = false
 position = Vector2(-265, 142)
