@@ -55,6 +55,41 @@ jobs:
             --exclude "addons/godot-git-plugin" \
             ./ "$WORKSPACE/"
 
+      - name: Write version (authoritative)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC="$WORKSPACE/version.cfg"
+          DST="$WORKSPACE/version.cfg"
+
+          MAJOR=0
+          MINOR=0
+          PATCH=0
+
+          if [[ -f "$SRC" ]]; then
+            MAJOR=$(awk -F= '/^major=/{print $2}' "$SRC" | tr -d ' ')
+            MINOR=$(awk -F= '/^minor=/{print $2}' "$SRC" | tr -d ' ')
+            PATCH=$(awk -F= '/^patch=/{print $2}' "$SRC" | tr -d ' ')
+          fi
+
+          CHANNEL="staging"
+          [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
+
+          {
+            echo "[version]"
+            echo "major=$MAJOR"
+            echo "minor=$MINOR"
+            echo "patch=$PATCH"
+            echo
+            echo "[channel]"
+            echo "name=\"$CHANNEL\""
+            echo
+            echo "[build]"
+            echo "commit=\"${GITHUB_SHA::7}\""
+            echo "id=\"$BUILD_ID\""
+            echo "date=\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\""
+          } > "$DST"
+          
       - name: Import project
         shell: bash
         env:
@@ -86,40 +121,6 @@ jobs:
             "$BUILD_DIR/index.html"
           sync
 
-      - name: Write version (authoritative)
-        shell: bash
-        run: |
-          set -euo pipefail
-          SRC="$WORKSPACE/version.cfg"
-          DST="$BUILD_DIR/version.cfg"
-
-          MAJOR=0
-          MINOR=0
-          PATCH=0
-
-          if [[ -f "$SRC" ]]; then
-            MAJOR=$(awk -F= '/^major=/{print $2}' "$SRC" | tr -d ' ')
-            MINOR=$(awk -F= '/^minor=/{print $2}' "$SRC" | tr -d ' ')
-            PATCH=$(awk -F= '/^patch=/{print $2}' "$SRC" | tr -d ' ')
-          fi
-
-          CHANNEL="staging"
-          [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
-
-          {
-            echo "[version]"
-            echo "major=$MAJOR"
-            echo "minor=$MINOR"
-            echo "patch=$PATCH"
-            echo
-            echo "[channel]"
-            echo "name=\"$CHANNEL\""
-            echo
-            echo "[build]"
-            echo "commit=\"${GITHUB_SHA::7}\""
-            echo "id=\"$BUILD_ID\""
-            echo "date=\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\""
-          } > "$DST"
 
       - name: Copy PWA assets
         shell: bash
