@@ -1,4 +1,4 @@
-name: Deploy Godot Web (v2 hardened)
+name: Godot Web Deploy
 
 on:
   push:
@@ -21,156 +21,136 @@ jobs:
 
     steps:
 
-    # ─────────────────────────────────────────────
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # ─────────────────────────────────────────────
-    - name: Load config
-      shell: bash
-      run: |
-        set -euo pipefail
-    
-        python3 - <<'PY' >> "$GITHUB_ENV"
-        import json
-        
-        cfg = json.load(open(".github/config.json"))
-        
-        print(f"DOMAIN={cfg['domain']}")
-        print(f"THEME_COLOR={cfg['theme_color']}")
-        PY
-        
-            echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+      - name: Load config
+        shell: bash
+        run: |
+          set -euo pipefail
 
-    # ─────────────────────────────────────────────
-    - name: Set deployment metadata
-      shell: bash
-      run: |
-        set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_ENV"
+import json
 
-        if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-          echo "DEPLOY_URL=https://$DOMAIN" >> "$GITHUB_ENV"
-          echo "IS_STAGING=0" >> "$GITHUB_ENV"
-        else
-          echo "DEPLOY_URL=https://$DOMAIN/staging" >> "$GITHUB_ENV"
-          echo "IS_STAGING=1" >> "$GITHUB_ENV"
-        fi
+cfg = json.load(open(".github/config.json"))
+print(f"DOMAIN={cfg['domain']}")
+print(f"THEME_COLOR={cfg['theme_color']}")
+PY
 
-    # ─────────────────────────────────────────────
-    - name: Prepare workspace
-      shell: bash
-      run: |
-        set -euo pipefail
+          echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
 
-        rm -rf "$WORKSPACE"
-        mkdir -p "$WORKSPACE"
+      - name: Set deployment metadata
+        shell: bash
+        run: |
+          set -euo pipefail
 
-        rsync -a --delete \
-          --exclude ".git" \
-          --exclude ".bak" \
-          --exclude ".godot" \
-          --exclude ".import" \
-          --exclude "addons/godot-git-plugin" \
-          ./ "$WORKSPACE/"
+          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+            echo "DEPLOY_URL=https://$DOMAIN" >> "$GITHUB_ENV"
+            echo "IS_STAGING=0" >> "$GITHUB_ENV"
+          else
+            echo "DEPLOY_URL=https://$DOMAIN/staging" >> "$GITHUB_ENV"
+            echo "IS_STAGING=1" >> "$GITHUB_ENV"
+          fi
 
-    # ─────────────────────────────────────────────
-    - name: Import project
-      shell: bash
-      env:
-        HOME: /home/godot
-      run: |
-        set -euo pipefail
+      - name: Prepare workspace
+        shell: bash
+        run: |
+          set -euo pipefail
 
-        "$GODOT" --headless \
-          --path "$WORKSPACE" \
-          --import --quit
+          rm -rf "$WORKSPACE"
+          mkdir -p "$WORKSPACE"
 
-    # ─────────────────────────────────────────────
-    - name: Export web build
-      shell: bash
-      env:
-        HOME: /home/godot
-      run: |
-        set -euo pipefail
+          rsync -a --delete \
+            --exclude ".git" \
+            --exclude ".godot" \
+            --exclude ".import" \
+            ./ "$WORKSPACE/"
 
-        BUILD_ID="$(date +%s)-${GITHUB_SHA::7}"
-        BUILD_DIR="$RELEASES/$BUILD_ID"
+      - name: Import project
+        shell: bash
+        env:
+          HOME: /home/godot
+        run: |
+          set -euo pipefail
 
-        rm -rf "$BUILD_DIR"
-        mkdir -p "$BUILD_DIR"
+          "$GODOT" --headless \
+            --path "$WORKSPACE" \
+            --import --quit
 
-        echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
-        echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
+      - name: Export web build
+        shell: bash
+        env:
+          HOME: /home/godot
+        run: |
+          set -euo pipefail
 
-        "$GODOT" --headless \
-          --path "$WORKSPACE" \
-          --export-release Web \
-          "$BUILD_DIR/index.html"
+          BUILD_ID="$(date +%s)-${GITHUB_SHA::7}"
+          BUILD_DIR="$RELEASES/$BUILD_ID"
 
-        sync
+          rm -rf "$BUILD_DIR"
+          mkdir -p "$BUILD_DIR"
 
-    - name: Write version (AUTHORITATIVE)
-      shell: bash
-      run: |
-        set -euo pipefail
-    
-        VERSION_SRC="$WORKSPACE/version.cfg"
-        VERSION_DST="$BUILD_DIR/version.cfg"
-    
-        MAJOR=$(awk -F= '/^major=/{print $2}' "$VERSION_SRC" 2>/dev/null || echo 0)
-        MINOR=$(awk -F= '/^minor=/{print $2}' "$VERSION_SRC" 2>/dev/null || echo 0)
-        PATCH=$(awk -F= '/^patch=/{print $2}' "$VERSION_SRC" 2>/dev/null || echo 0)
-    
-        if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-          CHANNEL="release"
-        else
-          CHANNEL="staging"
-        fi
-    
-        cat > "$VERSION_DST" <<'EOF'
-        [version]
-        major=__MAJOR__
-        minor=__MINOR__
-        patch=__PATCH__
-        
-        [channel]
-        name=__CHANNEL__
-        
-        [build]
-        commit=__COMMIT__
-        id=__BUILD_ID__
-        date=__DATE__
-        EOF
-        
-            sed -i \
-              -e "s/__MAJOR__/$MAJOR/" \
-              -e "s/__MINOR__/$MINOR/" \
-              -e "s/__PATCH__/$PATCH/" \
-              -e "s/__CHANNEL__/$CHANNEL/" \
-              -e "s/__COMMIT__/${GITHUB_SHA::7}/" \
-              -e "s/__BUILD_ID__/$BUILD_ID/" \
-              -e "s/__DATE__/$(date -u +%Y-%m-%dT%H:%M:%SZ)/" \
-              "$VERSION_DST"
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+          echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
 
-    # ─────────────────────────────────────────────
-    - name: Copy PWA assets
-      shell: bash
-      run: |
-        set -euo pipefail
+          "$GODOT" --headless \
+            --path "$WORKSPACE" \
+            --export-release Web \
+            "$BUILD_DIR/index.html"
 
-        cp "$WORKSPACE/.github/PWA/"*.png "$BUILD_DIR/"
-        mkdir -p "$BUILD_DIR/screenshots"
+          sync
 
-        cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/"
-        cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/"
+      # ─────────────────────────────────────────────
+      # SAFE VERSION GENERATION (no sed, no YAML risk)
+      - name: Write version (authoritative)
+        shell: bash
+        run: |
+          set -euo pipefail
 
-    # ─────────────────────────────────────────────
-    - name: Generate manifest
-      shell: bash
-      run: |
-        set -euo pipefail
+          SRC="$WORKSPACE/version.cfg"
+          DST="$BUILD_DIR/version.cfg"
 
-        cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
+          MAJOR=$(awk -F= '/^major=/{print $2}' "$SRC" 2>/dev/null || echo 0)
+          MINOR=$(awk -F= '/^minor=/{print $2}' "$SRC" 2>/dev/null || echo 0)
+          PATCH=$(awk -F= '/^patch=/{print $2}' "$SRC" 2>/dev/null || echo 0)
+
+          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+            CHANNEL="release"
+          else
+            CHANNEL="staging"
+          fi
+
+          cat > "$DST" <<EOF
+[version]
+major=$MAJOR
+minor=$MINOR
+patch=$PATCH
+
+[channel]
+name=$CHANNEL
+
+[build]
+commit=${GITHUB_SHA::7}
+id=$BUILD_ID
+date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+EOF
+
+      - name: Copy PWA assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cp "$WORKSPACE/.github/PWA/"*.png "$BUILD_DIR/"
+          mkdir -p "$BUILD_DIR/screenshots"
+          cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/"
+          cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/"
+
+      - name: Generate manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
 {
   "name": "$GAME_NAME",
   "short_name": "$GAME_NAME",
@@ -182,25 +162,23 @@ jobs:
 }
 EOF
 
-    # ─────────────────────────────────────────────
-    - name: Generate robots.txt
-      shell: bash
-      run: |
-        set -euo pipefail
+      - name: Generate robots.txt
+        shell: bash
+        run: |
+          set -euo pipefail
 
-        if [[ "$IS_STAGING" == "1" ]]; then
-          echo -e "User-agent: *\nDisallow: /" > "$BUILD_DIR/robots.txt"
-        else
-          echo -e "User-agent: *\nAllow: /\nSitemap: $DEPLOY_URL/sitemap.xml" > "$BUILD_DIR/robots.txt"
-        fi
+          if [[ "$IS_STAGING" == "1" ]]; then
+            echo -e "User-agent: *\nDisallow: /" > "$BUILD_DIR/robots.txt"
+          else
+            echo -e "User-agent: *\nAllow: /\nSitemap: $DEPLOY_URL/sitemap.xml" > "$BUILD_DIR/robots.txt"
+          fi
 
-    # ─────────────────────────────────────────────
-    - name: Patch index.html (safe minimal)
-      shell: bash
-      run: |
-        set -euo pipefail
+      - name: Patch index.html
+        shell: bash
+        run: |
+          set -euo pipefail
 
-        python3 - "$BUILD_DIR/index.html" <<'PY'
+          python3 - "$BUILD_DIR/index.html" <<'PY'
 from pathlib import Path
 import sys
 
@@ -215,81 +193,73 @@ html = html.replace(
 p.write_text(html)
 PY
 
-    # ─────────────────────────────────────────────
-    - name: Validate build (STRICT)
-      shell: bash
-      run: |
-        set -euo pipefail
+      - name: Validate build (strict)
+        shell: bash
+        run: |
+          set -euo pipefail
 
-        REQUIRED=(
-          index.html index.js index.wasm index.pck
-          manifest.webmanifest version.cfg
-        )
+          REQUIRED=(
+            index.html index.js index.wasm index.pck
+            manifest.webmanifest version.cfg
+          )
 
-        for f in "${REQUIRED[@]}"; do
-          [[ -s "$BUILD_DIR/$f" ]] || {
-            echo "FAILED: missing $f"
-            exit 1
-          }
-        done
+          for f in "${REQUIRED[@]}"; do
+            [[ -s "$BUILD_DIR/$f" ]] || {
+              echo "Missing: $f"
+              exit 1
+            }
+          done
 
-        echo "Build validation OK"
+      - name: Deploy (atomic swap)
+        shell: bash
+        run: |
+          set -euo pipefail
 
-    # ─────────────────────────────────────────────
-    - name: Deploy (atomic swap)
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-          TARGET="$PRODUCTION"
-        else
-          TARGET="$STAGING"
-        fi
-
-        # ensure build is fully flushed
-        sync
-
-        ln -sfn "$BUILD_DIR" "$TARGET.tmp"
-        mv -Tf "$TARGET.tmp" "$TARGET"
-
-        echo "TARGET=$TARGET" >> "$GITHUB_ENV"
-
-    # ─────────────────────────────────────────────
-    - name: Validate deployed build
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]] || exit 1
-
-    # ─────────────────────────────────────────────
-    - name: Cleanup releases (safe LRU)
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        KEEP=10
-
-        PROD="$(readlink -f "$PRODUCTION" 2>/dev/null || true)"
-        STAGE="$(readlink -f "$STAGING" 2>/dev/null || true)"
-
-        mapfile -t releases < <(
-          find "$RELEASES" -mindepth 1 -maxdepth 1 -type d \
-            -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2-
-        )
-
-        count=0
-
-        for r in "${releases[@]}"; do
-          [[ -z "$r" ]] && continue
-
-          if [[ "$r" == "$PROD" || "$r" == "$STAGE" ]]; then
-            continue
+          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+            TARGET="$PRODUCTION"
+          else
+            TARGET="$STAGING"
           fi
 
-          ((count++))
-          if (( count > KEEP )); then
-            rm -rf -- "$r"
-          fi
-        done
+          sync
+          ln -sfn "$BUILD_DIR" "$TARGET.tmp"
+          mv -Tf "$TARGET.tmp" "$TARGET"
+
+          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
+
+      - name: Validate deployed build
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]]
+
+      - name: Cleanup releases
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          KEEP=10
+
+          PROD="$(readlink -f "$PRODUCTION" 2>/dev/null || true)"
+          STAGE="$(readlink -f "$STAGING" 2>/dev/null || true)"
+
+          mapfile -t releases < <(
+            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d \
+              -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2-
+          )
+
+          count=0
+
+          for r in "${releases[@]}"; do
+            [[ -z "$r" ]] && continue
+
+            if [[ "$r" == "$PROD" || "$r" == "$STAGE" ]]; then
+              continue
+            fi
+
+            ((count++))
+
+            if (( count > KEEP )); then
+              rm -rf -- "$r"
+            fi
+          done
