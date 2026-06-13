@@ -113,12 +113,12 @@ jobs:
             echo "patch=$PATCH"
             echo
             echo "[channel]"
-            echo "name=$CHANNEL"
+            echo "name=\"$CHANNEL\""
             echo
             echo "[build]"
-            echo "commit=${GITHUB_SHA::7}"
-            echo "id=$BUILD_ID"
-            echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "commit=\"${GITHUB_SHA::7}\""
+            echo "id=\"$BUILD_ID\""
+            echo "date=\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\""
           } > "$DST"
 
       - name: Copy PWA assets
