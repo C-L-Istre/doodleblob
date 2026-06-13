@@ -1,8 +1,5 @@
 name: Deploy Godot Web
 
-# Only one deploy runs at a time. A new push cancels any in-progress run.
-# The group is shared across branches, so simultaneous pushes to main and
-# staging will cancel each other — only the latest push to each branch matters.
 on:
   push:
     branches:
@@ -10,7 +7,7 @@ on:
       - staging
 
 concurrency:
-  group: godot-web-deploy-${{ github.ref_name }}
+  group: godot-web-deploy
   cancel-in-progress: true
 
 env:
