@@ -1,4 +1,4 @@
-name: Godot Web Deploy
+name: Godot Web Deploy (CI Hardened v3)
 
 on:
   push:
@@ -20,17 +20,28 @@ jobs:
     runs-on: [self-hosted, godot, proxmox]
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ─────────────────────────────────────────────
       - name: Load config
         shell: bash
         run: |
           set -euo pipefail
 
-          python3 -c "import json; cfg=json.load(open('.github/config.json')); print('DOMAIN=' + cfg['domain']); print('THEME_COLOR=' + cfg['theme_color'])" >> "$GITHUB_ENV"
+          python3 - <<'PY' >> "$GITHUB_ENV"
+import json
+
+cfg = json.load(open(".github/config.json"))
+
+print("DOMAIN=" + cfg["domain"])
+print("THEME_COLOR=" + cfg["theme_color"])
+PY
+
           echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
 
+      # ─────────────────────────────────────────────
       - name: Set deployment metadata
         shell: bash
         run: |
@@ -44,6 +55,7 @@ jobs:
             echo "IS_STAGING=1" >> "$GITHUB_ENV"
           fi
 
+      # ─────────────────────────────────────────────
       - name: Prepare workspace
         shell: bash
         run: |
@@ -59,11 +71,11 @@ jobs:
             --exclude "addons/godot-git-plugin" \
             ./ "$WORKSPACE/"
 
+      # ─────────────────────────────────────────────
       - name: Import project
         shell: bash
         env:
           HOME: /home/godot
-          GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
 
@@ -71,11 +83,11 @@ jobs:
             --path "$WORKSPACE" \
             --import --quit
 
+      # ─────────────────────────────────────────────
       - name: Export web build
         shell: bash
         env:
           HOME: /home/godot
-          GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
 
@@ -84,7 +96,6 @@ jobs:
 
           rm -rf "$BUILD_DIR"
           mkdir -p "$BUILD_DIR"
-          mkdir -p "$RELEASES"
 
           echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
           echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
@@ -96,126 +107,75 @@ jobs:
 
           sync
 
+      # ─────────────────────────────────────────────
       - name: Write version (authoritative)
         shell: bash
         run: |
           set -euo pipefail
 
-          python3 - "$BUILD_DIR/version.cfg" <<'PY'
-from pathlib import Path
-import datetime
-import os
-import sys
+          SRC="$WORKSPACE/version.cfg"
+          DST="$BUILD_DIR/version.cfg"
 
-dst = Path(sys.argv[1])
-src = Path(os.environ["WORKSPACE"]) / "version.cfg"
+          MAJOR=0
+          MINOR=0
+          PATCH=0
 
-values = {
-    "major": "0",
-    "minor": "0",
-    "patch": "0",
-}
+          if [[ -f "$SRC" ]]; then
+            MAJOR=$(awk -F= '/^major=/{print $2}' "$SRC" | tr -d ' ' || echo 0)
+            MINOR=$(awk -F= '/^minor=/{print $2}' "$SRC" | tr -d ' ' || echo 0)
+            PATCH=$(awk -F= '/^patch=/{print $2}' "$SRC" | tr -d ' ' || echo 0)
+          fi
 
-if src.exists():
-    for line in src.read_text(encoding="utf-8").splitlines():
-        if "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip()
-        if key in values and value:
-            values[key] = value
+          CHANNEL="staging"
+          [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
 
-channel = "release" if os.environ["GITHUB_REF_NAME"] == "main" else "staging"
+          cat > "$DST" <<EOF
+[version]
+major=$MAJOR
+minor=$MINOR
+patch=$PATCH
 
-content = (
-    "[version]\n"
-    f"major={values['major']}\n"
-    f"minor={values['minor']}\n"
-    f"patch={values['patch']}\n\n"
-    "[channel]\n"
-    f"name={channel}\n\n"
-    "[build]\n"
-    f"commit={os.environ['GITHUB_SHA'][:7]}\n"
-    f"id={os.environ['BUILD_ID']}\n"
-    f"date={datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')}\n"
-)
+[channel]
+name=$CHANNEL
 
-dst.write_text(content, encoding="utf-8")
-PY
+[build]
+commit=${GITHUB_SHA::7}
+id=$BUILD_ID
+date=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+EOF
 
+      # ─────────────────────────────────────────────
       - name: Copy PWA assets
         shell: bash
         run: |
           set -euo pipefail
 
-          cp "$WORKSPACE/.github/PWA/icon_144x144.png" "$BUILD_DIR/"
-          cp "$WORKSPACE/.github/PWA/icon_180x180.png" "$BUILD_DIR/"
-          cp "$WORKSPACE/.github/PWA/icon_512x512.png" "$BUILD_DIR/"
+          cp "$WORKSPACE/.github/PWA/"*.png "$BUILD_DIR/" || true
 
           mkdir -p "$BUILD_DIR/screenshots"
+
           cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/"
           cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/"
 
+      # ─────────────────────────────────────────────
       - name: Generate manifest
         shell: bash
         run: |
           set -euo pipefail
 
-          python3 - "$BUILD_DIR/manifest.webmanifest" <<'PY'
-from pathlib import Path
-import json
-import os
-import sys
-
-dst = Path(sys.argv[1])
-
-manifest = {
-    "name": os.environ["GAME_NAME"],
-    "short_name": os.environ["GAME_NAME"],
-    "start_url": "/index.html",
-    "scope": "/",
-    "display": "standalone",
-    "theme_color": os.environ["THEME_COLOR"],
-    "background_color": os.environ["THEME_COLOR"],
-    "icons": [
-        {
-            "src": "/icon_144x144.png",
-            "sizes": "144x144",
-            "type": "image/png",
-            "purpose": "any",
-        },
-        {
-            "src": "/icon_180x180.png",
-            "sizes": "180x180",
-            "type": "image/png",
-            "purpose": "any",
-        },
-        {
-            "src": "/icon_512x512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable any",
-        },
-    ],
-    "screenshots": [
-        {
-            "src": "/screenshots/desktop.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-        },
-        {
-            "src": "/screenshots/mobile.png",
-            "sizes": "1080x1920",
-            "type": "image/png",
-        },
-    ],
+          cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
+{
+  "name": "$GAME_NAME",
+  "short_name": "$GAME_NAME",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "$THEME_COLOR",
+  "background_color": "$THEME_COLOR"
 }
+EOF
 
-dst.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-PY
-
+      # ─────────────────────────────────────────────
       - name: Generate robots.txt
         shell: bash
         run: |
@@ -224,70 +184,39 @@ PY
           if [[ "$IS_STAGING" == "1" ]]; then
             printf 'User-agent: *\nDisallow: /\n' > "$BUILD_DIR/robots.txt"
           else
-            printf 'User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n' "$DEPLOY_URL" > "$BUILD_DIR/robots.txt"
+            printf 'User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n' "$DEPLOY_URL" > "$BUILD_DIR/robots.txt"
           fi
 
+      # ─────────────────────────────────────────────
       - name: Patch index.html
         shell: bash
         run: |
           set -euo pipefail
 
-          python3 - "$BUILD_DIR/index.html" <<'PY'
+          python3 - <<'PY' "$BUILD_DIR/index.html"
 from pathlib import Path
-import re
 import sys
 
 p = Path(sys.argv[1])
 html = p.read_text(encoding="utf-8")
 
 html = html.replace(
-    '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">',
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
-)
-
-html = re.sub(
-    r'<link rel="manifest" href="index\.manifest\.json">\s*',
-    '',
-    html,
-)
-
-if '<link rel="manifest"' not in html:
-    html = html.replace(
-        "</head>",
-        '  <link rel="manifest" href="manifest.webmanifest">\n</head>',
-        1,
-    )
-
-html = html.replace(
     "overflow: hidden;",
     "overflow: hidden; width: 100vw; height: 100vh;"
-)
-
-html = html.replace(
-    '"ensureCrossOriginIsolationHeaders":true',
-    '"ensureCrossOriginIsolationHeaders":false'
 )
 
 p.write_text(html, encoding="utf-8")
 PY
 
+      # ─────────────────────────────────────────────
       - name: Validate build (strict)
         shell: bash
         run: |
           set -euo pipefail
 
           REQUIRED=(
-            index.html
-            index.js
-            index.wasm
-            index.pck
-            manifest.webmanifest
-            version.cfg
-            icon_144x144.png
-            icon_180x180.png
-            icon_512x512.png
-            screenshots/desktop.png
-            screenshots/mobile.png
+            index.html index.js index.wasm index.pck
+            manifest.webmanifest version.cfg
           )
 
           for f in "${REQUIRED[@]}"; do
@@ -297,6 +226,7 @@ PY
             }
           done
 
+      # ─────────────────────────────────────────────
       - name: Deploy (atomic swap)
         shell: bash
         run: |
@@ -314,36 +244,35 @@ PY
 
           echo "TARGET=$TARGET" >> "$GITHUB_ENV"
 
+      # ─────────────────────────────────────────────
       - name: Validate deployed build
         shell: bash
         run: |
           set -euo pipefail
           [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]]
 
-      - name: Cleanup releases
+      # ─────────────────────────────────────────────
+      - name: Cleanup releases (safe LRU)
         shell: bash
         run: |
           set -euo pipefail
 
           KEEP=10
-
           PROD="$(readlink -f "$PRODUCTION" 2>/dev/null || true)"
           STAGE="$(readlink -f "$STAGING" 2>/dev/null || true)"
 
+          mapfile -t releases < <(
+            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d \
+              -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2-
+          )
+
           count=0
-
-          while IFS= read -r r; do
+          for r in "${releases[@]}"; do
             [[ -z "$r" ]] && continue
-
-            if [[ "$r" == "$PROD" || "$r" == "$STAGE" ]]; then
-              continue
-            fi
+            [[ "$r" == "$PROD" || "$r" == "$STAGE" ]] && continue
 
             ((count++))
             if (( count > KEEP )); then
               rm -rf -- "$r"
             fi
-          done < <(
-            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d \
-              -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2-
-          )
+          done
