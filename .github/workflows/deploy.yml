@@ -228,17 +228,31 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
+          
           KEEP=10
-
+          
+          PROD_TARGET="$(readlink -f "$PRODUCTION" 2>/dev/null || true)"
+          STAGE_TARGET="$(readlink -f "$STAGING" 2>/dev/null || true)"
+          
+          # Build list safely even if empty
           mapfile -t releases < <(
-            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d | sort -r
+            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d 2>/dev/null \
+              | sort -r
           )
-
+          
           count=0
+          
           for r in "${releases[@]}"; do
+            [[ -z "$r" ]] && continue
+          
+            # never delete live targets
+            if [[ "$r" == "$PROD_TARGET" || "$r" == "$STAGE_TARGET" ]]; then
+              continue
+            fi
+          
             ((count++))
+          
             if (( count > KEEP )); then
-              rm -rf "$r"
+              rm -rf -- "$r" || true
             fi
           done
