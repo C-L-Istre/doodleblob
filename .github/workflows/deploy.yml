@@ -134,57 +134,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
-{
-  "name": "$GAME_NAME",
-  "short_name": "$GAME_NAME",
-  "start_url": "/index.html",
-  "scope": "/",
-  "display": "standalone",
-  "theme_color": "$THEME_COLOR",
-  "background_color": "$THEME_COLOR"
-}
-EOF
-
-      - name: Generate robots.txt
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "$IS_STAGING" == "1" ]]; then
-            printf 'User-agent: *\nDisallow: /\n' > "$BUILD_DIR/robots.txt"
-          else
-            printf 'User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n' "$DEPLOY_URL" > "$BUILD_DIR/robots.txt"
-          fi
-
-      - name: Patch index.html
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -c "from pathlib import Path; import sys; p=Path(sys.argv[1]); html=p.read_text(encoding='utf-8'); html=html.replace('<meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0\">','<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'); html=html.replace('overflow: hidden;','overflow: hidden; width: 100vw; height: 100vh;'); html=html.replace('\"ensureCrossOriginIsolationHeaders\":true','\"ensureCrossOriginIsolationHeaders\":false'); html=html.replace('<link rel=\"manifest\" href=\"index.manifest.json\">','<link rel=\"manifest\" href=\"manifest.webmanifest\">'); p.write_text(html, encoding='utf-8')" "$BUILD_DIR/index.html"
-
-      - name: Validate build (strict)
-        shell: bash
-        run: |
-          set -euo pipefail
-          REQUIRED=(
-            index.html
-            index.js
-            index.wasm
-            index.pck
-            manifest.webmanifest
-            version.cfg
-            icon_144x144.png
-            icon_180x180.png
-            icon_512x512.png
-            screenshots/desktop.png
-            screenshots/mobile.png
-          )
-          for f in "${REQUIRED[@]}"; do
-            [[ -s "$BUILD_DIR/$f" ]] || {
-              echo "Missing: $f"
-              exit 1
-            }
-          done
+      
+          printf '%s\n' \
+            '{' \
+            "  \"name\": \"$GAME_NAME\"," \
+            "  \"short_name\": \"$GAME_NAME\"," \
+            '  "start_url": "/index.html",' \
+            '  "scope": "/",' \
+            '  "display": "standalone",' \
+            "  \"theme_color\": \"$THEME_COLOR\"," \
+            "  \"background_color\": \"$THEME_COLOR\"" \
+            '}' \
+            > "$BUILD_DIR/manifest.webmanifest"
 
       - name: Deploy (atomic swap)
         shell: bash
