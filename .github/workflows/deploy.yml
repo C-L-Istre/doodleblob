@@ -73,7 +73,8 @@ jobs:
           MINOR=1
           PATCH=0
       
-          cat > "$WORKSPACE/version.cfg" <<EOF
+          mkdir -p "$WORKSPACE/resources"
+          cat > "$WORKSPACE/resources/version.cfg" <<EOF
           [version]
           major=$MAJOR
           minor=$MINOR

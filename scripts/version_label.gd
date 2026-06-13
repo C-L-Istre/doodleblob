@@ -1,6 +1,6 @@
 extends Label
 
-@export_file("*.cfg") var version_file := "res://version.cfg"
+@export_file("*.cfg") var version_file := "res://resources/version.cfg"
 
 func _ready() -> void:
 	var cfg := ConfigFile.new()
