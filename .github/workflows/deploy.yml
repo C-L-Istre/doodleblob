@@ -6,7 +6,6 @@ on:
       - main
       - staging
 
-# Only one deploy runs at a time.
 concurrency:
   group: godot-web-deploy
   cancel-in-progress: true
@@ -24,9 +23,11 @@ jobs:
 
     steps:
 
+      # ─────────────────────────────────────────────
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ─────────────────────────────────────────────
       - name: Load config
         shell: bash
         run: |
@@ -43,6 +44,7 @@ jobs:
 
           echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
 
+      # ─────────────────────────────────────────────
       - name: Set deployment metadata
         shell: bash
         run: |
@@ -56,11 +58,14 @@ jobs:
             echo "IS_STAGING=1" >> "$GITHUB_ENV"
           fi
 
+      # ─────────────────────────────────────────────
       - name: Set build id
         shell: bash
         run: |
+          set -euo pipefail
           echo "BUILD_ID=$(date +%s)-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
 
+      # ─────────────────────────────────────────────
       - name: Prepare workspace
         shell: bash
         run: |
@@ -71,14 +76,13 @@ jobs:
 
           rsync -a \
             --delete \
-            --exclude ".bak" \
             --exclude ".git" \
             --exclude ".godot" \
             --exclude ".import" \
-            --exclude "addons" \
             --exclude "exports" \
             ./ "$WORKSPACE/"
 
+      # ─────────────────────────────────────────────
       - name: Import project
         shell: bash
         env:
@@ -91,21 +95,19 @@ jobs:
             --path "$WORKSPACE" \
             --import --quit
 
+      # ─────────────────────────────────────────────
       - name: Export web build
         shell: bash
         env:
           HOME: /home/godot
-          GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
 
-          BUILD_ID="$(date +%s)-${GITHUB_SHA::7}"
           BUILD_DIR="$RELEASES/$BUILD_ID"
 
           rm -rf "$BUILD_DIR"
           mkdir -p "$BUILD_DIR"
 
-          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
           echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
 
           "$GODOT" --headless \
@@ -113,51 +115,46 @@ jobs:
             --export-release Web \
             "$BUILD_DIR/index.html"
 
-      - name: Remove Godot-generated manifest
+      # ─────────────────────────────────────────────
+      - name: Remove Godot manifest
         shell: bash
         run: |
           set -euo pipefail
           rm -f "$BUILD_DIR/index.manifest.json"
 
+      # ─────────────────────────────────────────────
       - name: Copy PWA assets
         shell: bash
         run: |
           set -euo pipefail
 
-          cp "$WORKSPACE/.github/PWA/icon_144x144.png" "$BUILD_DIR/icon_144x144.png"
-          cp "$WORKSPACE/.github/PWA/icon_180x180.png" "$BUILD_DIR/icon_180x180.png"
-          cp "$WORKSPACE/.github/PWA/icon_512x512.png" "$BUILD_DIR/icon_512x512.png"
+          cp "$WORKSPACE/.github/PWA/icon_144x144.png" "$BUILD_DIR/"
+          cp "$WORKSPACE/.github/PWA/icon_180x180.png" "$BUILD_DIR/"
+          cp "$WORKSPACE/.github/PWA/icon_512x512.png" "$BUILD_DIR/"
 
           mkdir -p "$BUILD_DIR/screenshots"
-          cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/desktop.png"
-          cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/mobile.png"
+          cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/"
+          cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/"
 
+      # ─────────────────────────────────────────────
       - name: Generate web manifest
         shell: bash
         run: |
           set -euo pipefail
 
           cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
-{
-  "id": "/index.html",
-  "name": "$GAME_NAME",
-  "short_name": "$GAME_NAME",
-  "description": "$GAME_NAME is a browser-based game built with Godot.",
-  "start_url": "/index.html",
-  "scope": "/",
-  "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
-  "orientation": "any",
-  "background_color": "$THEME_COLOR",
-  "theme_color": "$THEME_COLOR",
-  "icons": [
-    { "src": "/icon_144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
-    { "src": "/icon_180x180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
-    { "src": "/icon_512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
-  ]
-}
-EOF
+          {
+            "name": "$GAME_NAME",
+            "short_name": "$GAME_NAME",
+            "start_url": "/index.html",
+            "scope": "/",
+            "display": "standalone",
+            "background_color": "$THEME_COLOR",
+            "theme_color": "$THEME_COLOR"
+          }
+          EOF
 
+      # ─────────────────────────────────────────────
       - name: Generate robots.txt
         shell: bash
         run: |
@@ -172,104 +169,41 @@ EOF
             cat > "$BUILD_DIR/robots.txt" <<EOF
 User-agent: *
 Allow: /
-
 Sitemap: $DEPLOY_URL/sitemap.xml
 EOF
           fi
 
-      - name: Patch index.html
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          python3 - "$BUILD_DIR/index.html" <<'PY'
-          from pathlib import Path
-          import re, sys, os
-
-          DEPLOY_URL = os.environ["DEPLOY_URL"]
-          GAME_NAME = os.environ["GAME_NAME"]
-          THEME_COLOR = os.environ["THEME_COLOR"]
-
-          path = Path(sys.argv[1])
-          html = path.read_text(encoding="utf-8")
-
-          html = html.replace(
-              '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">',
-              '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
-          )
-
-          html = re.sub(r'<link rel="manifest" href="index\.manifest\.json">\s*', '', html)
-
-          inject = f"""
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="canonical" href="{DEPLOY_URL}/">
-<meta name="theme-color" content="{THEME_COLOR}">
-<meta property="og:title" content="{GAME_NAME}">
-<meta property="og:url" content="{DEPLOY_URL}/">
-"""
-
-          html = html.replace("</head>", inject + "\n</head>")
-
-          path.write_text(html, encoding="utf-8")
-          PY
-
+      # ─────────────────────────────────────────────
       - name: Validate output
         shell: bash
         run: |
           set -euo pipefail
 
-          REQUIRED_FILES=(
-            index.html index.js index.wasm index.pck
-            manifest.webmanifest
-            icon_144x144.png icon_180x180.png icon_512x512.png
-          )
-
-          for f in "${REQUIRED_FILES[@]}"; do
+          for f in index.html index.js index.wasm index.pck manifest.webmanifest; do
             [[ -f "$BUILD_DIR/$f" ]] || { echo "Missing $f"; exit 1; }
           done
 
+      # ─────────────────────────────────────────────
       - name: Deploy
         shell: bash
         run: |
           set -euo pipefail
 
-          case "$GITHUB_REF_NAME" in
-            main) TARGET="$PRODUCTION" ;;
-            staging) TARGET="$STAGING" ;;
-            *) exit 1 ;;
-          esac
+          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+            TARGET="$PRODUCTION"
+          else
+            TARGET="$STAGING"
+          fi
 
           ln -sfn "$BUILD_DIR" "${TARGET}.tmp"
           mv -Tf "${TARGET}.tmp" "$TARGET"
 
           echo "TARGET=$TARGET" >> "$GITHUB_ENV"
 
-      - name: Validate deployed symlink
+      # ─────────────────────────────────────────────
+      - name: Validate deploy
         shell: bash
         run: |
           set -euo pipefail
 
-          REAL="$(readlink -f "$TARGET")"
-          [[ "$REAL" == "$BUILD_DIR" ]] || exit 1
-
-      - name: Cleanup old releases
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          KEEP=10
-
-          PROD="$(readlink -f "$PRODUCTION" || true)"
-          STAGE="$(readlink -f "$STAGING" || true)"
-
-          mapfile -t releases < <(
-            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' |
-            sort -nr | cut -d' ' -f2-
-          )
-
-          i=0
-          for r in "${releases[@]}"; do
-            [[ "$r" == "$PROD" || "$r" == "$STAGE" ]] && continue
-            ((i++))
-            ((i > KEEP)) && rm -rf "$r"
-          done
+          [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]]
