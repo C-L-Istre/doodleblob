@@ -87,17 +87,23 @@ jobs:
           id="$BUILD_ID"
           date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           EOF
-      
-      - name: Import project
+          
+      - name: Clear Godot import cache
         shell: bash
-        env:
-          HOME: /home/godot
-          GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
-          "$GODOT" --headless \
-            --path "$WORKSPACE" \
-            --import --quit
+          rm -rf "$WORKSPACE/.godot"
+            
+            - name: Import project
+              shell: bash
+              env:
+                HOME: /home/godot
+                GODOT_SILENCE_ROOT_WARNING: "1"
+              run: |
+                set -euo pipefail
+                "$GODOT" --headless \
+                  --path "$WORKSPACE" \
+                  --import --quit
 
       - name: Export web build
         shell: bash
