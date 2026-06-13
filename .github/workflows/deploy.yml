@@ -128,29 +128,29 @@ jobs:
         fi
     
         cat > "$VERSION_DST" <<'EOF'
-    [version]
-    major=__MAJOR__
-    minor=__MINOR__
-    patch=__PATCH__
-    
-    [channel]
-    name=__CHANNEL__
-    
-    [build]
-    commit=__COMMIT__
-    id=__BUILD_ID__
-    date=__DATE__
-    EOF
-    
-        sed -i \
-          -e "s/__MAJOR__/$MAJOR/" \
-          -e "s/__MINOR__/$MINOR/" \
-          -e "s/__PATCH__/$PATCH/" \
-          -e "s/__CHANNEL__/$CHANNEL/" \
-          -e "s/__COMMIT__/${GITHUB_SHA::7}/" \
-          -e "s/__BUILD_ID__/$BUILD_ID/" \
-          -e "s/__DATE__/$(date -u +%Y-%m-%dT%H:%M:%SZ)/" \
-          "$VERSION_DST"
+        [version]
+        major=__MAJOR__
+        minor=__MINOR__
+        patch=__PATCH__
+        
+        [channel]
+        name=__CHANNEL__
+        
+        [build]
+        commit=__COMMIT__
+        id=__BUILD_ID__
+        date=__DATE__
+        EOF
+        
+            sed -i \
+              -e "s/__MAJOR__/$MAJOR/" \
+              -e "s/__MINOR__/$MINOR/" \
+              -e "s/__PATCH__/$PATCH/" \
+              -e "s/__CHANNEL__/$CHANNEL/" \
+              -e "s/__COMMIT__/${GITHUB_SHA::7}/" \
+              -e "s/__BUILD_ID__/$BUILD_ID/" \
+              -e "s/__DATE__/$(date -u +%Y-%m-%dT%H:%M:%SZ)/" \
+              "$VERSION_DST"
 
     # ─────────────────────────────────────────────
     - name: Copy PWA assets
