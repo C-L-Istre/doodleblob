@@ -30,14 +30,14 @@ jobs:
           set -euo pipefail
       
           python3 - <<'PY' >> "$GITHUB_ENV"
-      import json
-      
-      cfg = json.load(open(".github/config.json"))
-      print(f"DOMAIN={cfg['domain']}")
-      print(f"THEME_COLOR={cfg['theme_color']}")
-      PY
-      
-          echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+          import json
+          
+          cfg = json.load(open(".github/config.json"))
+          print(f"DOMAIN={cfg['domain']}")
+          print(f"THEME_COLOR={cfg['theme_color']}")
+          PY
+          
+              echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
 
       - name: Set deployment metadata
         shell: bash
