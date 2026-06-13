@@ -119,7 +119,6 @@ jobs:
             "$BUILD_DIR/index.html"
           sync
 
-
       - name: Copy PWA assets
         shell: bash
         run: |
