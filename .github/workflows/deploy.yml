@@ -42,53 +42,52 @@ jobs:
             echo "IS_STAGING=1" >> "$GITHUB_ENV"
           fi
 
-      - name: Prepare workspace
+      - name: Set build id
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf "$WORKSPACE"
-          mkdir -p "$WORKSPACE"
-          rsync -a --delete \
-            --exclude ".git" \
-            --exclude ".godot" \
-            --exclude ".import" \
-            --exclude "addons/godot-git-plugin" \
-            ./ "$WORKSPACE/"
+          echo "BUILD_ID=$(date +%s)-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+      
+            - name: Prepare workspace
+              shell: bash
+              run: |
+                set -euo pipefail
+                rm -rf "$WORKSPACE"
+                mkdir -p "$WORKSPACE"
+                rsync -a --delete \
+                  --exclude ".git" \
+                  --exclude ".godot" \
+                  --exclude ".import" \
+                  --exclude "addons/godot-git-plugin" \
+                  ./ "$WORKSPACE/"
 
-      - name: Write version (authoritative)
-        shell: bash
-        run: |
-          set -euo pipefail
-          SRC="$WORKSPACE/version.cfg"
-          DST="$WORKSPACE/version.cfg"
-
-          MAJOR=0
-          MINOR=0
-          PATCH=0
-
-          if [[ -f "$SRC" ]]; then
-            MAJOR=$(awk -F= '/^major=/{print $2}' "$SRC" | tr -d ' ')
-            MINOR=$(awk -F= '/^minor=/{print $2}' "$SRC" | tr -d ' ')
-            PATCH=$(awk -F= '/^patch=/{print $2}' "$SRC" | tr -d ' ')
-          fi
-
-          CHANNEL="staging"
-          [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
-
-          {
-            echo "[version]"
-            echo "major=$MAJOR"
-            echo "minor=$MINOR"
-            echo "patch=$PATCH"
-            echo
-            echo "[channel]"
-            echo "name=\"$CHANNEL\""
-            echo
-            echo "[build]"
-            echo "commit=\"${GITHUB_SHA::7}\""
-            echo "id=\"$BUILD_ID\""
-            echo "date=\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\""
-          } > "$DST"
+    
+            - name: Write version
+              shell: bash
+              run: |
+                set -euo pipefail
+            
+                CHANNEL="staging"
+                [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
+            
+                MAJOR=0
+                MINOR=1
+                PATCH=0
+            
+                cat > "$WORKSPACE/version.cfg" <<EOF
+            [version]
+            major=$MAJOR
+            minor=$MINOR
+            patch=$PATCH
+            
+            [channel]
+            name="$CHANNEL"
+            
+            [build]
+            commit="${GITHUB_SHA::7}"
+            id="$BUILD_ID"
+            date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            EOF
           
       - name: Import project
         shell: bash
