@@ -41,54 +41,53 @@ jobs:
             echo "DEPLOY_URL=https://$DOMAIN/staging" >> "$GITHUB_ENV"
             echo "IS_STAGING=1" >> "$GITHUB_ENV"
           fi
-
+          
       - name: Set build id
         shell: bash
         run: |
           set -euo pipefail
           echo "BUILD_ID=$(date +%s)-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-      
-            - name: Prepare workspace
-              shell: bash
-              run: |
-                set -euo pipefail
-                rm -rf "$WORKSPACE"
-                mkdir -p "$WORKSPACE"
-                rsync -a --delete \
-                  --exclude ".git" \
-                  --exclude ".godot" \
-                  --exclude ".import" \
-                  --exclude "addons/godot-git-plugin" \
-                  ./ "$WORKSPACE/"
-
-    
-            - name: Write version
-              shell: bash
-              run: |
-                set -euo pipefail
-            
-                CHANNEL="staging"
-                [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
-            
-                MAJOR=0
-                MINOR=1
-                PATCH=0
-            
-                cat > "$WORKSPACE/version.cfg" <<EOF
-            [version]
-            major=$MAJOR
-            minor=$MINOR
-            patch=$PATCH
-            
-            [channel]
-            name="$CHANNEL"
-            
-            [build]
-            commit="${GITHUB_SHA::7}"
-            id="$BUILD_ID"
-            date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            EOF
           
+      - name: Prepare workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$WORKSPACE"
+          mkdir -p "$WORKSPACE"
+          rsync -a --delete \
+            --exclude ".git" \
+            --exclude ".godot" \
+            --exclude ".import" \
+            --exclude "addons/godot-git-plugin" \
+            ./ "$WORKSPACE/"
+            
+      - name: Write version
+        shell: bash
+        run: |
+          set -euo pipefail
+      
+          CHANNEL="staging"
+          [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
+      
+          MAJOR=0
+          MINOR=1
+          PATCH=0
+      
+          cat > "$WORKSPACE/version.cfg" <<EOF
+      [version]
+      major=$MAJOR
+      minor=$MINOR
+      patch=$PATCH
+      
+      [channel]
+      name="$CHANNEL"
+      
+      [build]
+      commit="${GITHUB_SHA::7}"
+      id="$BUILD_ID"
+      date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      EOF
+      
       - name: Import project
         shell: bash
         env:
