@@ -94,16 +94,16 @@ jobs:
           set -euo pipefail
           rm -rf "$WORKSPACE/.godot"
             
-            - name: Import project
-              shell: bash
-              env:
-                HOME: /home/godot
-                GODOT_SILENCE_ROOT_WARNING: "1"
-              run: |
-                set -euo pipefail
-                "$GODOT" --headless \
-                  --path "$WORKSPACE" \
-                  --import --quit
+      - name: Import project
+        shell: bash
+        env:
+          HOME: /home/godot
+          GODOT_SILENCE_ROOT_WARNING: "1"
+        run: |
+          set -euo pipefail
+          "$GODOT" --headless \
+            --path "$WORKSPACE" \
+            --import --quit
 
       - name: Export web build
         shell: bash
