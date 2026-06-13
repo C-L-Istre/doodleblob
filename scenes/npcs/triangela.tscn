@@ -18,7 +18,7 @@ next = "info"
 script = ExtResource("6_dchoice")
 text = "I guess I'll help."
 next = "accept"
-quest_event = "advance:find_the_king:accepted"
+quest_event = "advance:find_the_king:accept"
 condition = "active:find_the_king"
 
 [sub_resource type="Resource" id="Choice_NotMyProblem"]
@@ -43,7 +43,7 @@ next = "quest_prompt"
 script = ExtResource("6_dchoice")
 text = "Fine. I'll look I guess..."
 next = "accept"
-quest_event = "advance:find_the_king:accepted"
+quest_event = "advance:find_the_king:accept"
 condition = "active:find_the_king"
 
 [sub_resource type="Resource" id="Choice_YeahNo"]

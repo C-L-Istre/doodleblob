@@ -14,7 +14,7 @@ text = "You found me!
 
 
 Hoo-RAH!!!"
-quest_event = "advance:find_the_king:found_him"
+quest_event = "advance:find_the_king:find_king"
 
 [sub_resource type="Resource" id="DialogData_Triangela"]
 script = ExtResource("6_161ud")
@@ -44,7 +44,6 @@ size = Vector2(64, 52)
 scale = Vector2(2, 2)
 script = ExtResource("1_uujmy")
 dialog_data = SubResource("DialogData_Triangela")
-prompt_text = "Press [Interact] to Talk"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=379029911]
 sprite_frames = SubResource("SpriteFrames_s5r76")

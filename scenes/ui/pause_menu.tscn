@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bvgn5wc0it5mu" path="res://scenes/ui/settings_panel.tscn" id="2_0lmf7"]
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_8uki6"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_0bnpd"]
-[ext_resource type="PackedScene" uid="uid://ckbawdrnatqoa" path="res://scenes/ui/quest_panel.tscn" id="5_0bnpd"]
+[ext_resource type="PackedScene" uid="uid://bcjq22pxoifkb" path="res://scenes/ui/quest_panel.tscn" id="5_0bnpd"]
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=1174273434]
 process_mode = 3
@@ -97,11 +97,10 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Exit Game"
 
-[node name="QuestPanel" parent="PausePanel/VBoxContainer/HBoxContainer" unique_id=2065725587 instance=ExtResource("5_0bnpd")]
+[node name="QuestPanel" parent="PausePanel/VBoxContainer/HBoxContainer" unique_id=1629768042 instance=ExtResource("5_0bnpd")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-size_flags_horizontal = 3
 
 [node name="SettingsPanel" parent="PausePanel/VBoxContainer/HBoxContainer" unique_id=312149562 instance=ExtResource("2_0lmf7")]
 unique_name_in_owner = true

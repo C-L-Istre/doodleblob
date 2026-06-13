@@ -85,6 +85,15 @@ func is_complete(quest_id: String) -> bool:
 func is_failed(quest_id: String) -> bool:
 	return get_state(quest_id) == QuestState.FAILED
 
+func get_active_quests() -> Array[Quest]:
+	var result: Array[Quest] = []
+
+	for quest_id: String in _registry:
+		if is_active(quest_id):
+			result.append(_registry[quest_id])
+
+	return result
+
 ## Returns the current progress count for a specific objective.
 func get_progress(quest_id: String, obj_id: String) -> int:
 	if not _states.has(quest_id):
