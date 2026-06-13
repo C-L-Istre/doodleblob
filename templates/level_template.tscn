@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cvy23l0ouswua"]
 
 [ext_resource type="Script" uid="uid://bpro0vbnhwtwg" path="res://scripts/control_root.gd" id="1_hq32h"]
+[ext_resource type="Script" uid="uid://13hrpmfwx0o8" path="res://scripts/level.gd" id="1_i403b"]
 [ext_resource type="PackedScene" uid="uid://beo0q1itvj6hp" path="res://scenes/ui/touch_controls.tscn" id="2_a381f"]
 [ext_resource type="PackedScene" uid="uid://cb6pqint8i8ck" path="res://scenes/ui/hud.tscn" id="2_g1ai2"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="3_g1ai2"]
@@ -14,10 +15,6 @@
 [ext_resource type="Texture2D" uid="uid://deq3o3t1fydlr" path="res://assets/sprites/blocks/grass.png" id="9_j5y0x"]
 [ext_resource type="Texture2D" uid="uid://bap2o0pnclv8" path="res://assets/sprites/blocks/sand.png" id="10_mvorh"]
 [ext_resource type="PackedScene" uid="uid://cbnx51ouraho8" path="res://scenes/misc/kill_zone.tscn" id="11_hulh5"]
-
-[sub_resource type="GDScript" id="GDScript_bahl2"]
-script/source = "extends Node2D
-"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nb51f"]
 texture = ExtResource("5_i403b")
@@ -2167,7 +2164,7 @@ sources/5 = SubResource("TileSetAtlasSource_fkdbe")
 sources/6 = SubResource("TileSetAtlasSource_81klo")
 
 [node name="Level Template" type="Node2D" unique_id=1725077776]
-script = SubResource("GDScript_bahl2")
+script = ExtResource("1_i403b")
 
 [node name="ControlRoot" type="Control" parent="." unique_id=406943870]
 process_mode = 3
@@ -2180,7 +2177,6 @@ script = ExtResource("1_hq32h")
 [node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_g1ai2")]
 
 [node name="TouchControls" parent="ControlRoot" unique_id=1524801131 instance=ExtResource("2_a381f")]
-visible = false
 
 [node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("3_g1ai2")]
 unique_name_in_owner = true

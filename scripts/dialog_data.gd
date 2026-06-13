@@ -4,26 +4,28 @@ extends Resource
 # ──────────────────────────────────────────────────────────────────────────────
 # DialogData
 #
-# A Resource that carries everything a conversation needs. Using a Resource
-# means contributors can author conversations as .tres files in the editor
-# and drag them onto NPC nodes — no code required.
+# Root resource for a branching conversation. Assign to an NPC's dialog_data
+# property either inline or as a saved .tres file.
 #
-# Extend this class when you need more fields (portrait, voice, emotion,
-# quest_id). Because every call site passes a DialogData, adding a field
-# with a default value is non-breaking — no NPC's interact() needs to change.
+# Nodes are stored as an Array so they author cleanly in the Inspector and
+# serialize reliably in .tres files. DialogBox builds an internal Dictionary
+# at start() for O(1) lookup — order of the array does not matter.
+#
+# start_node must match the node_id of one entry in `nodes`.
 # ──────────────────────────────────────────────────────────────────────────────
 
-## The name shown above the dialog box. Usually the NPC's name.
+## The name shown in the speaker bar above the dialog box.
 @export var speaker: String = ""
 
-## Lines of dialog shown one at a time. The player advances with the interact
-## action or a UI button. An empty array is valid — the dialog box won't open.
-@export_multiline var lines: Array[String] = []
-
 ## Portrait texture shown beside the speaker name.
-## Leave null until portrait art is ready — the dialog box hides the portrait
-## slot automatically when this is not set.
+## Leave null to hide the portrait slot automatically.
 @export var portrait: Texture2D = null
+
+## node_id of the first DialogNode to display.
+@export var start_node: String = ""
+
+## All nodes in this conversation. Order does not matter.
+@export var nodes: Array[DialogNode] = []
 
 # ── Reserved for future use ───────────────────────────────────────────────────
 # These fields are intentionally left as comments until implemented.

@@ -3,12 +3,20 @@ extends Area2D
 # ──────────────────────────────────────────────────────────────────────────────
 # LevelExit
 #
-# Area2D that transitions to the next scene when a body in the "player" group
-# enters it. Set next_level_path in the inspector (or leave empty to return to
-# the main menu when the player reaches the exit).
+# Area2D that transitions the player to the next scene when entered.
+#
+# Inspector setup:
+#   next_level_path — scene to load on a normal exit.
+#                     Leave empty on the final level: the player will be sent
+#                     to game_end.tscn where win_quest_id determines whether
+#                     the screen reads "Game Won" or "Game Over".
+#
+# Signal setup (connect in editor):
+#   body_entered → _on_body_entered
 # ──────────────────────────────────────────────────────────────────────────────
 
-## Path to the next level scene. Leave empty to return to the main menu.
+## Scene to load on a normal exit.
+## Leave empty on the final level — falls through to game_end automatically.
 @export_file("*.tscn") var next_level_path: String = ""
 
 
@@ -18,10 +26,8 @@ func _on_body_entered(body: Node) -> void:
 
 
 func _change_level() -> void:
-	# Save score as a high score candidate at each level boundary.
-	# Score is NOT reset here — it carries forward to the next level.
 	ScoreManager.finish_level()
 	if next_level_path.is_empty():
-		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
+		get_tree().change_scene_to_file("res://scenes/ui/game_end.tscn")
 	else:
 		get_tree().change_scene_to_file(next_level_path)

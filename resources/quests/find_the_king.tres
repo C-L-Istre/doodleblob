@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Quest" format=3 uid="uid://shav23ocruyt"]
+
+[ext_resource type="Script" uid="uid://cprgp6g0yh1dw" path="res://scripts/quest_objective.gd" id="1_nqw6i"]
+[ext_resource type="Script" uid="uid://b31nuriwlj1io" path="res://scripts/quest.gd" id="2_7jci1"]
+
+[sub_resource type="Resource" id="Resource_nqw6i"]
+script = ExtResource("1_nqw6i")
+objective_id = "accept"
+description = "I told Princess Triangela I would help find her dad, King Octavius."
+metadata/_custom_type_script = "uid://cprgp6g0yh1dw"
+
+[sub_resource type="Resource" id="Resource_7jci1"]
+script = ExtResource("1_nqw6i")
+objective_id = "find_king"
+description = "Find the King"
+metadata/_custom_type_script = "uid://cprgp6g0yh1dw"
+
+[resource]
+script = ExtResource("2_7jci1")
+quest_id = "find_the_king"
+title = "Find the King"
+description = "He's the King, so I should probably find him."
+objectives = Array[ExtResource("1_nqw6i")]([SubResource("Resource_nqw6i"), SubResource("Resource_7jci1")])
+metadata/_custom_type_script = "uid://b31nuriwlj1io"

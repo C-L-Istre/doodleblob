@@ -21,7 +21,7 @@ func _ready() -> void:
 	_lives_label.text = _format_lives(HealthManager.lives)
 
 
-# ── Signal handlers (connect in editor) ───────────────────────────────────────
+# ── Signal handlers (connected in code above, not in the editor) ──────────────
 
 func _on_score_changed(new_score: int) -> void:
 	_score_label.text = _format_score(new_score)

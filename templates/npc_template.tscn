@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://cb0mn5k52k8nn"]
+
+[ext_resource type="Script" uid="uid://dxpuc7dbb532e" path="res://scripts/npc.gd" id="1_tl5bd"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="6_ixgx6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_27vpw"]
+size = Vector2(10, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7l541"]
+size = Vector2(64, 52)
+
+[node name="NPC" type="CharacterBody2D" unique_id=1107866423]
+script = ExtResource("1_tl5bd")
+dialog_data = null
+prompt_text = "Press [Interact] to Talk"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=379029911]
+animation = &"idle"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=307942677]
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_27vpw")
+disabled = true
+
+[node name="PromptContainer" type="MarginContainer" parent="." unique_id=1621709192]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -48.0
+offset_right = 16.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PromptLabel" type="Label" parent="PromptContainer" unique_id=686740844]
+unique_name_in_owner = true
+z_index = 20
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ixgx6")
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+
+[node name="PromptArea" type="Area2D" parent="." unique_id=8339693]
+collision_layer = 0
+collision_mask = 2
+
+[node name="PromptCollision" type="CollisionShape2D" parent="PromptArea" unique_id=84602459]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_7l541")
+
+[connection signal="body_entered" from="PromptArea" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="PromptArea" to="." method="_on_area_2d_body_exited"]

@@ -1,0 +1,40 @@
+class_name DialogNode
+extends Resource
+
+# ──────────────────────────────────────────────────────────────────────────────
+# DialogNode
+#
+# One node in a branching dialog tree. Every node typewriters its text,
+# then does one of two things:
+#
+#   choices non-empty → show choice buttons; player picks one.
+#   choices empty     → show "Continue" / "Close" prompt.
+#                         next non-empty → advance to that node.
+#                         next empty     → close the dialog.
+#
+# node_id must be unique within its DialogData.
+# ──────────────────────────────────────────────────────────────────────────────
+
+## Unique identifier for this node within the conversation.
+@export var node_id: String = ""
+
+## Text displayed by the typewriter effect.
+@export_multiline var text: String = ""
+
+## For linear nodes (no choices): node_id to advance to on confirm.
+## Leave empty to close the dialog after this node.
+@export var next: String = ""
+
+## For branching nodes: choices presented to the player.
+## When non-empty, `next` is ignored.
+@export var choices: Array[DialogChoice] = []
+
+@export_group("Quest")
+## Quest event fired as soon as this node is displayed (before typewriter ends).
+## Format: "action:quest_id" or "action:quest_id:objective_id"
+## Examples:
+##   "start:find_the_king"
+##   "advance:find_the_king:talked_to_triangela"
+##   "complete:find_the_king"
+## Leave empty for no event.
+@export var quest_event: String = ""

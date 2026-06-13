@@ -1,41 +1,54 @@
 extends CanvasLayer
 
 # ──────────────────────────────────────────────────────────────────────────────
-# GameOver
+# GameEnd
 #
-# Game over screen. Loaded directly by HealthManager when lives reach zero.
-# Saves the final score as a high score candidate on the way back to the menu.
+# Combined win/lose screen. Loads after the final level exit or when all lives
+# are lost. win_quest_id determines the headline: if the named quest is
+# complete the screen reads "Game Won", otherwise "Game Over".
 #
-# All button signals are connected in the scene editor.
+# Inspector setup:
+#   restart_scene  — level scene to load on Play Again
+#   win_quest_id   — quest_id string from find_the_king.tres (or whichever
+#                    quest acts as the win condition)
 # ──────────────────────────────────────────────────────────────────────────────
 
 ## Scene to load when the player clicks Play Again. Set in the Inspector.
 @export_file("*.tscn") var restart_scene: String = ""
+@export var win_quest_id: String = ""
 
-@onready var _exit_button: Button = %ExitButton
+@onready var win_lose_label: Label = %WinLoseLabel
+@onready var exit_button: Button = %ExitButton
 
 
 func _ready() -> void:
-	_exit_button.visible = PlatformDetection.can_quit()
+	exit_button.visible = PlatformDetection.can_quit()
+	MenuNav.setup([%PlayButton, %MainMenuButton, %ExitButton])
 
-
-# ── Button handlers (connect in editor) ───────────────────────────────────────
+	##if QuestManager.all_complete():
+	if QuestManager.is_complete(win_quest_id):
+		win_lose_label.text = "Game Won"
+	else:
+		win_lose_label.text = "Game Over"
 
 func _on_play_button_pressed() -> void:
 	if restart_scene.is_empty():
-		push_error("GameOver: restart_scene is not set — assign a level path in the Inspector.")
+		push_error("GameEnd: restart_scene is not set — assign a level path in the Inspector.")
 		return
 	ScoreManager.finish_level()
 	ScoreManager.reset_score()
 	HealthManager.reset_game()
+	QuestManager.reset()
 	get_tree().change_scene_to_file(restart_scene)
+
 
 func _on_main_menu_button_pressed() -> void:
 	ScoreManager.finish_level()
 	ScoreManager.reset_score()
 	HealthManager.reset_game()
+	QuestManager.reset()
 	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
 
 
 func _on_exit_button_pressed() -> void:
-	get_tree().quit()
+	PlatformDetection.exit_game()

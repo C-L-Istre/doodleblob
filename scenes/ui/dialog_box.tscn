@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://clohqj88gfa0y" path="res://scripts/dialog_box.gd" id="1_hhmjc"]
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_rm1mb"]
+[ext_resource type="Texture2D" uid="uid://bl5dlxbd71450" path="res://assets/sprites/ui/dialog_cursor.png" id="2_xovei"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_xovei"]
 
 [node name="DialogBox" type="CanvasLayer" unique_id=941438766 groups=["dialog_box"]]
@@ -10,6 +11,7 @@ layer = 5
 visible = false
 script = ExtResource("1_hhmjc")
 chars_per_second = 24.0
+choice_cursor_texture = ExtResource("2_xovei")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1033502616]
 anchors_preset = 8
@@ -59,6 +61,14 @@ custom_minimum_size = Vector2(180, 120)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_xovei")
 autowrap_mode = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer/VBoxContainer" unique_id=732837372]
+layout_mode = 2
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/PanelContainer" unique_id=1600000001]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
 
 [node name="ContinueContainer" type="MarginContainer" parent="CenterContainer" unique_id=2057438625]
 layout_mode = 2

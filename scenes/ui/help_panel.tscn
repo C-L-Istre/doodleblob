@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://rt5q532rnwcb"]
+
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="1_tn4a7"]
+
+[node name="HelpPanel" type="PanelContainer" unique_id=102503026]
+custom_minimum_size = Vector2(400, 160)
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -80.0
+offset_right = 364.0
+offset_bottom = 80.0
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HelpLabel" type="Label" parent="." unique_id=1420018106]
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Ughhh....
+
+If you REALLY need to know:
+
+Use WASD or Arrow keys to move (D-Pad or either Joystick when using a controller)
+
+Jump with the JUMP button (W, Space, Up arrow, D-pad up, A Button)
+
+Mobile controls are on the screen (Left, Right, Jump).
+
+And if you actually found and read all of this then you probably could have figured it out on your own
+
+C-L-I"
+mouse_filter = 1
+theme_override_fonts/font = ExtResource("1_tn4a7")
+text = "Figure it out! You ain't never
+played a game before?"
+horizontal_alignment = 1

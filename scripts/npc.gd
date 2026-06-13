@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 # ──────────────────────────────────────────────────────────────────────────────
-# NPC (Triangela)
+# NPC
 #
 # Proximity-based interactable NPC. Registers itself with the player when in
 # range so the player's "interact" action opens the dialog box.
@@ -19,7 +19,7 @@ extends CharacterBody2D
 @export var dialog_data: DialogData
 
 ## Label shown above the NPC when the player is in range.
-@export var prompt_text: String = "Press [F] to Talk"
+@export var prompt_text: String = "Press [Interact] to Talk"
 
 @onready var _prompt_label: Label = %PromptLabel
 

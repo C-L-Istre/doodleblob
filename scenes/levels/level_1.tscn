@@ -1,9 +1,12 @@
 [gd_scene format=4 uid="uid://dbyhga8ebhtki"]
 
 [ext_resource type="PackedScene" uid="uid://s0hfpnwsx16u" path="res://scenes/characters/player.tscn" id="1_mm8aj"]
+[ext_resource type="Script" uid="uid://13hrpmfwx0o8" path="res://scripts/level.gd" id="1_ndtll"]
 [ext_resource type="PackedScene" uid="uid://wlmbjhsd1x0u" path="res://scenes/ui/pause_menu.tscn" id="2_iwr0g"]
+[ext_resource type="Script" uid="uid://b31nuriwlj1io" path="res://scripts/quest.gd" id="2_mqh5v"]
 [ext_resource type="PackedScene" uid="uid://cb6pqint8i8ck" path="res://scenes/ui/hud.tscn" id="2_np2pn"]
 [ext_resource type="Texture2D" uid="uid://bawkmft5csc10" path="res://assets/sprites/blocks/sky.png" id="2_wtwp4"]
+[ext_resource type="Resource" uid="uid://shav23ocruyt" path="res://resources/quests/find_the_king.tres" id="3_7o3do"]
 [ext_resource type="Texture2D" uid="uid://chxgv56tu6cpg" path="res://assets/sprites/blocks/water.png" id="3_iwr0g"]
 [ext_resource type="PackedScene" uid="uid://1h48hjny4p0b" path="res://scenes/ui/dialog_box.tscn" id="4_7h2jl"]
 [ext_resource type="Texture2D" uid="uid://ck4hg4slcqigx" path="res://assets/sprites/blocks/stone.png" id="4_bahl2"]
@@ -21,10 +24,6 @@
 [ext_resource type="PackedScene" uid="uid://cgolhqm2ftq5r" path="res://scenes/misc/level_exit.tscn" id="18_np2pn"]
 [ext_resource type="PackedScene" uid="uid://vpkouj5jdv0" path="res://scenes/objects/boat.tscn" id="18_v6ha0"]
 [ext_resource type="PackedScene" uid="uid://dy4d1g1dgbsy" path="res://scenes/objects/platform_falling.tscn" id="19_gmpev"]
-
-[sub_resource type="GDScript" id="GDScript_bahl2"]
-script/source = "extends Node2D
-"
 
 [sub_resource type="GDScript" id="GDScript_np2pn"]
 script/source = "extends Control
@@ -2210,7 +2209,8 @@ _data = {
 }
 
 [node name="Level 1" type="Node2D" unique_id=1725077776]
-script = SubResource("GDScript_bahl2")
+script = ExtResource("1_ndtll")
+quests = Array[ExtResource("2_mqh5v")]([ExtResource("3_7o3do")])
 
 [node name="ControlRoot" type="Control" parent="." unique_id=406943870]
 process_mode = 3
@@ -2279,6 +2279,11 @@ tile_set = SubResource("TileSet_tgy6u")
 [node name="LevelEnd" parent="Terrain" unique_id=1681016843 instance=ExtResource("18_np2pn")]
 position = Vector2(1349, 16)
 next_level_path = "uid://2vq50hudycot"
+
+[node name="LevelEnd" parent="Terrain/LevelEnd" unique_id=11591199 instance=ExtResource("18_np2pn")]
+position = Vector2(-1646, 24)
+scale = Vector2(2, 2)
+next_level_path = "uid://bpmotoamehaeo"
 
 [node name="KillZone" parent="Terrain" unique_id=2006232834 instance=ExtResource("15_wtwp4")]
 visible = false

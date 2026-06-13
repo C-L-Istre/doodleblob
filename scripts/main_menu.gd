@@ -3,39 +3,39 @@ extends Control
 # ──────────────────────────────────────────────────────────────────────────────
 # MainMenu
 #
-# Manages the main menu. Panel visibility, level navigation, and high score
-# display. All button signals are connected in the scene editor.
+# Root script for the main menu scene. Manages visibility switching between
+# sub-panels (level select, high score, help, settings) and wires the level
+# select panel's signals to scene-loading logic.
 #
-# Inspector setup:
-#   level_paths — one entry per level scene, in play order
-#   panels      — every panel that should close when another opens
-#                 (SelectLevelPanel, HighscorePanel, HelpPanel, SettingsPanel)
+# Signal connections that cannot go in the editor (sources are child subscenes
+# whose signals are not visible in the parent scene's connection dialog):
+#   level_select_panel.level_selected → _on_level_selected
+#   level_select_panel.panel_closed   → _on_level_select_closed
+#
+# All button signals are connected in the editor.
 # ──────────────────────────────────────────────────────────────────────────────
-# ScoreManager.high_score_changed is connected in code — no editor connection in the scene.
 
-## Scenes to load in order. Add entries here to expose levels in level select.
-@export var level_paths: Array[String] = []
+@onready var level_select_panel: PanelContainer = %LevelSelectPanel
+@onready var highscore_panel:    PanelContainer = %HighscorePanel
+@onready var exit_button:        Button         = %ExitGameButton
 
-@onready var _highscore_panel:    Label    = %HighscorePanel
-@onready var _select_level_panel: ItemList = %SelectLevelPanel
-@onready var _exit_button:        Button   = %ExitGameButton
-
-# Built from unique-name refs — all panels already have unique_name_in_owner = true
-# so no Inspector setup is required.
 var _panels: Array[CanvasItem]
 
 
 func _ready() -> void:
-	_panels = [
-		%SelectLevelPanel,
-		%HighscorePanel,
-		%HelpPanel,
-		%SettingsPanel,
-	]
-	_exit_button.visible = PlatformDetection.can_quit()
-	_highscore_panel.text = "High Score: %d" % ScoreManager.high_score
-	# high_score_changed has no editor connection in the scene — kept in code.
-	ScoreManager.high_score_changed.connect(_on_high_score_changed)
+	_panels = [%LevelSelectPanel, %HighscorePanel, %HelpPanel, %SettingsPanel]
+	exit_button.visible = PlatformDetection.can_quit()
+	MenuNav.setup([
+		%PlayGameButton,
+		%LevelSelectButton,
+		%HighscoreButton,
+		%HelpButton,
+		%SettingsButton,
+		%ExitGameButton,
+	])
+	level_select_panel.level_selected.connect(_on_level_selected)
+	level_select_panel.panel_closed.connect(_on_level_select_closed)
+	_close_all()
 
 
 # ── Panel management ──────────────────────────────────────────────────────────
@@ -56,30 +56,26 @@ func _toggle_panel(node: CanvasItem) -> void:
 # ── Button handlers (connect in editor) ───────────────────────────────────────
 
 func _on_play_game_button_pressed() -> void:
-	if level_paths.is_empty():
-		push_error("MainMenu: level_paths is empty — add at least one entry in the Inspector.")
+	var first_level: String = level_select_panel.get_first_level()
+	if first_level.is_empty():
+		push_error("MainMenu: no levels configured in LevelSelectPanel.level_paths.")
 		return
 	ScoreManager.reset_score()
 	HealthManager.reset_game()
-	call_deferred("_load_level", level_paths[0])
+	QuestManager.reset()
+	call_deferred("_load_level", first_level)
 
 
-func _on_select_level_button_pressed() -> void:
-	_toggle_panel(_select_level_panel)
-	if not _select_level_panel.visible:
-		_select_level_panel.deselect_all()
-
-
-func _on_select_level_panel_item_selected(index: int) -> void:
-	if index < 0 or index >= level_paths.size():
-		return
-	ScoreManager.reset_score()
-	HealthManager.reset_game()
-	call_deferred("_load_level", level_paths[index])
+func _on_level_select_button_pressed() -> void:
+	_toggle_panel(level_select_panel)
+	if level_select_panel.visible:
+		level_select_panel.grab_list_focus()
+	else:
+		level_select_panel.deselect_all()
 
 
 func _on_highscore_button_pressed() -> void:
-	_toggle_panel(_highscore_panel)
+	_toggle_panel(highscore_panel)
 
 
 func _on_help_button_pressed() -> void:
@@ -94,8 +90,21 @@ func _on_exit_game_button_pressed() -> void:
 	PlatformDetection.exit_game()
 
 
-func _on_high_score_changed(new_high: int) -> void:
-	_highscore_panel.text = "High Score: %d" % new_high
+# ── Level select signal handlers ──────────────────────────────────────────────
+
+## Fires when the player confirms a level in the LevelSelectPanel.
+func _on_level_selected(path: String) -> void:
+	ScoreManager.reset_score()
+	HealthManager.reset_game()
+	QuestManager.reset()
+	call_deferred("_load_level", path)
+
+
+## Fires when LevelSelectPanel.panel_closed is emitted (ItemList lost focus).
+## Kept as a named handler rather than a lambda so it appears clearly in the
+## call stack if the close chain needs debugging.
+func _on_level_select_closed() -> void:
+	_close_all()
 
 
 # ── Private ───────────────────────────────────────────────────────────────────

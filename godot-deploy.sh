@@ -4,7 +4,7 @@ set -euo pipefail
 log() { echo "[provision] $*"; }
 
 # =========================
-# INPUTS
+# INPUTS 
 # =========================
 
 GODOT_VERSION="${GODOT_VERSION:-4.6.3.stable}"

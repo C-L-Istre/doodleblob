@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://bjss8576j0j5j"]
+
+[ext_resource type="Script" uid="uid://dxpuc7dbb532e" path="res://scripts/npc.gd" id="1_uujmy"]
+[ext_resource type="Script" uid="uid://40yblr5l8mf3" path="res://scripts/dialog_node.gd" id="2_vexs0"]
+[ext_resource type="Script" uid="uid://bcwcobxymunmv" path="res://scripts/dialog_choice.gd" id="3_vsx15"]
+[ext_resource type="Texture2D" uid="uid://bd10j131t2wey" path="res://assets/sprites/npcs/KingOct.png" id="4_tc4wk"]
+[ext_resource type="Script" uid="uid://eatc5v34vqd" path="res://scripts/dialog_data.gd" id="6_161ud"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="8_c7beo"]
+
+[sub_resource type="Resource" id="Node_root"]
+script = ExtResource("2_vexs0")
+node_id = "root"
+text = "You found me!
+
+
+Hoo-RAH!!!"
+quest_event = "advance:find_the_king:find_king"
+
+[sub_resource type="Resource" id="DialogData_Triangela"]
+script = ExtResource("6_161ud")
+speaker = "King Octavius"
+portrait = ExtResource("4_tc4wk")
+start_node = "root"
+nodes = Array[ExtResource("2_vexs0")]([SubResource("Node_root")])
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_s5r76"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_tc4wk")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_27vpw"]
+size = Vector2(10, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7l541"]
+size = Vector2(64, 52)
+
+[node name="KingOctavius" type="CharacterBody2D" unique_id=1107866423]
+scale = Vector2(2, 2)
+script = ExtResource("1_uujmy")
+dialog_data = SubResource("DialogData_Triangela")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=379029911]
+sprite_frames = SubResource("SpriteFrames_s5r76")
+animation = &"idle"
+autoplay = "idle"
+frame_progress = 0.1764631
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=307942677]
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_27vpw")
+disabled = true
+
+[node name="PromptContainer" type="MarginContainer" parent="." unique_id=1621709192]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -48.0
+offset_right = 16.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PromptLabel" type="Label" parent="PromptContainer" unique_id=686740844]
+unique_name_in_owner = true
+z_index = 20
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_c7beo")
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+
+[node name="PromptArea" type="Area2D" parent="." unique_id=8339693]
+collision_layer = 0
+collision_mask = 2
+
+[node name="PromptCollision" type="CollisionShape2D" parent="PromptArea" unique_id=84602459]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_7l541")
+
+[connection signal="body_entered" from="PromptArea" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="PromptArea" to="." method="_on_area_2d_body_exited"]
