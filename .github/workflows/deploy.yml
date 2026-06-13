@@ -121,9 +121,9 @@ PY
           PATCH=0
 
           if [[ -f "$SRC" ]]; then
-            MAJOR=$(awk -F= '/^major=/{print $2}' "$SRC" | tr -d ' ' || echo 0)
-            MINOR=$(awk -F= '/^minor=/{print $2}' "$SRC" | tr -d ' ' || echo 0)
-            PATCH=$(awk -F= '/^patch=/{print $2}' "$SRC" | tr -d ' ' || echo 0)
+            MAJOR=$(awk -F= '/^major=/{print $2}' "$SRC" | tr -d ' ')
+            MINOR=$(awk -F= '/^minor=/{print $2}' "$SRC" | tr -d ' ')
+            PATCH=$(awk -F= '/^patch=/{print $2}' "$SRC" | tr -d ' ')
           fi
 
           CHANNEL="staging"
@@ -151,9 +151,7 @@ EOF
           set -euo pipefail
 
           cp "$WORKSPACE/.github/PWA/"*.png "$BUILD_DIR/" || true
-
           mkdir -p "$BUILD_DIR/screenshots"
-
           cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/"
           cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/"
 
@@ -252,7 +250,7 @@ PY
           [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]]
 
       # ─────────────────────────────────────────────
-      - name: Cleanup releases (safe LRU)
+      - name: Cleanup releases
         shell: bash
         run: |
           set -euo pipefail
