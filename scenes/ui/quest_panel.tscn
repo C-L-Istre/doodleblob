@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://bcjq22pxoifkb"]
 
 [ext_resource type="Script" uid="uid://dqi4l7e5j3k3e" path="res://scripts/quest_panel.gd" id="1_s7cfj"]
+[ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_pg1it"]
+[ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_7r24x"]
 
 [node name="QuestPanel" type="PanelContainer" unique_id=1629768042]
 custom_minimum_size = Vector2(400, 300)
@@ -27,6 +29,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 40)
 layout_mode = 2
 size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2_pg1it")
 text = "Quests"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -37,6 +40,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 240)
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("3_7r24x")
 text = "Objectives"
 horizontal_alignment = 1
 autowrap_mode = 3

@@ -9,13 +9,13 @@ func _ready() -> void:
 		text = "v?.?.?"
 		return
 
-		var major := int(cfg.get_value("version", "major", 0))
-		var minor := int(cfg.get_value("version", "minor", 0))
-		var patch := int(cfg.get_value("version", "patch", 0))
+	var major := int(cfg.get_value("version", "major", 0))
+	var minor := int(cfg.get_value("version", "minor", 0))
+	var patch := int(cfg.get_value("version", "patch", 0))
 
-		var channel := str(cfg.get_value("channel", "name", "dev"))
+	var channel := str(cfg.get_value("channel", "name", "dev"))
 
-		text = "v%d.%d.%d" % [major, minor, patch]
+	text = "v%d.%d.%d" % [major, minor, patch]
 
-		if channel != "release":
-			text += "-%s" % channel
+	if channel != "release":
+		text += "-%s" % channel
