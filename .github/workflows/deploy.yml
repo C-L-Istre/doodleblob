@@ -74,19 +74,19 @@ jobs:
           PATCH=0
       
           cat > "$WORKSPACE/version.cfg" <<EOF
-      [version]
-      major=$MAJOR
-      minor=$MINOR
-      patch=$PATCH
-      
-      [channel]
-      name="$CHANNEL"
-      
-      [build]
-      commit="${GITHUB_SHA::7}"
-      id="$BUILD_ID"
-      date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-      EOF
+          [version]
+          major=$MAJOR
+          minor=$MINOR
+          patch=$PATCH
+          
+          [channel]
+          name="$CHANNEL"
+          
+          [build]
+          commit="${GITHUB_SHA::7}"
+          id="$BUILD_ID"
+          date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          EOF
       
       - name: Import project
         shell: bash
