@@ -35,7 +35,6 @@ jobs:
 
           python3 - <<'PY' >> "$GITHUB_ENV"
           import json
-
           cfg = json.load(open(".github/config.json"))
 
           print(f"DOMAIN={cfg['domain']}")
@@ -59,13 +58,6 @@ jobs:
           fi
 
       # ─────────────────────────────────────────────
-      - name: Set build id
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "BUILD_ID=$(date +%s)-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-
-      # ─────────────────────────────────────────────
       - name: Prepare workspace
         shell: bash
         run: |
@@ -76,9 +68,11 @@ jobs:
 
           rsync -a \
             --delete \
+            --exclude ".bak" \
             --exclude ".git" \
             --exclude ".godot" \
             --exclude ".import" \
+            --exclude "addons" \
             --exclude "exports" \
             ./ "$WORKSPACE/"
 
@@ -100,14 +94,17 @@ jobs:
         shell: bash
         env:
           HOME: /home/godot
+          GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
 
+          BUILD_ID="$(date +%s)-${GITHUB_SHA::7}"
           BUILD_DIR="$RELEASES/$BUILD_ID"
 
           rm -rf "$BUILD_DIR"
           mkdir -p "$BUILD_DIR"
 
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
           echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
 
           "$GODOT" --headless \
@@ -116,7 +113,7 @@ jobs:
             "$BUILD_DIR/index.html"
 
       # ─────────────────────────────────────────────
-      - name: Remove Godot manifest
+      - name: Remove Godot-generated manifest
         shell: bash
         run: |
           set -euo pipefail
@@ -144,13 +141,14 @@ jobs:
 
           cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
           {
+            "id": "/index.html",
             "name": "$GAME_NAME",
             "short_name": "$GAME_NAME",
             "start_url": "/index.html",
             "scope": "/",
             "display": "standalone",
-            "background_color": "$THEME_COLOR",
-            "theme_color": "$THEME_COLOR"
+            "theme_color": "$THEME_COLOR",
+            "background_color": "$THEME_COLOR"
           }
           EOF
 
@@ -161,17 +159,31 @@ jobs:
           set -euo pipefail
 
           if [[ "$IS_STAGING" == "1" ]]; then
-            cat > "$BUILD_DIR/robots.txt" <<EOF
-User-agent: *
-Disallow: /
-EOF
+            echo -e "User-agent: *\nDisallow: /" > "$BUILD_DIR/robots.txt"
           else
-            cat > "$BUILD_DIR/robots.txt" <<EOF
-User-agent: *
-Allow: /
-Sitemap: $DEPLOY_URL/sitemap.xml
-EOF
+            echo -e "User-agent: *\nAllow: /\nSitemap: $DEPLOY_URL/sitemap.xml" > "$BUILD_DIR/robots.txt"
           fi
+
+      # ─────────────────────────────────────────────
+      - name: Patch index.html
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - "$BUILD_DIR/index.html" <<'PY'
+          from pathlib import Path
+          import os
+
+          path = Path(__import__("sys").argv[1])
+          html = path.read_text()
+
+          html = html.replace(
+              "overflow: hidden;",
+              "overflow: hidden; width: 100vw; height: 100vh;"
+          )
+
+          path.write_text(html)
+          PY
 
       # ─────────────────────────────────────────────
       - name: Validate output
@@ -180,7 +192,10 @@ EOF
           set -euo pipefail
 
           for f in index.html index.js index.wasm index.pck manifest.webmanifest; do
-            [[ -f "$BUILD_DIR/$f" ]] || { echo "Missing $f"; exit 1; }
+            [[ -f "$BUILD_DIR/$f" ]] || {
+              echo "Missing: $f"
+              exit 1
+            }
           done
 
       # ─────────────────────────────────────────────
@@ -195,15 +210,35 @@ EOF
             TARGET="$STAGING"
           fi
 
-          ln -sfn "$BUILD_DIR" "${TARGET}.tmp"
-          mv -Tf "${TARGET}.tmp" "$TARGET"
+          ln -sfn "$BUILD_DIR" "$TARGET.tmp"
+          mv -Tf "$TARGET.tmp" "$TARGET"
 
           echo "TARGET=$TARGET" >> "$GITHUB_ENV"
 
       # ─────────────────────────────────────────────
-      - name: Validate deploy
+      - name: Validate deployed symlink
         shell: bash
         run: |
           set -euo pipefail
 
-          [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]]
+          [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]] || exit 1
+
+      # ─────────────────────────────────────────────
+      - name: Cleanup old releases
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          KEEP=10
+
+          mapfile -t releases < <(
+            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d | sort -r
+          )
+
+          count=0
+          for r in "${releases[@]}"; do
+            ((count++))
+            if (( count > KEEP )); then
+              rm -rf "$r"
+            fi
+          done
