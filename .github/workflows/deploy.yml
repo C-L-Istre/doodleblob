@@ -1,4 +1,4 @@
-name: Godot Web Deploy (CI Hardened v3)
+name: Godot Web Deploy
 
 on:
   push:
@@ -20,33 +20,20 @@ jobs:
     runs-on: [self-hosted, godot, proxmox]
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ─────────────────────────────────────────────
       - name: Load config
         shell: bash
         run: |
           set -euo pipefail
-
-          python3 - <<'PY' >> "$GITHUB_ENV"
-import json
-
-cfg = json.load(open(".github/config.json"))
-
-print("DOMAIN=" + cfg["domain"])
-print("THEME_COLOR=" + cfg["theme_color"])
-PY
-
+          python3 -c "import json; cfg=json.load(open('.github/config.json')); print('DOMAIN=' + cfg['domain']); print('THEME_COLOR=' + cfg['theme_color'])" >> "$GITHUB_ENV"
           echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
 
-      # ─────────────────────────────────────────────
       - name: Set deployment metadata
         shell: bash
         run: |
           set -euo pipefail
-
           if [[ "$GITHUB_REF_NAME" == "main" ]]; then
             echo "DEPLOY_URL=https://$DOMAIN" >> "$GITHUB_ENV"
             echo "IS_STAGING=0" >> "$GITHUB_ENV"
@@ -55,15 +42,12 @@ PY
             echo "IS_STAGING=1" >> "$GITHUB_ENV"
           fi
 
-      # ─────────────────────────────────────────────
       - name: Prepare workspace
         shell: bash
         run: |
           set -euo pipefail
-
           rm -rf "$WORKSPACE"
           mkdir -p "$WORKSPACE"
-
           rsync -a --delete \
             --exclude ".git" \
             --exclude ".godot" \
@@ -71,48 +55,41 @@ PY
             --exclude "addons/godot-git-plugin" \
             ./ "$WORKSPACE/"
 
-      # ─────────────────────────────────────────────
       - name: Import project
         shell: bash
         env:
           HOME: /home/godot
+          GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
-
           "$GODOT" --headless \
             --path "$WORKSPACE" \
             --import --quit
 
-      # ─────────────────────────────────────────────
       - name: Export web build
         shell: bash
         env:
           HOME: /home/godot
+          GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
-
           BUILD_ID="$(date +%s)-${GITHUB_SHA::7}"
           BUILD_DIR="$RELEASES/$BUILD_ID"
-
           rm -rf "$BUILD_DIR"
           mkdir -p "$BUILD_DIR"
-
+          mkdir -p "$RELEASES"
           echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
           echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
-
           "$GODOT" --headless \
             --path "$WORKSPACE" \
             --export-release Web \
             "$BUILD_DIR/index.html"
-
           sync
 
-      # ─────────────────────────────────────────────
       - name: Write version (authoritative)
         shell: bash
         run: |
           set -euo pipefail
-
           SRC="$WORKSPACE/version.cfg"
           DST="$BUILD_DIR/version.cfg"
 
@@ -144,23 +121,19 @@ id=$BUILD_ID
 date=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
 
-      # ─────────────────────────────────────────────
       - name: Copy PWA assets
         shell: bash
         run: |
           set -euo pipefail
-
           cp "$WORKSPACE/.github/PWA/"*.png "$BUILD_DIR/" || true
           mkdir -p "$BUILD_DIR/screenshots"
           cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/"
           cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/"
 
-      # ─────────────────────────────────────────────
       - name: Generate manifest
         shell: bash
         run: |
           set -euo pipefail
-
           cat > "$BUILD_DIR/manifest.webmanifest" <<EOF
 {
   "name": "$GAME_NAME",
@@ -173,50 +146,39 @@ EOF
 }
 EOF
 
-      # ─────────────────────────────────────────────
       - name: Generate robots.txt
         shell: bash
         run: |
           set -euo pipefail
-
           if [[ "$IS_STAGING" == "1" ]]; then
             printf 'User-agent: *\nDisallow: /\n' > "$BUILD_DIR/robots.txt"
           else
             printf 'User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n' "$DEPLOY_URL" > "$BUILD_DIR/robots.txt"
           fi
 
-      # ─────────────────────────────────────────────
       - name: Patch index.html
         shell: bash
         run: |
           set -euo pipefail
+          python3 -c "from pathlib import Path; import sys; p=Path(sys.argv[1]); html=p.read_text(encoding='utf-8'); html=html.replace('<meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0\">','<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'); html=html.replace('overflow: hidden;','overflow: hidden; width: 100vw; height: 100vh;'); html=html.replace('\"ensureCrossOriginIsolationHeaders\":true','\"ensureCrossOriginIsolationHeaders\":false'); html=html.replace('<link rel=\"manifest\" href=\"index.manifest.json\">','<link rel=\"manifest\" href=\"manifest.webmanifest\">'); p.write_text(html, encoding='utf-8')" "$BUILD_DIR/index.html"
 
-          python3 - <<'PY' "$BUILD_DIR/index.html"
-from pathlib import Path
-import sys
-
-p = Path(sys.argv[1])
-html = p.read_text(encoding="utf-8")
-
-html = html.replace(
-    "overflow: hidden;",
-    "overflow: hidden; width: 100vw; height: 100vh;"
-)
-
-p.write_text(html, encoding="utf-8")
-PY
-
-      # ─────────────────────────────────────────────
       - name: Validate build (strict)
         shell: bash
         run: |
           set -euo pipefail
-
           REQUIRED=(
-            index.html index.js index.wasm index.pck
-            manifest.webmanifest version.cfg
+            index.html
+            index.js
+            index.wasm
+            index.pck
+            manifest.webmanifest
+            version.cfg
+            icon_144x144.png
+            icon_180x180.png
+            icon_512x512.png
+            screenshots/desktop.png
+            screenshots/mobile.png
           )
-
           for f in "${REQUIRED[@]}"; do
             [[ -s "$BUILD_DIR/$f" ]] || {
               echo "Missing: $f"
@@ -224,51 +186,41 @@ PY
             }
           done
 
-      # ─────────────────────────────────────────────
       - name: Deploy (atomic swap)
         shell: bash
         run: |
           set -euo pipefail
-
           if [[ "$GITHUB_REF_NAME" == "main" ]]; then
             TARGET="$PRODUCTION"
           else
             TARGET="$STAGING"
           fi
-
           sync
           ln -sfn "$BUILD_DIR" "$TARGET.tmp"
           mv -Tf "$TARGET.tmp" "$TARGET"
-
           echo "TARGET=$TARGET" >> "$GITHUB_ENV"
 
-      # ─────────────────────────────────────────────
       - name: Validate deployed build
         shell: bash
         run: |
           set -euo pipefail
           [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]]
 
-      # ─────────────────────────────────────────────
       - name: Cleanup releases
         shell: bash
         run: |
           set -euo pipefail
-
           KEEP=10
           PROD="$(readlink -f "$PRODUCTION" 2>/dev/null || true)"
           STAGE="$(readlink -f "$STAGING" 2>/dev/null || true)"
-
           mapfile -t releases < <(
             find "$RELEASES" -mindepth 1 -maxdepth 1 -type d \
               -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2-
           )
-
           count=0
           for r in "${releases[@]}"; do
             [[ -z "$r" ]] && continue
             [[ "$r" == "$PROD" || "$r" == "$STAGE" ]] && continue
-
             ((count++))
             if (( count > KEEP )); then
               rm -rf -- "$r"
