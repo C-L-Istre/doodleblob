@@ -10,7 +10,7 @@ func _ready() -> void:
 	_refresh()
 
 
-func _refresh(_unused = null) -> void:
+func _refresh() -> void:
 	var active := QuestManager.get_active_quests()
 
 	if active.is_empty():
@@ -38,7 +38,7 @@ func _refresh(_unused = null) -> void:
 		]
 
 	objective_label.text = text
-	
+
 
 func _on_objective_advanced(
 	_quest_id: String,

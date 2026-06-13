@@ -102,7 +102,7 @@ func advance() -> void:
 
 
 # ── Input — choice navigation ──────────────────────────────────────────────────
- 
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return

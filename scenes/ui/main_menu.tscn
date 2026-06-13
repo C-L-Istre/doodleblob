@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://jjq7dwrgsl8r" path="res://scenes/ui/highscore_panel.tscn" id="6_q85j6"]
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="6_wb0q5"]
 [ext_resource type="PackedScene" uid="uid://rt5q532rnwcb" path="res://scenes/ui/help_panel.tscn" id="7_8g5eo"]
+[ext_resource type="Script" uid="uid://dek6xven5t25h" path="res://scripts/version_label.gd" id="7_btxxm"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_uhagc"]
 
@@ -103,6 +104,7 @@ layout_mode = 2
 
 [node name="SettingsPanel" parent="HBoxContainer" unique_id=1009959844 instance=ExtResource("4_btxxm")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 1
 
@@ -118,6 +120,20 @@ grow_vertical = 2
 mouse_filter = 2
 texture = SubResource("PlaceholderTexture2D_uhagc")
 expand_mode = 2
+
+[node name="VersionLabel" type="Label" parent="." unique_id=1646854188]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Version"
+script = ExtResource("7_btxxm")
 
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/PlayGameButton" to="." method="_on_play_game_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/MenuButtonContainer/LevelSelectButton" to="." method="_on_level_select_button_pressed"]
