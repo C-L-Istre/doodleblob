@@ -170,7 +170,7 @@ jobs:
       - name: Cleanup releases
         shell: bash
         run: |
-          set -x
+          set -euo pipefail
           KEEP=10
           PROD="$(readlink -f "$PRODUCTION" 2>/dev/null || true)"
           STAGE="$(readlink -f "$STAGING" 2>/dev/null || true)"
@@ -182,7 +182,7 @@ jobs:
           for r in "${releases[@]}"; do
             [[ -z "$r" ]] && continue
             [[ "$r" == "$PROD" || "$r" == "$STAGE" ]] && continue
-            ((count++))
+            ((++count))
             if (( count > KEEP )); then
               rm -rf -- "$r"
             fi
