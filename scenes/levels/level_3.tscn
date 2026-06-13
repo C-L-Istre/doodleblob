@@ -2181,7 +2181,6 @@ script = ExtResource("1_qi5uv")
 [node name="HUD" parent="ControlRoot" unique_id=1997154890 instance=ExtResource("2_t4txi")]
 
 [node name="TouchControls" parent="ControlRoot" unique_id=1524801131 instance=ExtResource("2_f6egh")]
-visible = false
 
 [node name="PauseMenu" parent="ControlRoot" unique_id=355687917 instance=ExtResource("3_t4txi")]
 unique_name_in_owner = true
