@@ -12,17 +12,18 @@ extends CanvasLayer
 #   SettingsPanel → Visibility : Hidden
 # ──────────────────────────────────────────────────────────────────────────────
 
-@onready var _settings_panel: PanelContainer  = %SettingsPanel
-@onready var _exit_button:    Button = %ExitButton
+@onready var settings_panel: PanelContainer  = %SettingsPanel
+@onready var quest_panel: PanelContainer = %QuestPanel
+@onready var exit_button:    Button = %ExitButton
 
 var _panels:      Array[CanvasItem]
 var _nav_buttons: Array[Button]
 
 
 func _ready() -> void:
-	_panels      = [%SettingsPanel]
-	_nav_buttons = [%ResumeButton, %SettingsButton, %MainMenuButton, %ExitButton]
-	_exit_button.visible = PlatformDetection.can_quit()
+	_panels      = [%SettingsPanel, %QuestPanel]
+	_nav_buttons = [%ResumeButton, %SettingsButton, %QuestButton, %MainMenuButton, %ExitButton]
+	exit_button.visible = PlatformDetection.can_quit()
 	# Wire styles now while the node is available; focus is grabbed in _pause()
 	# because grab_focus() has no effect on hidden nodes.
 	MenuNav.style(_nav_buttons)
@@ -59,7 +60,10 @@ func _on_resume_button_pressed() -> void:
 
 
 func _on_settings_button_pressed() -> void:
-	_toggle_panel(_settings_panel)
+	_toggle_panel(settings_panel)
+
+func _on_quest_button_pressed() -> void:
+	_toggle_panel(quest_panel)
 
 
 func _on_main_menu_button_pressed() -> void:
