@@ -65,29 +65,29 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-      
+
           CHANNEL="staging"
           [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
-      
+
           MAJOR=0
           MINOR=1
           PATCH=0
-      
+
           mkdir -p "$WORKSPACE/resources"
-          cat > "$WORKSPACE/resources/version.cfg" <<EOF
-          [version]
-          major=$MAJOR
-          minor=$MINOR
-          patch=$PATCH
-          
-          [channel]
-          name="$CHANNEL"
-          
-          [build]
-          commit="${GITHUB_SHA::7}"
-          id="$BUILD_ID"
-          date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          EOF
+          printf '%s\n' \
+            '[version]' \
+            "major=$MAJOR" \
+            "minor=$MINOR" \
+            "patch=$PATCH" \
+            '' \
+            '[channel]' \
+            "name=\"$CHANNEL\"" \
+            '' \
+            '[build]' \
+            "commit=\"${GITHUB_SHA::7}\"" \
+            "id=\"$BUILD_ID\"" \
+            "date=\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" \
+            > "$WORKSPACE/resources/version.cfg"
           
       - name: Clear Godot import cache
         shell: bash
@@ -113,12 +113,10 @@ jobs:
           GODOT_SILENCE_ROOT_WARNING: "1"
         run: |
           set -euo pipefail
-          BUILD_ID="$(date +%s)-${GITHUB_SHA::7}"
           BUILD_DIR="$RELEASES/$BUILD_ID"
           rm -rf "$BUILD_DIR"
           mkdir -p "$BUILD_DIR"
           mkdir -p "$RELEASES"
-          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
           echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
           "$GODOT" --headless \
             --path "$WORKSPACE" \
