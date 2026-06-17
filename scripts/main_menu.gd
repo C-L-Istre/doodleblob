@@ -73,6 +73,33 @@ func _on_level_select_button_pressed() -> void:
 	else:
 		level_select_panel.deselect_all()
 
+func _ready() -> void:
+	panels = [
+		select_level_panel,
+		highscore_panel,
+		help_panel,
+		settings_panel
+	]
+	play_game_button.pressed.connect(play_game)
+	select_level_button.pressed.connect(show_levels)
+	highscore_button.pressed.connect(view_highscore)
+	help_button.pressed.connect(view_help)
+	settings_button.pressed.connect(open_settings)
+	exit_game_button.pressed.connect(exit_game)
+
+	exit_game_button.visible = PlatformDetection.can_quit()
+
+	highscore_panel.text = "High Score: " + str(ScoreManager.high_score)
+
+	select_level_panel.item_selected.connect(on_level_selected)
+
+# -------------------------
+# Show only selected panel
+# -------------------------
+
+func show_only(node: CanvasItem) -> void:
+	for panel in panels:
+		panel.visible = false
 
 func _on_highscore_button_pressed() -> void:
 	_toggle_panel(highscore_panel)

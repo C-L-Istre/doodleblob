@@ -19,80 +19,34 @@ jobs:
   build:
     runs-on: [self-hosted, godot, proxmox]
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      GODOT:      /usr/local/bin/godot
+      WORKSPACE:  /var/lib/godot/workspace
+      RELEASES:   /var/www/godot/releases
+      CURRENT:    /var/www/godot/current
+      # Brand tokens — update here to keep manifest, meta tags, and theme in sync.
+      THEME_COLOR: "#00b700"
+      GAME_NAME:   "doodleblob"
+      GAME_URL:    "https://game.fretu.stream"
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Load config
         shell: bash
         run: |
           set -euo pipefail
-          python3 -c "import json; cfg=json.load(open('.github/config.json')); print('DOMAIN=' + cfg['domain']); print('THEME_COLOR=' + cfg['theme_color'])" >> "$GITHUB_ENV"
-          echo "GAME_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
-
-      - name: Set deployment metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-            echo "DEPLOY_URL=https://$DOMAIN" >> "$GITHUB_ENV"
-            echo "IS_STAGING=0" >> "$GITHUB_ENV"
-          else
-            echo "DEPLOY_URL=https://$DOMAIN/staging" >> "$GITHUB_ENV"
-            echo "IS_STAGING=1" >> "$GITHUB_ENV"
-          fi
-          
-      - name: Set build id
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "BUILD_ID=$(date +%s)-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-          
-      - name: Prepare workspace
-        shell: bash
-        run: |
-          set -euo pipefail
           rm -rf "$WORKSPACE"
           mkdir -p "$WORKSPACE"
-          rsync -a --delete \
+          rsync -a \
+            --delete \
             --exclude ".git" \
             --exclude ".godot" \
             --exclude ".import" \
             --exclude "addons/godot-git-plugin" \
             ./ "$WORKSPACE/"
-            
-      - name: Write version
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          CHANNEL="staging"
-          [[ "$GITHUB_REF_NAME" == "main" ]] && CHANNEL="release"
-
-          MAJOR=0
-          MINOR=1
-          PATCH=0
-
-          mkdir -p "$WORKSPACE/resources"
-          printf '%s\n' \
-            '[version]' \
-            "major=$MAJOR" \
-            "minor=$MINOR" \
-            "patch=$PATCH" \
-            '' \
-            '[channel]' \
-            "name=\"$CHANNEL\"" \
-            '' \
-            '[build]' \
-            "commit=\"${GITHUB_SHA::7}\"" \
-            "id=\"$BUILD_ID\"" \
-            "date=\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" \
-            > "$WORKSPACE/resources/version.cfg"
-          
-      - name: Clear Godot import cache
-        shell: bash
-        run: |
-          set -euo pipefail
           rm -rf "$WORKSPACE/.godot"
             
       - name: Import project
@@ -124,69 +78,185 @@ jobs:
             "$BUILD_DIR/index.html"
           sync
 
-      - name: Copy PWA assets
+      - name: Remove Godot-generated manifest
         shell: bash
         run: |
           set -euo pipefail
-          cp "$WORKSPACE/.github/PWA/"*.png "$BUILD_DIR/" || true
+          # CI generates its own manifest.webmanifest below with full Lighthouse
+          # compliance. Godot's generated index.manifest.json is removed to
+          # prevent conflicts. Only present when PWA is enabled in export preset.
+          rm -f "$BUILD_DIR/index.manifest.json"
+
+      - name: Copy CI-owned PWA assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "$WORKSPACE/pwa/icon_144x144.png"  "$BUILD_DIR/icon_144x144.png"
+          cp "$WORKSPACE/pwa/icon_180x180.png"  "$BUILD_DIR/icon_180x180.png"
+          cp "$WORKSPACE/pwa/icon_512x512.png"  "$BUILD_DIR/icon_512x512.png"
           mkdir -p "$BUILD_DIR/screenshots"
-          cp "$WORKSPACE/.github/PWA/desktop.png" "$BUILD_DIR/screenshots/"
-          cp "$WORKSPACE/.github/PWA/mobile.png" "$BUILD_DIR/screenshots/"
+          cp "$WORKSPACE/pwa/desktop.png"       "$BUILD_DIR/screenshots/desktop.png"
+          cp "$WORKSPACE/pwa/mobile.png"        "$BUILD_DIR/screenshots/mobile.png"
 
       - name: Generate manifest
         shell: bash
         run: |
           set -euo pipefail
-      
-          printf '%s\n' \
-            '{' \
-            "  \"name\": \"$GAME_NAME\"," \
-            "  \"short_name\": \"$GAME_NAME\"," \
-            '  "start_url": "/index.html",' \
-            '  "scope": "/",' \
-            '  "display": "standalone",' \
-            "  \"theme_color\": \"$THEME_COLOR\"," \
-            "  \"background_color\": \"$THEME_COLOR\"" \
-            '}' \
-            > "$BUILD_DIR/manifest.webmanifest"
+          python3 .github/scripts/generate_manifest.py
 
-      - name: Deploy (atomic swap)
+      - name: Generate robots.txt
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-            TARGET="$PRODUCTION"
+          printf 'User-agent: *\nAllow: /\n' > "$BUILD_DIR/robots.txt"
+
+      - name: Patch index.html
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/patch_index.py "$BUILD_DIR/index.html"
+
+      - name: Validate output
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REQUIRED_FILES=(
+            index.html
+            index.js
+            index.wasm
+            index.pck
+            manifest.webmanifest
+            robots.txt
+            icon_144x144.png
+            icon_180x180.png
+            icon_512x512.png
+            screenshots/desktop.png
+            screenshots/mobile.png
+          )
+
+          PASS=true
+
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [[ ! -f "$BUILD_DIR/$file" ]]; then
+              echo "MISSING: $file"
+              PASS=false
+            else
+              SIZE="$(stat -c%s "$BUILD_DIR/$file")"
+              echo "OK: $file (${SIZE} bytes)"
+            fi
+          done
+
+          if python3 -c \
+            "import json,sys; json.load(open('$BUILD_DIR/manifest.webmanifest'))" 2>&1; then
+            echo "OK: manifest.webmanifest is valid JSON"
           else
-            TARGET="$STAGING"
+            echo "ERROR: manifest.webmanifest is not valid JSON"
+            PASS=false
           fi
-          sync
-          ln -sfn "$BUILD_DIR" "$TARGET.tmp"
-          mv -Tf "$TARGET.tmp" "$TARGET"
-          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
 
-      - name: Validate deployed build
+          if grep -q 'manifest.webmanifest' "$BUILD_DIR/index.html"; then
+            echo "OK: manifest link present in index.html"
+          else
+            echo "ERROR: manifest link missing from index.html"
+            PASS=false
+          fi
+
+          if grep -q 'user-scalable=no' "$BUILD_DIR/index.html"; then
+            echo "ERROR: user-scalable=no still present — Lighthouse will deduct points"
+            PASS=false
+          else
+            echo "OK: viewport does not restrict zoom"
+          fi
+
+          if python3 -c \
+            "import json; m=json.load(open('$BUILD_DIR/manifest.webmanifest')); \
+             assert any('maskable' in i.get('purpose','') for i in m['icons'])" 2>&1; then
+            echo "OK: maskable icon declared in manifest"
+          else
+            echo "ERROR: no maskable icon in manifest — Lighthouse installability will fail"
+            PASS=false
+          fi
+
+          if ! $PASS; then
+            echo ""
+            echo "Validation failed — removing incomplete build"
+            rm -rf "$BUILD_DIR"
+            exit 1
+          fi
+
+          echo ""
+          echo "All checks passed"
+          echo ""
+          echo "Final build contents:"
+          find "$BUILD_DIR" -maxdepth 2 -type f | sort
+
+      - name: Deploy
         shell: bash
         run: |
           set -euo pipefail
-          [[ "$(readlink -f "$TARGET")" == "$BUILD_DIR" ]]
+          ln -sfn "$BUILD_DIR" "$CURRENT"
+          echo "Deployed: $BUILD_DIR -> $CURRENT"
 
-      - name: Cleanup releases
+      - name: Cleanup old releases
         shell: bash
         run: |
           set -euo pipefail
           KEEP=10
-          PROD="$(readlink -f "$PRODUCTION" 2>/dev/null || true)"
-          STAGE="$(readlink -f "$STAGING" 2>/dev/null || true)"
+
+          CURRENT_REAL=""
+          if [[ -L "$CURRENT" ]]; then
+            CURRENT_REAL="$(readlink -f "$CURRENT" || true)"
+          fi
+
           mapfile -t releases < <(
-            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d \
-              -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2-
+            find "$RELEASES" -mindepth 1 -maxdepth 1 -type d | sort -r
           )
           count=0
-          for r in "${releases[@]}"; do
-            [[ -z "$r" ]] && continue
-            [[ "$r" == "$PROD" || "$r" == "$STAGE" ]] && continue
-            ((++count))
-            if (( count > KEEP )); then
-              rm -rf -- "$r"
+          for release in "${releases[@]}"; do
+            if [[ -n "$CURRENT_REAL" ]] && \
+               [[ "$(readlink -f "$release")" == "$CURRENT_REAL" ]]; then
+              continue
+            fi
+            count=$((count + 1))
+            if [[ "$count" -gt "$KEEP" ]]; then
+              echo "Removing old release: $release"
+              rm -rf "$release"
             fi
           done
+
+      - name: Show deployment info
+        shell: bash
+        run: |
+          echo "Build ID:  $BUILD_ID"
+          echo "Build Dir: $BUILD_DIR"
+          echo "Current:   $(readlink -f "$CURRENT")"
+
+      - name: Notify on failure
+        if: failure()
+        shell: bash
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          GH_REPO:    ${{ github.repository }}
+          GH_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          GH_SHA:     ${{ github.sha }}
+          GH_ACTOR:   ${{ github.actor }}
+        run: |
+          if [[ -z "${SLACK_WEBHOOK:-}" ]]; then
+            echo "SLACK_WEBHOOK not set — skipping failure notification"
+            exit 0
+          fi
+          curl -fsSL -X POST "$SLACK_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"text\": \"*Godot CI build failed* :red_circle:\",
+              \"attachments\": [{
+                \"color\": \"danger\",
+                \"fields\": [
+                  {\"title\": \"Repository\",  \"value\": \"$GH_REPO\",      \"short\": true},
+                  {\"title\": \"Commit\",       \"value\": \"${GH_SHA::7}\",  \"short\": true},
+                  {\"title\": \"Triggered by\", \"value\": \"$GH_ACTOR\",    \"short\": true},
+                  {\"title\": \"Run\",          \"value\": \"$GH_RUN_URL\",   \"short\": false}
+                ]
+              }]
+            }"

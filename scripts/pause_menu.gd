@@ -1,24 +1,10 @@
 extends CanvasLayer
 
-# ──────────────────────────────────────────────────────────────────────────────
-# PauseMenu
-#
-# In-game pause overlay. toggle_pause() is the public entry point — called
-# from control_root.gd when the "pause" input action fires.
-#
-# Scene Inspector setup:
-#   Node → Process Mode : Always
-#   Visibility          : Hidden
-#   SettingsPanel → Visibility : Hidden
-# ──────────────────────────────────────────────────────────────────────────────
-
-@onready var settings_panel: PanelContainer  = %SettingsPanel
-@onready var quest_panel: PanelContainer = %QuestPanel
-@onready var exit_button:    Button = %ExitButton
-
-var _panels:      Array[CanvasItem]
-var _nav_buttons: Array[Button]
-
+@onready var resume_button: Button      = %ResumeButton
+@onready var settings_button: Button    = %SettingsButton
+@onready var settings_panel: Panel      = %SettingsPanel
+@onready var main_menu_button: Button   = %MainMenuButton
+@onready var exit_button: Button        = %ExitButton
 
 func _ready() -> void:
 	_panels      = [%SettingsPanel, %QuestPanel]
@@ -29,22 +15,14 @@ func _ready() -> void:
 	MenuNav.style(_nav_buttons)
 
 
-# ── Panel management ──────────────────────────────────────────────────────────
+	resume_button.pressed.connect(_on_resume_pressed)
+	settings_button.pressed.connect(_on_settings_pressed)
+	main_menu_button.pressed.connect(_on_main_menu_pressed)
+	exit_button.pressed.connect(_on_exit_pressed)
 
-func _close_all() -> void:
-	for panel in _panels:
-		panel.visible = false
+	exit_button.visible = PlatformDetection.can_quit()
 
-
-func _toggle_panel(node: CanvasItem) -> void:
-	if node.visible:
-		_close_all()
-	else:
-		_close_all()
-		node.visible = true
-
-
-# ── Public API ────────────────────────────────────────────────────────────────
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func toggle_pause() -> void:
 	if get_tree().paused:
@@ -53,40 +31,20 @@ func toggle_pause() -> void:
 		_pause()
 
 
-# ── Button handlers ───────────────────────────────────────────────────────────
+func _resume() -> void:
+	get_tree().paused = false
+	hide()
+	settings_panel.hide()
 
 func _on_resume_button_pressed() -> void:
 	_resume()
 
+func _on_settings_pressed() -> void:
+	settings_panel.show()
 
-func _on_settings_button_pressed() -> void:
-	_toggle_panel(settings_panel)
-
-func _on_quest_button_pressed() -> void:
-	_toggle_panel(quest_panel)
-
-
-func _on_main_menu_button_pressed() -> void:
-	HealthManager.reset_game()
-	ScoreManager.finish_level()
-	ScoreManager.reset_score()
-	QuestManager.reset()
+func _on_main_menu_pressed() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
 
-
-func _on_exit_button_pressed() -> void:
+func _on_exit_pressed() -> void:
 	PlatformDetection.exit_game()
-
-
-# ── Private ───────────────────────────────────────────────────────────────────
-
-func _pause() -> void:
-	get_tree().paused = true
-	show()
-	MenuNav.focus_first(_nav_buttons)
-
-
-func _resume() -> void:
-	get_tree().paused = false
-	hide()

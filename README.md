@@ -1063,58 +1063,35 @@ If either header appears twice, Caddy is also setting it — re-read the COOP/CO
 Check that the staging symlink exists and points somewhere valid:
 
 ```bash
-pct exec <CTID> -- readlink -f /var/www/godot/staging
+pct exec <CTID> -- env \
+  RUNNER_TOKEN="<FRESH_TOKEN>" \
+  REPO_URL="https://github.com/<GIT_USER>/<REPO>" \
+  CTID="<CTID>" \
+  bash -s << 'EOF'
+RUNNER_DIR="/home/godot/runner"
+
+runuser -u godot -- bash -lc "
+  cd '$RUNNER_DIR'
+  ./config.sh --unattended \
+    --url '$REPO_URL' \
+    --token '$RUNNER_TOKEN' \
+    --name 'gd-$CTID' \
+    --labels 'proxmox,gd-$CTID,godot' \
+    --work _work \
+    --runasservice \
+    --replace
+"
+cd '$RUNNER_DIR'
+./svc.sh install godot
+./svc.sh start
+EOF
 ```
 
-If it points to the initial placeholder (`…/releases/staging/initial`) and that directory
-is missing (possible after a cleanup pass), re-run `godot-deploy.sh` to recreate it, or
-manually push a build to the `staging` branch.
+---
 
-### Export fails — "No export template found"
+## Notes
 
-Templates are installed to `/home/godot/.local/share/godot/export_templates/$GODOT_VERSION/`.
-The export step runs with `HOME=/home/godot`. Verify:
-
-```bash
-pct exec <CTID> -- ls /home/godot/.local/share/godot/export_templates/
-```
-
-If the directory is empty or missing, re-run `godot-deploy.sh` (or just the bootstrap
-portion) with the correct `GODOT_VERSION` and updated checksums.
-
-### Runner not picking up jobs
-
-```bash
-pct exec <CTID> -- systemctl status 'actions.runner.*.service'
-```
-
-If the unit is stopped, check whether the Godot binary is on the runner's PATH:
-
-```bash
-pct exec <CTID> -- sudo -u godot bash -c 'echo $PATH; which godot'
-```
-
-The provisioning script writes `/etc/systemd/system/actions.runner.*.service.d/path.conf`
-to inject `/usr/local/bin` into the unit's `PATH`. If that file is missing, recreate it
-and reload systemd.
-
-### Import step takes very long or hangs
-
-The first import after a clean workspace can take several minutes for large projects
-(shader compilation). Subsequent runs are fast because the workspace is not wiped between
-builds — only modified files are rsynced. If the import hangs indefinitely, check
-`GODOT_SILENCE_ROOT_WARNING=1` is set (missing it causes Godot to block waiting for
-stdin in some configurations).
-
-### Concurrent push cancels in-progress deploy
-
-This is intentional — see the `concurrency` block in `deploy.yml`. If you need
-independent staging and production pipelines, split `concurrency.group` to
-`godot-web-deploy-${{ github.ref_name }}`.
-
-### Audio doesn't play on first load (no error in console)
-
-The audio unlock snippet in `index.html` should handle this by resuming the `AudioContext`
-on the first click, touch, or keydown. If it still doesn't work, check that the
-`coi-serviceworker.js` in `.github/PWA/` is being served (it enables SharedArrayBuffer
-which some browsers require for Godot's audio pipeline).
+- The game is served at `http://<CONTAINER_IP>:8080`
+- Builds are triggered automatically on every push to `main` or `master`
+- The 10 most recent builds are retained on disk; older ones are deleted automatically
+- Required browser headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`) are set by Caddy and are verified on each deploy — these are mandatory for Godot's multithreaded web export
