@@ -36,8 +36,7 @@ func _ready() -> void:
 	level_select_panel.level_selected.connect(_on_level_selected)
 	level_select_panel.panel_closed.connect(_on_level_select_closed)
 	_close_all()
-
-
+	
 # ── Panel management ──────────────────────────────────────────────────────────
 
 func _close_all() -> void:

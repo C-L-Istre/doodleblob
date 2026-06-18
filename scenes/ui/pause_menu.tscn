@@ -62,35 +62,35 @@ theme_override_constants/margin_bottom = 10
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ResumeButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=1499615217]
+[node name="ResumeButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=1499615217 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Resume"
 
-[node name="QuestButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=69721724]
+[node name="QuestButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=69721724 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Quest Log"
 
-[node name="SettingsButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=2072559907]
+[node name="SettingsButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=2072559907 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Settings"
 
-[node name="MainMenuButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=656031257]
+[node name="MainMenuButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=656031257 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_0bnpd")
 text = "Main Menu"
 
-[node name="ExitButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=412490237]
+[node name="ExitButton" type="Button" parent="PausePanel/VBoxContainer/HBoxContainer/MarginContainer/ButtonContainer" unique_id=412490237 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2

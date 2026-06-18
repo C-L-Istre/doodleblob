@@ -4,13 +4,13 @@
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="1_ww1po"]
 
 [node name="LevelSelectPanel" type="PanelContainer" unique_id=1944754846]
-custom_minimum_size = Vector2(400, 160)
+custom_minimum_size = Vector2(400, 0)
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -80.0
+offset_top = -4.0
 offset_right = 400.0
-offset_bottom = 80.0
+offset_bottom = 4.0
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -19,6 +19,7 @@ level_paths = Array[String](["res://scenes/levels/level_1.tscn", "res://scenes/l
 
 [node name="LevelList" type="ItemList" parent="." unique_id=1446043780]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 180)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6

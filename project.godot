@@ -26,6 +26,7 @@ QuestManager="*uid://c21yexodo1vqp"
 HealthManager="*uid://bs10dpdaybt8"
 ScoreManager="*uid://f26k77trdccc"
 Music="*uid://cxq1ikg7pavn7"
+UIManager="*uid://cxa4skr35225m"
 
 [display]
 
@@ -44,6 +45,7 @@ version_control/autoload_on_startup=true
 [global_group]
 
 player=""
+ui_focus_lockable="lock input to keep focus"
 
 [input]
 

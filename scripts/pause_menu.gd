@@ -28,7 +28,6 @@ func _ready() -> void:
 	# because grab_focus() has no effect on hidden nodes.
 	MenuNav.style(_nav_buttons)
 
-
 # ── Panel management ──────────────────────────────────────────────────────────
 
 func _close_all() -> void:

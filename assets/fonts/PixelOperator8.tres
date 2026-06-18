@@ -4,3 +4,5 @@
 
 [resource]
 default_font = ExtResource("1_0cdhf")
+AcceptDialog/font_sizes/title_font_size = 16
+Label/font_sizes/font_size = 16

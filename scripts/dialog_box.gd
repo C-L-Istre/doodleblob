@@ -103,7 +103,10 @@ func advance() -> void:
 
 # ── Input — choice navigation ──────────────────────────────────────────────────
 
+
 func _unhandled_input(event: InputEvent) -> void:
+	if not UIManager.is_menu():
+		return
 	if not visible:
 		return
 

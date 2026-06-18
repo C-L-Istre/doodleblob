@@ -60,6 +60,8 @@ func _ready() -> void:
 # ── Input ─────────────────────────────────────────────────────────────────────
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not UIManager.is_menu():
+		return
 	# Only consume ui_accept when the list actually has keyboard focus so this
 	# handler does not interfere with other ui_accept consumers (e.g. buttons).
 	if not level_list.has_focus():

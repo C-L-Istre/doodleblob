@@ -26,6 +26,10 @@ func _on_body_entered(body: Node) -> void:
 
 
 func _change_level() -> void:
+	# Report this level's time/score to ScoreManager before it's freed.
+	# The level root is always the current scene, and always has level.gd.
+	get_tree().current_scene.record_progress()
+
 	ScoreManager.finish_level()
 	if next_level_path.is_empty():
 		get_tree().change_scene_to_file("res://scenes/ui/game_end.tscn")

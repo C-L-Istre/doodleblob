@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bc3fjhxwi45cl" path="res://scripts/game_end.gd" id="1_s8urn"]
 [ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_6b57o"]
+[ext_resource type="Theme" uid="uid://gyfkm6q0rnyg" path="res://assets/fonts/PixelOperator8.tres" id="2_ddffr"]
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="3_ddffr"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_s8urn"]
@@ -26,6 +27,38 @@ grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 
+[node name="HighScoreAcceptDialog" type="AcceptDialog" parent="CenterContainer" unique_id=376800949]
+unique_name_in_owner = true
+transparent_bg = true
+oversampling_override = 1.0
+title = "New High Score!"
+initial_position = 2
+size = Vector2i(256, 192)
+unresizable = true
+always_on_top = true
+transparent = true
+popup_window = true
+min_size = Vector2i(0, 192)
+theme = ExtResource("2_ddffr")
+ok_button_text = "Accept"
+dialog_autowrap = true
+
+[node name="UsernameLineEdit" type="LineEdit" parent="CenterContainer/HighScoreAcceptDialog" unique_id=826522187]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 64)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_top = 8.0
+offset_right = 120.0
+offset_bottom = 150.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("3_ddffr")
+placeholder_text = "Enter Your Name"
+alignment = 1
+max_length = 20
+
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=593800724]
 layout_mode = 2
 
@@ -41,21 +74,21 @@ text = "Game End"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=477483]
+[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=477483 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_ddffr")
 text = "Play Again"
 
-[node name="MainMenuButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=220326486]
+[node name="MainMenuButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=220326486 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_ddffr")
 text = "Main Menu"
 
-[node name="ExitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1177768792]
+[node name="ExitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1177768792 groups=["ui_focus_lockable"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
@@ -75,6 +108,7 @@ grow_vertical = 2
 mouse_filter = 2
 texture = SubResource("PlaceholderTexture2D_s8urn")
 
+[connection signal="text_submitted" from="CenterContainer/HighScoreAcceptDialog/UsernameLineEdit" to="." method="_on_username_line_edit_text_submitted"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

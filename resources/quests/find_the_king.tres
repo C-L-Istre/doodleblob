@@ -20,5 +20,6 @@ script = ExtResource("2_7jci1")
 quest_id = "find_the_king"
 title = "Find the King"
 description = "He's the King, so I should probably find him."
+reward_points = 50
 objectives = Array[ExtResource("1_nqw6i")]([SubResource("Resource_nqw6i"), SubResource("Resource_7jci1")])
 metadata/_custom_type_script = "uid://b31nuriwlj1io"

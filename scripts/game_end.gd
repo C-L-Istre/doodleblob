@@ -19,7 +19,8 @@ extends CanvasLayer
 
 @onready var win_lose_label: Label = %WinLoseLabel
 @onready var exit_button: Button = %ExitButton
-
+@onready var high_score_accept: AcceptDialog = %HighScoreAcceptDialog
+@onready var username_line_edit: LineEdit = %UsernameLineEdit
 
 func _ready() -> void:
 	exit_button.visible = PlatformDetection.can_quit()
@@ -30,11 +31,49 @@ func _ready() -> void:
 		win_lose_label.text = "Game Won"
 	else:
 		win_lose_label.text = "Game Over"
+		
+	var qualifies := ScoreManager.qualifies_for_leaderboard(
+		ScoreManager.current_score
+	)
+	
+	if qualifies:
+		high_score_accept.popup_centered()
+
+		await get_tree().process_frame
+		await get_tree().process_frame
+
+		UIManager.set_state(UIManager.UIState.TEXT_INPUT)
+
+		call_deferred("_focus_username")
+
+func _input(event: InputEvent) -> void:
+
+	# Stop held navigation from stealing focus immediately
+	if event.is_action("ui_right") \
+	or event.is_action("ui_left") \
+	or event.is_action("ui_up") \
+	or event.is_action("ui_down"):
+
+		get_viewport().set_input_as_handled()
+
+func _focus_username() -> void:
+	username_line_edit.grab_focus()
+	username_line_edit.caret_column = username_line_edit.text.length()
+
+func _submit_leaderboard_score() -> void:
+	if ScoreManager.qualifies_for_leaderboard(
+		ScoreManager.current_score
+	):
+		ScoreManager.submit_score(username_line_edit.text)
+
+func _on_username_line_edit_text_submitted(_new_text: String) -> void:
+	high_score_accept.hide()
+	_submit_leaderboard_score()
+
+	UIManager.set_state(UIManager.UIState.MENU)
 
 func _on_play_button_pressed() -> void:
-	if restart_scene.is_empty():
-		push_error("GameEnd: restart_scene is not set — assign a level path in the Inspector.")
-		return
+	_submit_leaderboard_score()
 	ScoreManager.finish_level()
 	ScoreManager.reset_score()
 	HealthManager.reset_game()
@@ -43,6 +82,7 @@ func _on_play_button_pressed() -> void:
 
 
 func _on_main_menu_button_pressed() -> void:
+	_submit_leaderboard_score()
 	ScoreManager.finish_level()
 	ScoreManager.reset_score()
 	HealthManager.reset_game()
@@ -51,4 +91,5 @@ func _on_main_menu_button_pressed() -> void:
 
 
 func _on_exit_button_pressed() -> void:
+	_submit_leaderboard_score()
 	PlatformDetection.exit_game()

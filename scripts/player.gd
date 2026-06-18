@@ -105,6 +105,8 @@ func _interact() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if UIManager.is_text_input() or UIManager.is_menu():
+		return
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 

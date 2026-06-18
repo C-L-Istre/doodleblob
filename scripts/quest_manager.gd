@@ -37,7 +37,14 @@ extends Node
 # ── Win condition ─────────────────────────────────────────────────────────────
 #
 #   QuestManager.all_complete() returns true when every registered quest is
-#   done. Use this in a level exit trigger or the future game_end script.
+#   done. Used by GameEnd (win_quest_id) and final-level exits.
+#
+# ── Score rewards ─────────────────────────────────────────────────────────────
+#
+#   Set Quest.reward_points to a non-zero value to award ScoreManager points
+#   the moment a quest completes -- whether via objective auto-completion or
+#   an explicit "complete:" event. This applies even for quests with no
+#   dialog at all (see level.gd's "collect all coins" example).
 # ──────────────────────────────────────────────────────────────────────────────
 
 signal quest_started(quest_id: String)
@@ -145,6 +152,11 @@ func complete_quest(quest_id: String) -> void:
 		push_warning("QuestManager.complete_quest: unknown quest '%s'" % quest_id)
 		return
 	_states[quest_id]["state"] = QuestState.COMPLETED
+
+	var quest: Quest = _registry.get(quest_id)
+	if quest and quest.reward_points != 0:
+		ScoreManager.add_points(quest.reward_points)
+
 	quest_completed.emit(quest_id)
 
 

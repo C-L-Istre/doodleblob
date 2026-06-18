@@ -2,25 +2,34 @@
 
 [ext_resource type="FontFile" uid="uid://6lk7bsvsptai" path="res://assets/fonts/PixelOperator8.ttf" id="1_ad08j"]
 [ext_resource type="Script" uid="uid://dlww58oe7lnnu" path="res://scripts/highscore_panel.gd" id="1_fjoho"]
+[ext_resource type="FontFile" uid="uid://3hj5k01aix62" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_l1bu4"]
 
 [node name="HighscorePanel" type="PanelContainer" unique_id=762392332]
-custom_minimum_size = Vector2(400, 160)
+custom_minimum_size = Vector2(400, 300)
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -80.0
-offset_right = 360.0
-offset_bottom = 80.0
+offset_top = -138.0
+offset_right = 240.0
+offset_bottom = 138.0
 grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 script = ExtResource("1_fjoho")
 
-[node name="HighscoreLabel" type="Label" parent="." unique_id=1466847742]
-unique_name_in_owner = true
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1020294031]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBoxContainer" unique_id=2004957422]
+custom_minimum_size = Vector2(360, 40)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_fonts/font = ExtResource("1_ad08j")
-text = "Itsada high score! "
+theme_override_fonts/font = ExtResource("2_l1bu4")
+text = "High Scores"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="HighscoreLabel" type="Label" parent="VBoxContainer" unique_id=1466847742]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("1_ad08j")
+text = "Its'ada high score(s)! "

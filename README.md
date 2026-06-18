@@ -590,20 +590,40 @@ PlatformDetection.exit_game()      # platform-aware quit -- no-op on web/mobile
 
 **`ScoreManager`** (`scripts/score_manager.gd`)
 
-Tracks the current session score and all-time high score. High score persists between
-sessions in `user://save.cfg`. Connect to `score_changed` to drive HUD labels reactively.
+Tracks the current session score, total elapsed time, and a local top-10 leaderboard of
+`{name, score}` entries, persisted in `user://save.cfg`. `high_score` is always
+`leaderboard[0].score` (0 if empty) -- there is no separately-tracked high score.
+Connect to `score_changed` to drive HUD labels reactively.
 
 ```gdscript
-ScoreManager.add_point()        # increment current score by 1
-ScoreManager.finish_level()     # save high score if current score beats it
-ScoreManager.reset_score()      # reset current score to 0
-ScoreManager.current_score      # int (read)
-ScoreManager.high_score         # int (read)
-# Signals: score_changed(new_score: int), high_score_changed(new_high: int)
+ScoreManager.add_point()                    # increment current score by 1
+ScoreManager.add_points(amount)             # add a lump sum (quest rewards)
+ScoreManager.reset_score()                  # reset score, total_time, level_records
+ScoreManager.qualifies_for_leaderboard(s)   # -> bool; true if score s would make top 10
+ScoreManager.submit_score(player_name)      # -> int rank (1-based), or -1 if it didn't qualify
+ScoreManager.record_level(id, time, score)  # called by level.gd via record_progress()
+ScoreManager.format_time(seconds)           # -> "MM:SS" string
+ScoreManager.current_score                  # int (read)
+ScoreManager.high_score                     # int (read) -- top leaderboard entry's score
+ScoreManager.total_time                     # float seconds (read), sum across exited levels
+ScoreManager.level_records                  # Dictionary (read), level_id -> {time, score}
+ScoreManager.leaderboard                    # Array[Dictionary] (read), sorted descending
+# Signals: score_changed(new_score), high_score_changed(new_high), leaderboard_changed
 ```
 
+`finish_level()` is retained as a no-op for existing call sites but does not touch the
+leaderboard -- submitting a score requires a player name, so call `submit_score()` from
+the end-of-run screen (`game_end.gd`) once the player has entered one. A pre-leaderboard
+save (single `high_score`, no name) is migrated into a one-entry leaderboard on first
+load.
+
+`total_time` and `level_records` are populated per-level by `level.gd` -- see the
+Per-Level Timer and Coins notes under `level.gd` below. `level_records` is in-memory
+only (not persisted); it's a foundation for a future per-level best-time/best-score
+display.
+
 To remove the score system: delete `score_manager.gd`, remove it from `[autoload]`, and
-remove `ScoreManager.add_point()` calls from pickup scripts.
+remove `ScoreManager.add_point()` / `add_points()` calls from pickup and quest scripts.
 
 ---
 
@@ -656,6 +676,11 @@ QuestManager.check_condition(cond: String)   # "active:id", "complete:id", "inac
 ```
 
 Event and condition string formats are fully documented in `quest_manager.gd`.
+
+**Score rewards:** set `Quest.reward_points` to a non-zero value to award
+`ScoreManager.add_points()` the moment a quest completes -- via objective
+auto-completion or an explicit `"complete:"` event, dialog-driven or not (see the
+"collect all coins" example under `level.gd` below).
 
 ---
 
@@ -720,9 +745,14 @@ the Inspector -- no code changes required.
 
 **`scripts/highscore_panel.gd`** / **`scenes/ui/highscore_panel.tscn`**
 
-Embedded panel inside the main menu. Displays the high score from `ScoreManager` and
-stays in sync via the `high_score_changed` signal. No external calls needed -- the
-panel self-initialises and self-updates.
+Embedded panel inside the main menu. Displays the local leaderboard as multi-line text
+via the existing `%HighscoreLabel`: `"1. Name — Score"` per entry, one per line. Stays
+in sync via the `leaderboard_changed` signal. No external calls needed -- the panel
+self-initialises and self-updates.
+
+`%HighscoreLabel` needs Autowrap enabled and enough vertical room for `MAX_ENTRIES` (10)
+lines -- adjust `custom_minimum_size` in the editor if entries get clipped. Renaming the
+node to `%LeaderboardLabel` is optional and purely cosmetic.
 
 ---
 
@@ -839,7 +869,9 @@ hazards. No group check -- any node implementing `die()` is affected.
 
 Transitions to `next_level_path` when the player enters. Leave `next_level_path` empty
 on the final level -- the player is sent to `game_end.tscn` automatically and the
-`win_quest_id` on that scene determines the win/lose headline.
+`win_quest_id` on that scene determines the win/lose headline. Calls
+`get_tree().current_scene.record_progress()` before changing scenes, reporting this
+level's time and score delta to `ScoreManager` (see `level.gd`).
 
 ---
 
@@ -850,11 +882,31 @@ Attach to each level's root node. Registers `Quest` resources with `QuestManager
 
 ```
 Inspector setup per level:
-  quests -- drag .tres Quest resources here; leave empty for levels with no quest content
+  quests   -- drag .tres Quest resources here; leave empty for levels with no quest content
+  level_id -- optional display name for ScoreManager.level_records; defaults to the
+              scene filename (e.g. "level_1") if left empty
 ```
 
-Register on levels that contain quest-related NPCs or a final exit that checks quest
-completion. Skip pure-traversal levels -- `QuestManager` carries state between scenes.
+Register quests on levels that contain quest-related NPCs or a final exit that checks
+quest completion. Skip pure-traversal levels -- `QuestManager` carries state between
+scenes.
+
+**Per-level timer:** elapsed time accumulates in `_process()` from the moment the level
+loads. `level_exit.gd` calls `record_progress()` on a normal exit, which adds this
+level's time to `ScoreManager.total_time` and stores `{time, score}` under `level_id` in
+`ScoreManager.level_records`. If the player dies and the level reloads, the timer
+restarts from zero for that attempt -- only a completed exit is recorded. Coins and
+score earned do *not* carry over if the level reloads on death, since `_ready()` runs
+again and re-snapshots the starting score.
+
+**Per-level coins:** every node in the `"coins"` group is counted in `_ready()` and its
+`collected` signal connected. When `_collected_coins` reaches `_total_coins`,
+`QuestManager.advance_objective("collect_all_coins", "all_coins")` fires. Levels with no
+coins in the group simply never trigger this (total stays 0).
+
+To award points for a full coin sweep, register a `Quest` with `quest_id =
+"collect_all_coins"`, `reward_points = 10`, and one objective `all_coins` (`required_count
+= 1`) on any level that has coins -- registration is idempotent, same as `find_the_king`.
 
 ---
 
@@ -868,9 +920,11 @@ method. `queue_free()`s itself after falling past `despawn_depth`.
 
 **`scripts/coin.gd`** -- `Area2D`
 
-Calls `ScoreManager.add_point()` on body contact, then plays the `"pickup"` animation.
-The `AnimationPlayer` should call `queue_free()` at the end of that animation via an
-Animation Track call.
+Calls `ScoreManager.add_point()` and emits `collected` on body contact, then plays the
+`"pickup"` animation. The `AnimationPlayer` should call `queue_free()` at the end of
+that animation via an Animation Track call. Must be in the `"coins"` group (set on
+`coin.tscn` in the editor, Node > Groups) for `level.gd` to count it toward the
+"collect all coins" total.
 
 ---
 
